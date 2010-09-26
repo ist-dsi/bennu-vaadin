@@ -1,0 +1,425 @@
+@import url(../reindeer/styles.css);
+
+.v-generated-body,.v-app {
+	background: url(images/back01.gif);
+}
+
+div,p,form,h1,h2,h3,h4,ul,li {
+	margin: 0;
+	padding: 0;
+}
+
+/*---------------------------------------
+       Layout
+---------------------------------------*/
+#container {
+	width: 955px;
+	position: relative;
+	margin: 0 auto 0 auto;
+	padding: 25px 0 0 0;
+}
+
+#header {
+	background: url (   images/logo_ist.png ) no-repeat scroll left top;
+	padding: 5px 0 5px 0;
+	height: 90px;
+	background: #333;
+	border-top: 3px solid #555;
+	position: relative;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+}
+
+#header p {
+	margin: 0;
+}
+
+#logo {
+	padding: 0 0 20px 25px;
+	width: 500px;
+	height: 1%;
+}
+
+#logo img {
+	padding: 0 0 10px 0; /*margin: 12px 12px 0 0;*/
+	float: left;
+}
+
+#logo #text {
+	
+}
+
+#logo #text h1 {
+	color: #fff;
+}
+
+#logo #text #subtitle {
+	font-size: 11px;
+	color: #b6d7e8;
+}
+
+#supportnav {
+	position: absolute;
+	top: 20px;
+	right: 25px;
+	color: #fff;
+}
+
+#supportnav a {
+	color: #9fd8ff;
+	border-bottom: 1px solid #9fd8ff;
+}
+
+#mainnav {
+	width: 955px;
+}
+
+#mainnav .v-menubar {
+	padding: 0 17px 0 17px;
+}
+
+#container2 {
+	
+}
+
+#container3 {
+	
+}
+
+#content {
+	
+}
+
+#footer {
+	
+}
+
+#content {
+	background: #fff;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+}
+
+#text {
+	padding: 20px 0 0 0;
+}
+
+#login {
+	padding: 0 25px 0 0;
+}
+
+#headerforms {
+	padding: 0 25px 0 0;
+}
+
+#mainnav {
+	
+}
+
+#secondarynav {
+	height: 40px;
+}
+
+#container2 {
+	
+}
+
+#container3 {
+	
+}
+
+#content {
+	padding: 10px 25px 20px 25px;
+}
+
+#footer {
+	
+}
+
+/*---------------------------------------
+       Type
+---------------------------------------*/
+body {
+	font-family: Verdana, Trebuchet MS, Arial, Helvetica, sans-serif;
+	color: #444;
+	font-size: 11px;
+	line-height: 18px;
+}
+
+h1,h2,h3,h4,h5 {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+	font-size: 28px;
+	padding: 10px 0 10px 0;
+}
+
+h2 {
+	font-size: 22px;
+	padding: 15px 0 15px 0;
+	margin-bottom: -10px;
+}
+
+h3 {
+	font-size: 15px;
+	padding: 10px 0 10px 0;
+	margin-bottom: -10px;
+}
+
+h4 {
+	font-size: 12px;
+	padding: 10px 0 10px 0;
+	margin-bottom: -10px;
+}
+
+p {
+	margin: 10px 0 10px 0;
+}
+
+ul {
+	margin: 0;
+	padding: 10px 0 10px 16px;
+}
+
+ul li {
+	margin: 0;
+	padding: 0;
+}
+
+/*---------------------------------------
+       Links
+---------------------------------------*/
+a {
+	color: #d17647;
+	border-bottom: 1px solid #e8baa3;
+	text-decoration: none;
+}
+
+/*---------------------------------------
+       Language and Global Search
+---------------------------------------*/
+#headerforms {
+	position: absolute;
+	top: 45px;
+	right: 0;
+}
+
+#headerforms form#language {
+	margin-right: 10px;
+}
+
+#headerforms form#globalsearch {
+	
+}
+
+#headerforms form {
+	float: left;
+}
+
+/*---------------------------------------
+       Login Form
+---------------------------------------*/
+#login {
+	position: absolute;
+	top: 18px;
+	right: 0;
+	color: #fff;
+}
+
+#login a {
+	color: #9fd8ff;
+	border-bottom: 1px solid #9fd8ff;
+}
+
+#login form.login {
+	float: right;
+}
+
+/*---------------------------------------
+       Mainnav
+---------------------------------------*/
+#mainnav {
+	background: #333;
+	/* text-transform: uppercase; */
+}
+
+body.top #mainnav {
+	float: left;
+	/* mozilla 1.7.2 (ff 0.9.3) main nav fix + div clear both */
+}
+
+#mainnav ul {
+	margin: 0;
+	padding: 0 0 0 24px;
+	list-style: none;
+}
+
+#mainnav ul li {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+#mainnav a {
+	position: relative;
+	float: left;
+	margin: 0 0 0 2px;
+	text-decoration: none;
+	background: #3d86af;
+	border: none;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+}
+
+#mainnav a span {
+	display: block;
+	padding: 6px 18px 6px 18px;
+	color: #fff;
+	float: none;
+}
+
+#mainnav ul li.selected a {
+	background: #e6e6dc;
+	background: #eee;
+}
+
+#mainnav ul li.selected a span {
+	color: #444;
+}
+
+/*---------------------------------------
+       Secondary Nav
+---------------------------------------*/
+#secondarynav {
+	position: relative;
+	background: #eee;
+}
+
+#secondarynav ul {
+	padding: 10px 10px 0 28px;
+	margin: 0;
+}
+
+#secondarynav ul li {
+	margin: 0;
+	display: inline;
+}
+
+#secondarynav a {
+	margin: 0;
+	padding: 5px;
+	color: #1d698e;
+	text-decoration: none;
+	border: none;
+}
+
+#secondarynav a span {
+	border-bottom: 1px solid #000;
+	border-bottom: 1px solid #79a4bd;
+	border-bottom: 1px solid #a5c3d3;
+}
+
+#secondarynav a:hover span { /*text-decoration: underline;*/
+	
+}
+
+#secondarynav a.new {
+	margin-left: 5px;
+	padding-left: 15px;
+	background: url(plus01.gif) 0px 0.55em no-repeat;
+}
+
+#secondarynav span.separator {
+	color: #888;
+}
+
+/*---------------------------------------
+       Footer
+---------------------------------------*/
+#footer {
+	position: relative;
+	z-index: 1;
+	clear: both;
+	padding: 20px 0 20px 0;
+	/*background: #15587a;*/
+}
+
+#footer div {
+	color: #fff;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+}
+
+#footer div a {
+	color: #fff;
+	background: #2763A5;
+	border-bottom: 1px dotted #fff;
+}
+
+#footer div a:hover {
+	color: #fff;
+	text-decoration: none;
+	border-top: 1px dotted #fff;
+	border-bottom: 0px dotted #fff;
+}
+
+/*---------------------------------------
+       ?
+---------------------------------------*/
+div.wrapper {
+	padding-right: 150px;
+}  /* used when #flow is visible */
+.clear {
+	clear: both;
+}
+
+.v-select-optiongroup-horizontal .v-select-option {
+	display: block;
+	float: left;
+}
+
+.v-csslayout-left {
+	background: url (   images/logo_ist.png ) no-repeat scroll left top;
+	padding-left: 20px;
+}
+
+.inline,
+.inline > div,
+.inline > span {
+	display: inline;
+}
+
+.v-gridlayout-properties .v-gridlayout-spacing-on {
+	padding: 0px;
+}
+
+.v-gridlayout-properties .v-gridlayout-margin-top {
+	padding-top: 20px;
+}
+
+.v-gridlayout-properties>div>div {
+	border-bottom: 1px solid #ddd;
+}
+
+.v-gridlayout-properties .v-label-label {
+	border-top: 1px solid #ddd;
+	text-align: right;
+	padding: 4px;
+}
+
+.v-gridlayout-properties .value {
+	background: #fff;
+	border-top: 1px solid #ddd;
+	padding: 4px;
+}
+
+.v-label-page-title {
+	text-align: center;
+	margin-top: 15px
+}
+
+.bold {
+	font-weight: bold;  
+}
