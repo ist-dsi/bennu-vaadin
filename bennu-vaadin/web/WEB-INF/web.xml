@@ -7,26 +7,29 @@
 		<param-name>productionMode</param-name>
 		<param-value>false</param-value>
 	</context-param>
+
 	<servlet>
-		<servlet-name>bennu</servlet-name>
-		<servlet-class>org.vaadin.navigator7.NavigableApplicationServlet</servlet-class>
+        <servlet-name>EmbeddedApplicationInitializer</servlet-name>
+        <servlet-class>pt.ist.bennu.vaadin.EmbeddedApplicationInitializer</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+	<servlet>
+		<servlet-name>VaadinEmbedded</servlet-name>
+		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
 		<init-param>
 			<description>Vaadin application class to start</description>
 			<param-name>application</param-name>
-			<param-value>pt.ist.bennu.vaadin.ui.BennuApplication</param-value>
-		</init-param>
-		<init-param>
-			<description>Navigator7 WebApplication class to start (optionnal)</description>
-			<param-name>webApplication</param-name>
-			<param-value>pt.ist.bennu.vaadin.ui.BennuWebApplication</param-value>
+			<param-value>pt.ist.vaadinframework.EmbeddedApplication</param-value>
 		</init-param>
 	</servlet>
+
 	<servlet-mapping>
-		<servlet-name>bennu</servlet-name>
-		<url-pattern>/bennu/*</url-pattern>
+		<servlet-name>VaadinEmbedded</servlet-name>
+		<url-pattern>/vaadin/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>bennu</servlet-name>
+		<servlet-name>VaadinEmbedded</servlet-name>
 		<url-pattern>/VAADIN/*</url-pattern>
 	</servlet-mapping>
 </web-app>
