@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
+import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
@@ -117,7 +118,12 @@ public class EmbeddedApplication extends Application implements HttpServletReque
 
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
 
-    private final Window window = new Window();
+    private final Window window;
+
+    {
+	setTheme("reindeer");
+	window = new Window();
+    }
 
     @Override
     public void init() {
@@ -126,32 +132,35 @@ public class EmbeddedApplication extends Application implements HttpServletReque
 
     @Override
     public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
+	setLocale(Language.getLocale());
 	String param = (String) request.getSession().getAttribute(VAADIN_PARAM);
-	request.getSession().removeAttribute(VAADIN_PARAM);
-	for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
-	    Matcher matcher = entry.getKey().matcher(param);
-	    if (matcher.find()) {
-		try {
-		    EmbeddedComponentContainer container = entry.getValue().newInstance();
-		    Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
-		    for (int i = 0; i <= matcher.groupCount(); i++) {
-			arguments.add(matcher.group(i));
+	if (param != null) {
+	    request.getSession().removeAttribute(VAADIN_PARAM);
+	    for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
+		Matcher matcher = entry.getKey().matcher(param);
+		if (matcher.find()) {
+		    try {
+			EmbeddedComponentContainer container = entry.getValue().newInstance();
+			Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
+			for (int i = 0; i <= matcher.groupCount(); i++) {
+			    arguments.add(matcher.group(i));
+			}
+			container.setArguments(arguments.toArray(new String[0]));
+			window.setContent(container);
+			return;
+		    } catch (InstantiationException e) {
+			VaadinFrameworkLogger.getLogger().error(
+				"Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
+					+ ", " + entry.getValue().getName() + ">", e);
+		    } catch (IllegalAccessException e) {
+			VaadinFrameworkLogger.getLogger().error(
+				"Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
+					+ ", " + entry.getValue().getName() + ">", e);
 		    }
-		    container.setArguments(arguments.toArray(new String[0]));
-		    window.setContent(container);
-		    return;
-		} catch (InstantiationException e) {
-		    VaadinFrameworkLogger.getLogger().error(
-			    "Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
-				    + ", " + entry.getValue().getName() + ">", e);
-		} catch (IllegalAccessException e) {
-		    VaadinFrameworkLogger.getLogger().error(
-			    "Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
-				    + ", " + entry.getValue().getName() + ">", e);
 		}
 	    }
+	    window.setContent(new NoMatchingPatternFoundComponent());
 	}
-	window.setContent(new NoMatchingPatternFoundComponent());
     }
 
     @Override

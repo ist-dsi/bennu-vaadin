@@ -1,0 +1,48 @@
+package pt.ist.vaadinframework.example.domain;
+
+class ExampleRoot {
+}
+
+class Person {
+	String name;
+}
+
+class PersonStuff {
+	Boolean important;
+}
+
+relation PersonRoot {
+	ExampleRoot playsRole root {
+		multiplicity 1;
+	}
+	Person playsRole person {
+		multiplicity 0..1;
+	}
+}
+
+relation PersonStuffRoot {
+	ExampleRoot playsRole root {
+		multiplicity 1;
+	}
+	PersonStuff playsRole stuff {
+		multiplicity *;
+	}
+}
+
+relation PersonStuffSet {
+	Person playsRole person {
+		multiplicity 1;
+	}
+	PersonStuff playsRole stuff {
+		multiplicity *;
+	}
+}
+
+relation PersonPrecioudStuffSet {
+	Person playsRole personPrecious {
+		multiplicity 1;
+	}
+	PersonStuff playsRole precious {
+		multiplicity 1;
+	}
+}
