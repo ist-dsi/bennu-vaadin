@@ -8,7 +8,9 @@ import pt.utl.ist.fenix.tools.util.i18n.Language;
 public class VaadinResources {
     public static enum Keys implements MessageBundleKey {
 	INTEGER_VALIDATOR_MESSAGE("com.vaadin.data.validator.IntegerValidator.message"), PAGE_ACCESS_DENIED(
-		"pt.ist.bennu.vaadin.error.pageAccessDenied");
+		"pt.ist.bennu.vaadin.error.pageAccessDenied"), SERVERS_MENU_CONFIGURATION_PAGE_TITLE(
+		"pt.ist.bennu.vaadin.ui.pages.MenuConfigurationPage.title"), SERVERS_MENU_CONFIGURATION_PAGE_NODE_ACCESS_GROUP(
+		"pt.ist.bennu.vaadin.ui.pages.MenuConfigurationPage.node.accessGroup");
 
 	private String key;
 

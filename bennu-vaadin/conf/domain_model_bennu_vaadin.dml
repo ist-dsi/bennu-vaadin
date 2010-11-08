@@ -1,6 +1,1 @@
-package pt.ist.bennu.vaadin;
-
-
-class domain.PageNode extends .myorg.domain.contents.Node {
-	String classname;
-}
+package pt.ist.bennu.vaadin.domain;
