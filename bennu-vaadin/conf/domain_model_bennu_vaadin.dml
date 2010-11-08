@@ -1,1 +1,5 @@
 package pt.ist.bennu.vaadin.domain;
+
+class contents.VaadinNode extends .myorg.domain.contents.ActionNode {
+	String argument;
+}
