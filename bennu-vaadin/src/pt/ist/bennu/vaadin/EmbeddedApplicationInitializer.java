@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServlet;
 
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
-import pt.utl.ist.fenix.tools.util.FileUtils;
-import vaadin.annotation.EmbeddedAnnotationProcessor;
-import vaadin.annotation.EmbeddedComponent;
 
 @SuppressWarnings("serial")
 public class EmbeddedApplicationInitializer extends HttpServlet {
@@ -48,7 +45,7 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 	    e.printStackTrace();
 	    throw new Error("Could not read property file: embeddedcomponent.properties");
 	}
-
+/*
 	loadEmbeddedComponentsFromFile(embeddedComponentClasses);
 	for (Class<? extends EmbeddedComponentContainer> embeddedComponentClass : embeddedComponentClasses) {
 	    EmbeddedComponent embeddedComponent = embeddedComponentClass.getAnnotation(EmbeddedComponent.class);
@@ -67,8 +64,9 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 	    }
 
 	}
+*/
     }
-
+/*
     private void loadEmbeddedComponentsFromFile(final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses) {
 	final InputStream inputStream = this.getClass().getResourceAsStream("/" + EmbeddedAnnotationProcessor.LOG_FILENAME);
 	if (inputStream != null) {
@@ -91,4 +89,5 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 	    throw new Error("Error opening file: " + EmbeddedAnnotationProcessor.LOG_FILENAME);
 	}
     }
+*/
 }
