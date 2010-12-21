@@ -19,14 +19,14 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.ui.fields;
-
-import com.vaadin.ui.DateField;
+package pt.ist.vaadinframework.data;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public class PartialField extends DateField {
+public interface ValueType<Type> {
+    public Type getContent();
 
+    public ValueType<Type> getValueForContent(Type content);
 }

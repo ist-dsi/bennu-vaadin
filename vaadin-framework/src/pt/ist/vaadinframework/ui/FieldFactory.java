@@ -27,10 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.Instant;
-import org.joda.time.Partial;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
 import pt.ist.vaadinframework.data.validator.CharacterValidator;
@@ -40,9 +39,9 @@ import pt.ist.vaadinframework.data.validator.IntegerValidator;
 import pt.ist.vaadinframework.data.validator.LongValidator;
 import pt.ist.vaadinframework.data.validator.ShortValidator;
 import pt.ist.vaadinframework.ui.fields.EnumField;
-import pt.ist.vaadinframework.ui.fields.InstantField;
 import pt.ist.vaadinframework.ui.fields.MultiLanguageStringField;
-import pt.ist.vaadinframework.ui.fields.PartialField;
+import pt.ist.vaadinframework.ui.fields.PopupDateTimeField;
+import pt.ist.vaadinframework.ui.fields.PopupLocalDateField;
 import pt.ist.vaadinframework.ui.fields.PrimitiveField;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
@@ -50,6 +49,7 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.DomainProperty;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
@@ -57,8 +57,6 @@ import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Select;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
 
@@ -72,6 +70,8 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     }
 
     private static Map<Class<?>, FieldMaker> factories = new HashMap<Class<?>, FieldMaker>();
+
+    private final Map<Class<?>, FieldMaker> customFactories = new HashMap<Class<?>, FieldMaker>();
 
     static {
 	addClassFactory(Byte.class, new FieldMaker() {
@@ -113,7 +113,7 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
 	addClassFactory(Boolean.class, new FieldMaker() {
 	    @Override
 	    public Field createField(Object propertyId, Property property, Component uiContext) {
-		return new OptionGroup();
+		return new CheckBox();
 	    }
 	});
 	addClassFactory(Character.class, new FieldMaker() {
@@ -152,6 +152,47 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
 		return field;
 	    }
 	});
+	addClassFactory(Item.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		Form form = new Form();
+		form.setImmediate(true);
+		form.setFormFieldFactory(new FieldFactory());
+		form.setItemDataSource((Item) property.getValue());
+		return form;
+	    }
+	});
+	addClassFactory(MultiLanguageString.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		return new MultiLanguageStringField(Language.pt, Language.en);
+	    }
+	});
+	addClassFactory(DateTime.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		PopupDateTimeField field = new PopupDateTimeField();
+		field.setResolution(DateField.RESOLUTION_SEC);
+		return field;
+	    }
+	});
+	// addClassFactory(Partial.class, new FieldMaker() {
+	// @Override
+	// public Field createField(Object propertyId, Property property,
+	// Component uiContext) {
+	// PartialField field = new PartialField();
+	// field.setResolution(DateField.RESOLUTION_DAY);
+	// return field;
+	// }
+	// });
+	addClassFactory(LocalDate.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		PopupLocalDateField field = new PopupLocalDateField();
+		field.setResolution(DateField.RESOLUTION_DAY);
+		return field;
+	    }
+	});
     }
 
     /**
@@ -160,11 +201,15 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
      */
     @Override
     public Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
-	Property containerProperty = container.getContainerProperty(itemId, propertyId);
-	Class<?> type = containerProperty.getType();
-	Field field = createFieldByPropertyType(type);
-	field.setSizeFull();
-	field.setCaption(DefaultFieldFactory.createCaptionByPropertyId(propertyId));
+	Property property = container.getContainerProperty(itemId, propertyId);
+	Field field = createField(propertyId, property, uiContext);
+	if (field != null) {
+	    if (property instanceof DomainProperty<?>) {
+		field.setRequired(((DomainProperty<?>) property).isRequired());
+	    }
+	    setCaption(field, propertyId, property);
+	    setDescription(field, propertyId, property);
+	}
 	return field;
     }
 
@@ -174,78 +219,71 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
      */
     @Override
     public Field createField(Item item, Object propertyId, Component uiContext) {
-	Class<?> type = item.getItemProperty(propertyId).getType();
-	Field field = createFieldByPropertyType(type);
-	field.setSizeFull();
-	field.setCaption(DefaultFieldFactory.createCaptionByPropertyId(propertyId));
+	Property property = item.getItemProperty(propertyId);
+	Field field = createField(propertyId, property, uiContext);
+	if (field != null) {
+	    if (property instanceof DomainProperty<?>) {
+		field.setRequired(((DomainProperty<?>) property).isRequired());
+	    }
+	    setCaption(field, propertyId, property);
+	    setDescription(field, propertyId, property);
+	}
 	return field;
     }
 
-    public static Field createFieldByPropertyType(Class<?> type) {
-	// Null typed properties can not be edited
-	if (type == null) {
-	    return null;
-	}
-
-	if (AbstractDomainObject.class.isAssignableFrom(type)) {
-	    Select select = new Select();
-	    for (Object option : SelectOptionProvider.provideFor(type)) {
-		select.addItem(option);
+    private Field createField(Object propertyId, Property property, Component uiContext) {
+	Class<?> type = property.getType();
+	if (type != null) {
+	    if (customFactories.containsKey(type)) {
+		return customFactories.get(type).createField(propertyId, property, uiContext);
 	    }
-	    return select;
+	    if (factories.containsKey(type)) {
+		return factories.get(type).createField(propertyId, property, uiContext);
+	    }
+	    for (Class<?> clazz : customFactories.keySet()) {
+		if (clazz.isAssignableFrom(type)) {
+		    customFactories.put(type, customFactories.get(clazz));
+		    return customFactories.get(type).createField(propertyId, property, uiContext);
+		}
+	    }
+	    for (Class<?> clazz : factories.keySet()) {
+		if (clazz.isAssignableFrom(type)) {
+		    factories.put(type, factories.get(clazz));
+		    return factories.get(type).createField(propertyId, property, uiContext);
+		}
+	    }
 	}
+	return new TextField();
+    }
 
-	// Item field
-	if (Item.class.isAssignableFrom(type)) {
-	    return new Form();
-	}
+    private void setCaption(Field field, Object propertyId, Property property) {
+	// String key = property.getType().getName() + "." + propertyId;
+	// if (bundle.containsKey(key)) {
+	// field.setCaption(bundle.getString(key));
+	// } else {
+	field.setCaption(DefaultFieldFactory.createCaptionByPropertyId(propertyId));
+	// }
+    }
 
-	// Enum field
-	if (Enum.class.isAssignableFrom(type)) {
-	    return new EnumField((Class<? extends Enum<?>>) type);
-	}
-
-	// Multilanguage field
-	if (MultiLanguageString.class.isAssignableFrom(type)) {
-	    return new MultiLanguageStringField(Language.pt, Language.en);
-	}
-
-	// Date field
-	if (Date.class.isAssignableFrom(type)) {
-	    final DateField df = new DateField();
-	    df.setResolution(DateField.RESOLUTION_DAY);
-	    return df;
-	}
-
-	// joda-time types
-	if (Instant.class.isAssignableFrom(type)) {
-	    InstantField field = new InstantField();
-	    field.setResolution(DateField.RESOLUTION_SEC);
-	    return field;
-	}
-
-	if (Partial.class.isAssignableFrom(type)) {
-	    PartialField field = new PartialField();
-	    field.setResolution(DateField.RESOLUTION_DAY);
-	    return field;
-	}
-
-	// TODO: Interval, Duration, Period
-
-	// Boolean field
-	if (Boolean.class.isAssignableFrom(type)) {
-	    return new CheckBox();
-	}
-
-	TextField text = new TextField();
-	text.setNullSettingAllowed(true);
-	text.setNullRepresentation(StringUtils.EMPTY);
-	return text;
+    private void setDescription(Field field, Object propertyId, Property property) {
+	// String key = property.getType().getName() + "." + propertyId +
+	// ".description";
+	// if (bundle.containsKey(key)) {
+	// field.setDescription(bundle.getString(key));
+	// }
     }
 
     public static boolean addClassFactory(Class<?> type, FieldMaker maker) {
 	if (!factories.containsKey(type)) {
 	    factories.put(type, maker);
+	    return true;
+	}
+	return false;
+    }
+
+    public boolean addCustomClassFactory(Class<?> type, FieldMaker maker) {
+	if (!customFactories.containsKey(type)) {
+	    customFactories.put(type, maker);
 	    return true;
 	}
 	return false;

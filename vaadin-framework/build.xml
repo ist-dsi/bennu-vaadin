@@ -3,7 +3,6 @@
 	<description>Vaadin Fenix Framework Integration Library</description>
 
 	<property name="src.dir" location="src" />
-	<property name="src.gen" location="src_gen" />
 	<property name="build.dir" location="build" />
 	<property name="doc.dir" location="doc" />
 	<property name="dist.dir" location="dist" />
@@ -20,49 +19,24 @@
 		</fileset>
 	</path>
 
-	<path id="post.process.class.path.ref">
-		<path refid="class.path.ref" />
-		<pathelement location="${build.dir}" />
-	</path>
-
-	<taskdef resource="pt/ist/fenixframework/dml-ant.xml">
-		<classpath refid="class.path.ref" />
-	</taskdef>
-
-
 	<target name="clean" description="Removes any generated files">
 		<delete dir="${build.dir}" />
 		<delete dir="${doc.dir}" />
 		<delete dir="${dist.dir}" />
-		<delete dir="${src.gen}" />
 	</target>
 
-	<target name="generate-domain">
-		<dml-domain-generator destDirectory="${src.dir}" destDirectoryBase="${src.gen}">
-			<fileset dir="${conf.dir}">
-				<include name="*.dml" />
-			</fileset>
-		</dml-domain-generator>
-	</target>
-
-	<target name="compile" depends="generate-domain" description="Compiles the plugin">
+	<target name="compile" description="Compiles the plugin">
 		<mkdir dir="${build.dir}" />
 		<javac destdir="${build.dir}" target="1.5" debug="on">
 			<src path="${src.dir}" />
-			<src path="${src.gen}" />
 			<classpath refid="class.path.ref" />
 		</javac>
-		<dml-post-processor dir="${build.dir}">
-			<fileset dir="${conf.dir}" />
-			<classpath refid="post.process.class.path.ref" />
-		</dml-post-processor>
 	</target>
 
 	<target name="doc" depends="compile" description="Generate javadoc documentation">
 		<mkdir dir="${doc.dir}" />
 		<javadoc destdir="${doc.dir}">
 			<fileset dir="${src.dir}" />
-			<fileset dir="${src.gen}" />
 			<classpath refid="class.path.ref" />
 		</javadoc>
 	</target>

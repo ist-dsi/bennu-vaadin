@@ -49,5 +49,4 @@ public enum ValidatorKeys implements MessageBundleKey {
     public String getKey() {
 	return key;
     }
-
 }

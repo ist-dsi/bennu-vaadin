@@ -19,22 +19,27 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.example.domain;
+package pt.ist.vaadinframework;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * 
  */
-public class Person extends Person_Base {
+public enum CommonKeys implements MessageBundleKey {
+    BUTTON_SAVE("pt.ist.vaadinframework.common.button.save"), BUTTON_DISCARD("pt.ist.vaadinframework.common.button.discard");
 
-    public Person() {
-	super();
-	PersonStuff precious = new PersonStuff(true);
-	setPrecious(precious);
-	addStuff(precious);
-	addStuff(new PersonStuff(false));
+    private final String key;
+
+    private CommonKeys(String key) {
+	this.key = key;
     }
 
-    public static Person getPerson() {
-	return ExampleRoot.getInstance().getPerson();
+    /**
+     * @see pt.ist.vaadinframework.MessageBundleKey#getKey()
+     */
+    @Override
+    public String getKey() {
+	return key;
     }
+
 }
