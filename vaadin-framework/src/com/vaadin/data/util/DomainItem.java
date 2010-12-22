@@ -96,9 +96,9 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotif
 	    PropertyDescriptor descriptor = model.getPropertyDescriptor(id);
 	    if (descriptor != null) {
 		if (descriptor.isCollection()) {
-		    properties.put(descriptor.getPropertyId(), new DomainRelation<Type, AbstractDomainObject>(this, descriptor));
+		    properties.put(id, new DomainRelation<Type, AbstractDomainObject>(this, descriptor));
 		} else {
-		    properties.put(descriptor, new DomainProperty<Type>(this, descriptor));
+		    properties.put(id, new DomainProperty<Type>(this, descriptor));
 		}
 	    }
 	}

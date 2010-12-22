@@ -22,6 +22,7 @@
 package pt.ist.vaadinframework.ui;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
 import pt.ist.vaadinframework.data.validator.CharacterValidator;
@@ -50,6 +52,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.DomainProperty;
+import com.vaadin.data.util.DomainRelation;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
@@ -57,6 +60,7 @@ import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
+import com.vaadin.ui.Select;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
 
@@ -74,6 +78,25 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     private final Map<Class<?>, FieldMaker> customFactories = new HashMap<Class<?>, FieldMaker>();
 
     static {
+	addClassFactory(AbstractDomainObject.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		Select select = new Select();
+		if (property instanceof DomainProperty<?>) {
+		    DomainProperty<?> domainProperty = (DomainProperty<?>) property;
+		    if (domainProperty.getPossibleValues() != null) {
+			for (Object object : domainProperty.getPossibleValues()) {
+			    select.addItem(object);
+			}
+		    }
+		    if (domainProperty instanceof DomainRelation) {
+			select.setMultiSelect(true);
+		    }
+		    select.setNullSelectionAllowed(!domainProperty.isRequired());
+		}
+		return select;
+	    }
+	});
 	addClassFactory(Byte.class, new FieldMaker() {
 	    @Override
 	    public Field createField(Object propertyId, Property property, Component uiContext) {
@@ -234,6 +257,11 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     private Field createField(Object propertyId, Property property, Component uiContext) {
 	Class<?> type = property.getType();
 	if (type != null) {
+	    if (Collection.class.isAssignableFrom(type)) {
+		if (property instanceof DomainRelation) {
+		    type = ((DomainRelation) property).getElementType();
+		}
+	    }
 	    if (customFactories.containsKey(type)) {
 		return customFactories.get(type).createField(propertyId, property, uiContext);
 	    }

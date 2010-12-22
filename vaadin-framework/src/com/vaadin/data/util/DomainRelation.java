@@ -34,6 +34,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.metamodel.MetaModel;
 import com.vaadin.data.util.metamodel.PropertyDescriptor;
+import com.vaadin.data.util.metamodel.RolePropertyDescriptor;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
@@ -50,7 +51,7 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 
     public DomainRelation(DomainItem<Host> item, PropertyDescriptor descriptor) {
 	super(item, descriptor);
-	if (Collection.class.isAssignableFrom(descriptor.getPropertyType())) {
+	if (!Collection.class.isAssignableFrom(descriptor.getPropertyType())) {
 	    throw new IllegalArgumentException("DomainRelation must be bound to relation properties");
 	}
 	MetaModel model = MetaModel.findMetaModelForType(item.getType());
@@ -193,6 +194,13 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
     @Override
     public int size() {
 	return items.size();
+    }
+
+    public Class<?> getElementType() {
+	if (descriptor instanceof RolePropertyDescriptor) {
+	    return ((RolePropertyDescriptor) descriptor).getElementType();
+	}
+	return null;
     }
 
     /**

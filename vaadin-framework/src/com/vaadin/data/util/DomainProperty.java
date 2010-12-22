@@ -23,11 +23,15 @@ package com.vaadin.data.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.metamodel.ModelIntroscpectionException;
 import com.vaadin.data.util.metamodel.PropertyDescriptor;
@@ -45,6 +49,10 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
     private Object value;
 
     private boolean modified = false;
+
+    private Collection<?> possibleValues;
+
+    private Collection<Validator> validators;
 
     public DomainProperty(DomainItem<Type> item, PropertyDescriptor descriptor) {
 	this.item = item;
@@ -135,6 +143,42 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
     @Override
     public Class<?> getType() {
 	return descriptor.getPropertyType();
+    }
+
+    public Collection<Validator> getValidators() {
+	return validators;
+    }
+
+    public DomainProperty<Type> addValidator(Validator validator) {
+	if (validators == null) {
+	    validators = new ArrayList<Validator>();
+	}
+	return this;
+    }
+
+    public DomainProperty<Type> removeValidator(Validator validator) {
+	if (validators != null) {
+	    validators.remove(validator);
+	}
+	return this;
+    }
+
+    /**
+     * @return the possibleValues
+     */
+    public Collection<?> getPossibleValues() {
+	return possibleValues;
+    }
+
+    /**
+     * @param possibleValues the possibleValues to set
+     */
+    public void setPossibleValues(Collection<?> possibleValues) {
+	this.possibleValues = possibleValues;
+    }
+
+    public void setPossibleValues(Object... possibleValues) {
+	this.possibleValues = Arrays.asList(possibleValues);
     }
 
     /**

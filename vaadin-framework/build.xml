@@ -43,9 +43,6 @@
 
 	<target name="jar" depends="compile" description="Generates the jar with the plugin">
 		<mkdir dir="${dist.dir}" />
-		<copy todir="${build.dir}">
-			<fileset dir="${conf.dir}" includes="*.dml" />
-		</copy>
 		<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}" />
 	</target>
 </project>

@@ -80,6 +80,10 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 	return reader.getReturnType();
     }
 
+    public Class<?> getElementType() {
+	return elementType;
+    }
+
     /**
      * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getDefaultValue()
      */
