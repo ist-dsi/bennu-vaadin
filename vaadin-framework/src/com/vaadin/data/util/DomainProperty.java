@@ -52,7 +52,7 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 
     private Collection<?> possibleValues;
 
-    private Collection<Validator> validators;
+    private final Collection<Validator> validators = new ArrayList<Validator>();
 
     public DomainProperty(DomainItem<Type> item, PropertyDescriptor descriptor) {
 	this.item = item;
@@ -150,16 +150,12 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
     }
 
     public DomainProperty<Type> addValidator(Validator validator) {
-	if (validators == null) {
-	    validators = new ArrayList<Validator>();
-	}
+	validators.add(validator);
 	return this;
     }
 
     public DomainProperty<Type> removeValidator(Validator validator) {
-	if (validators != null) {
-	    validators.remove(validator);
-	}
+	validators.remove(validator);
 	return this;
     }
 

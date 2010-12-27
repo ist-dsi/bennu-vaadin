@@ -47,25 +47,27 @@ public class MetaModel {
      * @param type
      */
     private MetaModel(Class<? extends AbstractDomainObject> type) {
-	DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName());
-	for (Slot slot : clazz.getSlotsList()) {
-	    try {
-		descriptors.put(slot.getName(), new SlotPropertyDescriptor(slot, type));
-	    } catch (IntrospectionException e) {
-		VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for slot: " + slot.getName());
+	for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz = (DomainClass) clazz
+		.getSuperclass()) {
+	    for (Slot slot : clazz.getSlotsList()) {
+		try {
+		    descriptors.put(slot.getName(), new SlotPropertyDescriptor(slot, type));
+		} catch (IntrospectionException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for slot: " + slot.getName());
+		}
 	    }
-	}
-	for (Role role : clazz.getRoleSlotsList()) {
-	    try {
-		descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
-	    } catch (SecurityException e) {
-		VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-	    } catch (IntrospectionException e) {
-		VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-	    } catch (NoSuchMethodException e) {
-		VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-	    } catch (ClassNotFoundException e) {
-		VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+	    for (Role role : clazz.getRoleSlotsList()) {
+		try {
+		    descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
+		} catch (SecurityException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+		} catch (IntrospectionException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+		} catch (NoSuchMethodException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+		} catch (ClassNotFoundException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+		}
 	    }
 	}
     }

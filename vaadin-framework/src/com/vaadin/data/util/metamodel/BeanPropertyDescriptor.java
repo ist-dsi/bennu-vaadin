@@ -24,6 +24,8 @@ package com.vaadin.data.util.metamodel;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 
+import pt.ist.fenixframework.pstm.AbstractDomainObject;
+
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
@@ -51,6 +53,23 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
 	if (Boolean.class.isAssignableFrom(getPropertyType())) {
 	    return Boolean.FALSE;
 	}
+	return null;
+    }
+
+    /**
+     * @see java.beans.PropertyDescriptor#getPropertyType()
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<? extends AbstractDomainObject> getPropertyType() {
+	return (Class<? extends AbstractDomainObject>) super.getPropertyType();
+    }
+
+    /**
+     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getCollectionElementType()
+     */
+    @Override
+    public Class<? extends AbstractDomainObject> getCollectionElementType() {
 	return null;
     }
 

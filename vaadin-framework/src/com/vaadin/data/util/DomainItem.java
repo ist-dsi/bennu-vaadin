@@ -42,13 +42,13 @@ import com.vaadin.data.util.metamodel.PropertyDescriptor;
 public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotifierItem {
     private final PerTxBox<Type> instance;
 
-    private final Class<Type> type;
+    private final Class<? extends Type> type;
 
     private final Collection<String> propertyIds;
 
     private final Map<Object, DomainProperty<Type>> properties = new HashMap<Object, DomainProperty<Type>>();
 
-    public DomainItem(Class<Type> type) {
+    public DomainItem(Class<? extends Type> type) {
 	this.type = type;
 	this.instance = new PerTxBox<Type>(null);
 	propertyIds = MetaModel.findMetaModelForType(type).getPropertyIds();

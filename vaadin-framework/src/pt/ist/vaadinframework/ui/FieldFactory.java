@@ -22,6 +22,7 @@
 package pt.ist.vaadinframework.ui;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import pt.ist.vaadinframework.data.validator.FloatValidator;
 import pt.ist.vaadinframework.data.validator.IntegerValidator;
 import pt.ist.vaadinframework.data.validator.LongValidator;
 import pt.ist.vaadinframework.data.validator.ShortValidator;
+import pt.ist.vaadinframework.data.validator.URLValidator;
 import pt.ist.vaadinframework.ui.fields.EnumField;
 import pt.ist.vaadinframework.ui.fields.MultiLanguageStringField;
 import pt.ist.vaadinframework.ui.fields.PopupDateTimeField;
@@ -51,6 +53,7 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
 import com.vaadin.data.util.DomainProperty;
 import com.vaadin.data.util.DomainRelation;
 import com.vaadin.ui.CheckBox;
@@ -216,6 +219,16 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
 		return field;
 	    }
 	});
+	addClassFactory(URL.class, new FieldMaker() {
+	    @Override
+	    public Field createField(Object propertyId, Property property, Component uiContext) {
+		TextField field = new TextField();
+		field.setNullSettingAllowed(true);
+		field.setNullRepresentation(StringUtils.EMPTY);
+		field.addValidator(new URLValidator());
+		return field;
+	    }
+	});
     }
 
     /**
@@ -226,13 +239,7 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     public Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
 	Property property = container.getContainerProperty(itemId, propertyId);
 	Field field = createField(propertyId, property, uiContext);
-	if (field != null) {
-	    if (property instanceof DomainProperty<?>) {
-		field.setRequired(((DomainProperty<?>) property).isRequired());
-	    }
-	    setCaption(field, propertyId, property);
-	    setDescription(field, propertyId, property);
-	}
+	setCommonProperties(field, propertyId, property);
 	return field;
     }
 
@@ -244,18 +251,26 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     public Field createField(Item item, Object propertyId, Component uiContext) {
 	Property property = item.getItemProperty(propertyId);
 	Field field = createField(propertyId, property, uiContext);
-	if (field != null) {
-	    if (property instanceof DomainProperty<?>) {
-		field.setRequired(((DomainProperty<?>) property).isRequired());
-	    }
-	    setCaption(field, propertyId, property);
-	    setDescription(field, propertyId, property);
-	}
+	setCommonProperties(field, propertyId, property);
 	return field;
     }
 
     private Field createField(Object propertyId, Property property, Component uiContext) {
 	Class<?> type = property.getType();
+	if (property instanceof DomainProperty) {
+	    DomainProperty<?> domainProperty = (DomainProperty<?>) property;
+	    if (domainProperty.getPossibleValues() != null) {
+		Select select = new Select();
+		for (Object object : domainProperty.getPossibleValues()) {
+		    select.addItem(object);
+		}
+		if (domainProperty instanceof DomainRelation) {
+		    select.setMultiSelect(true);
+		}
+		select.setNullSelectionAllowed(!domainProperty.isRequired());
+		return select;
+	    }
+	}
 	if (type != null) {
 	    if (Collection.class.isAssignableFrom(type)) {
 		if (property instanceof DomainRelation) {
@@ -282,6 +297,20 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
 	    }
 	}
 	return new TextField();
+    }
+
+    private void setCommonProperties(Field field, Object propertyId, Property property) {
+	if (field != null) {
+	    if (property instanceof DomainProperty<?>) {
+		DomainProperty<?> domainProperty = (DomainProperty<?>) property;
+		field.setRequired(domainProperty.isRequired());
+		for (Validator validator : domainProperty.getValidators()) {
+		    field.addValidator(validator);
+		}
+	    }
+	    setCaption(field, propertyId, property);
+	    setDescription(field, propertyId, property);
+	}
     }
 
     private void setCaption(Field field, Object propertyId, Property property) {

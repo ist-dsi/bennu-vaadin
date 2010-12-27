@@ -24,7 +24,6 @@ package pt.ist.vaadinframework.ui;
 import jvstm.TransactionalCommand;
 import pt.ist.fenixframework.pstm.Transaction;
 
-import com.vaadin.data.Buffered;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Form;
@@ -122,9 +121,6 @@ public class TxForm extends Form {
 	    @Override
 	    public void doIt() {
 		TxForm.this.commit();
-		if (getItemDataSource() instanceof Buffered) {
-		    ((Buffered) getItemDataSource()).commit();
-		}
 	    }
 	});
 	Transaction.begin(true);

@@ -48,7 +48,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 
     // if the relation has * on other type this implies a collection of elements
     // of this type.
-    private Class<?> elementType;
+    private Class<? extends AbstractDomainObject> elementType;
 
     public RolePropertyDescriptor(Role role, Class<? extends AbstractDomainObject> type) throws IntrospectionException,
 	    SecurityException, NoSuchMethodException, ClassNotFoundException {
@@ -59,7 +59,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 	    writer = property.getWriteMethod();
 	} else {
 	    reader = type.getMethod("get" + WordUtils.capitalize(role.getName()) + "Set");
-	    elementType = Class.forName(role.getOtherRole().getType().getFullName());
+	    elementType = (Class<? extends AbstractDomainObject>) Class.forName(role.getType().getFullName());
 	}
 	required = role.getMultiplicityLower() > 0;
     }
@@ -76,11 +76,12 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
      * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getPropertyType()
      */
     @Override
-    public Class<?> getPropertyType() {
-	return reader.getReturnType();
+    public Class<? extends AbstractDomainObject> getPropertyType() {
+	return (Class<? extends AbstractDomainObject>) reader.getReturnType();
     }
 
-    public Class<?> getElementType() {
+    @Override
+    public Class<? extends AbstractDomainObject> getCollectionElementType() {
 	return elementType;
     }
 

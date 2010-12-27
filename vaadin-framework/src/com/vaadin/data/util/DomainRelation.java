@@ -34,7 +34,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.metamodel.MetaModel;
 import com.vaadin.data.util.metamodel.PropertyDescriptor;
-import com.vaadin.data.util.metamodel.RolePropertyDescriptor;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
@@ -54,7 +53,7 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	if (!Collection.class.isAssignableFrom(descriptor.getPropertyType())) {
 	    throw new IllegalArgumentException("DomainRelation must be bound to relation properties");
 	}
-	MetaModel model = MetaModel.findMetaModelForType(item.getType());
+	MetaModel model = MetaModel.findMetaModelForType(descriptor.getCollectionElementType());
 	for (PropertyDescriptor propertyDescriptor : model.getPropertyDescriptors()) {
 	    propertyIds.add(propertyDescriptor.getPropertyId());
 	}
@@ -196,11 +195,8 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	return items.size();
     }
 
-    public Class<?> getElementType() {
-	if (descriptor instanceof RolePropertyDescriptor) {
-	    return ((RolePropertyDescriptor) descriptor).getElementType();
-	}
-	return null;
+    public Class<? extends AbstractDomainObject> getElementType() {
+	return descriptor.getCollectionElementType();
     }
 
     /**
@@ -208,6 +204,7 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
      */
     @Override
     public Class<?> getType(Object propertyId) {
-	return MetaModel.findMetaModelForType(item.getType()).getPropertyDescriptor(propertyId).getPropertyType();
+	return MetaModel.findMetaModelForType(descriptor.getCollectionElementType()).getPropertyDescriptor(propertyId)
+		.getPropertyType();
     }
 }

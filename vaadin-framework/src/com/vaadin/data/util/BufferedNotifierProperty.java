@@ -28,54 +28,19 @@ import com.vaadin.data.Buffered;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ReadOnlyStatusChangeNotifier;
 import com.vaadin.data.Property.ValueChangeNotifier;
-import com.vaadin.data.Validator.InvalidValueException;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public abstract class BufferedNotifierProperty implements Property, Buffered, ValueChangeNotifier, ReadOnlyStatusChangeNotifier {
-    private boolean writeThrough;
-
-    private boolean readThrough;
+public abstract class BufferedNotifierProperty extends BufferedProxy implements Property, Buffered, ValueChangeNotifier,
+	ReadOnlyStatusChangeNotifier {
 
     private boolean readOnly;
 
     private LinkedList<ValueChangeListener> valueChangeListeners;
 
     private LinkedList<ReadOnlyStatusChangeListener> readOnlyStatusChangeListeners;
-
-    /**
-     * @see com.vaadin.data.Buffered#isWriteThrough()
-     */
-    @Override
-    public boolean isWriteThrough() {
-	return writeThrough;
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#setWriteThrough(boolean)
-     */
-    @Override
-    public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	this.writeThrough = writeThrough;
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#isReadThrough()
-     */
-    @Override
-    public boolean isReadThrough() {
-	return readThrough;
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#setReadThrough(boolean)
-     */
-    @Override
-    public void setReadThrough(boolean readThrough) throws SourceException {
-	this.readThrough = readThrough;
-    }
 
     /**
      * @see com.vaadin.data.Property#isReadOnly()

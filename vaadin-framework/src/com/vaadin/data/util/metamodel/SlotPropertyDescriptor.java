@@ -62,6 +62,23 @@ public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
+     * @see java.beans.PropertyDescriptor#getPropertyType()
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<? extends AbstractDomainObject> getPropertyType() {
+	return (Class<? extends AbstractDomainObject>) super.getPropertyType();
+    }
+
+    /**
+     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getCollectionElementType()
+     */
+    @Override
+    public Class<? extends AbstractDomainObject> getCollectionElementType() {
+	return null;
+    }
+
+    /**
      * @see com.vaadin.data.util.metamodel.PropertyDescriptor#isCollection()
      */
     @Override

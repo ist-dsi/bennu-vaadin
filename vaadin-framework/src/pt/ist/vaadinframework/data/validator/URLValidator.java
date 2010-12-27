@@ -19,29 +19,31 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util.metamodel;
+package pt.ist.vaadinframework.data.validator;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import java.net.URL;
+
+import pt.ist.vaadinframework.VaadinResources;
+
+import com.vaadin.data.validator.AbstractStringValidator;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public interface PropertyDescriptor {
-    public String getPropertyId();
+@SuppressWarnings("serial")
+public class URLValidator extends AbstractStringValidator {
+    public URLValidator() {
+	super(VaadinResources.getString(ValidatorKeys.URL_VALIDATOR_ERROR));
+    }
 
-    public Class<? extends AbstractDomainObject> getPropertyType();
-
-    public Class<? extends AbstractDomainObject> getCollectionElementType();
-
-    public boolean isCollection();
-
-    public boolean isRequired();
-
-    public Object getDefaultValue();
-
-    public Object read(Object host) throws ModelIntroscpectionException;
-
-    public void write(Object host, Object newValue) throws ModelIntroscpectionException;
-
+    @Override
+    protected boolean isValidString(String value) {
+	try {
+	    new URL(value);
+	    return true;
+	} catch (Exception e) {
+	    return false;
+	}
+    }
 }
