@@ -28,7 +28,7 @@ public class VaadinContextAction extends ContextBaseAction {
 
 	@Override
 	public ActionForward forward(final String body) {
-	    return new ActionForward("/embedded/head.jsp");
+	    return new ActionForward("/embedded/vaadin-embedded-full.jsp");
 	}
 
 	public FullVaadinLayoutContext() {
