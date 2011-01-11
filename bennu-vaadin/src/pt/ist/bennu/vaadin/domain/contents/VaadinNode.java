@@ -31,6 +31,12 @@ public class VaadinNode extends VaadinNode_Base {
 	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup) {
 	return new VaadinNode(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup);
     }
+    
+    @Service
+    public static VaadinNode createVaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
+	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup, boolean useBennuLayout) {
+	return new VaadinNode(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, useBennuLayout);
+    }
 
     @Override
     protected void appendUrlPrefix(StringBuilder stringBuilder) {
