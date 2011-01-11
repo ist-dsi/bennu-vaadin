@@ -3,6 +3,7 @@ package pt.ist.bennu.vaadin.domain.contents;
 import myorg.domain.VirtualHost;
 import myorg.domain.contents.Node;
 import myorg.domain.groups.PersistentGroup;
+import pt.ist.fenixWebFramework.services.Service;
 
 public class VaadinNode extends VaadinNode_Base {
 

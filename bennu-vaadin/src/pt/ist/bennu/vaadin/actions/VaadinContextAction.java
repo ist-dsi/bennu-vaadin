@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.vaadinframework.EmbeddedApplication;
 
 @Mapping(path="/vaadinContext")
