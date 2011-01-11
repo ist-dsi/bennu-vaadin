@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.vaadinframework.EmbeddedApplication;
 
 @Mapping(path="/vaadinContext")
@@ -26,12 +25,28 @@ public class VaadinContextAction extends ContextBaseAction {
     public final ActionForward forwardToVaadin(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) throws Exception {
 	final String argument = request.getParameter("argument");
-	return forwardToVaadin(request, argument);
+	return forwardToVaadin(request, argument, true);
     }
 
-    public static ActionForward forwardToVaadin(final HttpServletRequest request, final String argument) {
+    public final ActionForward forwardToFullVaadin(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+	final String argument = request.getParameter("argument");
+	return forwardToVaadin(request, argument, false);
+    }
+
+    public static ActionForward forwardToVaadin(final HttpServletRequest request, final String argument, final boolean useBennuLayout) {
 	request.getSession().setAttribute(EmbeddedApplication.VAADIN_PARAM, argument);
-	setContext(request, new VaadinLayoutContext(getContext(request).getPath()));
+	final VaadinLayoutContext vaadinLayoutContext = new VaadinLayoutContext(getContext(request).getPath());
+	if (!useBennuLayout) {
+	    vaadinLayoutContext.setPageHeader("/layout/blank.jsp");
+	    vaadinLayoutContext.setSideBar("/layout/blank.jsp");
+	    vaadinLayoutContext.setMenuTop("/layout/blank.jsp");
+	    vaadinLayoutContext.setSubMenuTop("/layout/blank.jsp");
+	    vaadinLayoutContext.setPageOperations("/layout/blank.jsp");
+	    vaadinLayoutContext.setBreadCrumbs("/layout/blank.jsp");
+	    vaadinLayoutContext.setFooter("/layout/blank.jsp");
+	}
+	setContext(request, vaadinLayoutContext);
 	return forward(request, "/embedded/vaadin-embedded.jsp");
     }
 }
