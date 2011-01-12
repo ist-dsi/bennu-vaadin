@@ -6,6 +6,9 @@
 <bean:define id="theme" name="virtualHost" property="theme.name"/>
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/VAADIN/themes/" + theme + "/styles.css"%>">
+
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
+
 <script type="text/javascript">
 	var vaadin = { vaadinConfigurations: { 'vaadin': {appUri:'<%=request.getContextPath() + "/vaadin"%>', pathInfo: '/'}}};
 </script>
