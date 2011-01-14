@@ -13,9 +13,3 @@
 .embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
 	padding-top: 0px;
 }
-
-.page-title {
-	padding-top: 15px;
-	font-size: large;
-	font-weight: bold;
-}
