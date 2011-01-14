@@ -23,7 +23,9 @@ package com.vaadin.data.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import jvstm.PerTxBox;
@@ -48,6 +50,8 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotif
 
     private final Map<Object, DomainProperty<Type>> properties = new HashMap<Object, DomainProperty<Type>>();
 
+    private LinkedList<InstanceCreationListener> instanceCreationListeners;
+
     public DomainItem(Class<? extends Type> type) {
 	this.type = type;
 	this.instance = new PerTxBox<Type>(null);
@@ -67,7 +71,7 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotif
 
     /* Instance management */
 
-    protected Type getInstance() {
+    public Type getInstance() {
 	return instance.get();
     }
 
@@ -75,6 +79,7 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotif
 	if (instance.get() == null) {
 	    try {
 		instance.put(type.newInstance());
+		fireInstanceCreation();
 	    } catch (InstantiationException e) {
 		throw new SourceException(this, e);
 	    } catch (IllegalAccessException e) {
@@ -171,6 +176,45 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotif
 	    }
 	}
 	return false;
+    }
+
+    @SuppressWarnings("unused")
+    private class DomainItemInstanceCreationEvent extends EventObject implements InstanceCreationEvent {
+	protected DomainItemInstanceCreationEvent(DomainItem<Type> source) {
+	    super(source);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public DomainItem<Type> getDomainItem() {
+	    return (DomainItem<Type>) getSource();
+	}
+    }
+
+    public void addListener(InstanceCreationListener listener) {
+	if (instanceCreationListeners == null) {
+	    instanceCreationListeners = new LinkedList<InstanceCreationListener>();
+	}
+	instanceCreationListeners.add(listener);
+    }
+
+    public void removeListener(InstanceCreationListener listener) {
+	if (instanceCreationListeners != null) {
+	    instanceCreationListeners.remove(listener);
+	}
+    }
+
+    /**
+     * Sends a read only status change event to all registered listeners.
+     */
+    protected void fireInstanceCreation() {
+	if (instanceCreationListeners != null) {
+	    final Object[] l = instanceCreationListeners.toArray();
+	    final InstanceCreationEvent event = new DomainItemInstanceCreationEvent(this);
+	    for (int i = 0; i < l.length; i++) {
+		((InstanceCreationListener) l[i]).itemCreation(event);
+	    }
+	}
     }
 
 }

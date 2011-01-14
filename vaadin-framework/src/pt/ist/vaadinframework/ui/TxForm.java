@@ -21,11 +21,16 @@
  */
 package pt.ist.vaadinframework.ui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import jvstm.TransactionalCommand;
+import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.fenixframework.pstm.Transaction;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.HorizontalLayout;
@@ -40,6 +45,8 @@ public class TxForm extends Form {
     public static enum FormStyle {
 	WRITE_THROUGH, SAVE_CLEAR_CANCEL;
     }
+
+    private Collection<ClickListener> saveListeners, discardListeners, cancelListeners;
 
     public TxForm() {
 	this(FormStyle.WRITE_THROUGH);
@@ -83,18 +90,19 @@ public class TxForm extends Form {
 		@Override
 		public void buttonClick(ClickEvent event) {
 		    txCommit();
+		    notifyListeners(saveListeners, event);
 		    getWindow().showNotification("successful commit", Notification.TYPE_TRAY_NOTIFICATION);
+		    if (getWindow().isClosable()) {
+			getWindow().getParent().removeWindow(getWindow());
+		    }
 		}
 	    });
 	    buttons.addComponent(save);
 	    Button clear = new Button("Clear", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-		    for (Object propertyId : getItemPropertyIds()) {
-			if (!getItemProperty(propertyId).isReadOnly()) {
-			    getItemProperty(propertyId).setValue(null);
-			}
-		    }
+		    discard();
+		    notifyListeners(discardListeners, event);
 		    getWindow().showNotification("cleared form", Notification.TYPE_TRAY_NOTIFICATION);
 		}
 	    });
@@ -102,7 +110,11 @@ public class TxForm extends Form {
 	    Button cancel = new Button("Cancel", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-		    getWindow().showNotification("hey, who turned out the lights");
+		    notifyListeners(cancelListeners, event);
+		    getWindow().showNotification("cancelled form", Notification.TYPE_TRAY_NOTIFICATION);
+		    if (getWindow().isClosable()) {
+			getWindow().getParent().removeWindow(getWindow());
+		    }
 		}
 	    });
 	    buttons.addComponent(cancel);
@@ -110,6 +122,26 @@ public class TxForm extends Form {
 	    break;
 	default:
 	    break;
+	}
+    }
+
+    /**
+     * @see com.vaadin.ui.Form#commit()
+     */
+    @Override
+    public void commit() throws SourceException {
+	try {
+	    super.commit();
+	} catch (SourceException e) {
+	    for (Throwable cause : e.getCauses()) {
+		if (cause instanceof jvstm.CommitException) {
+		    throw (jvstm.CommitException) cause;
+		}
+		if (cause instanceof AbstractDomainObject.UnableToDetermineIdException) {
+		    throw (AbstractDomainObject.UnableToDetermineIdException) cause;
+		}
+	    }
+	    throw e;
 	}
     }
 
@@ -124,5 +156,52 @@ public class TxForm extends Form {
 	    }
 	});
 	Transaction.begin(true);
+    }
+
+    public void addSaveListener(ClickListener listener) {
+	if (saveListeners == null) {
+	    saveListeners = new ArrayList<ClickListener>();
+	}
+	saveListeners.add(listener);
+    }
+
+    public void removeSaveListener(ClickListener listener) {
+	if (saveListeners != null) {
+	    saveListeners.remove(listener);
+	}
+    }
+
+    public void addDiscardListener(ClickListener listener) {
+	if (discardListeners == null) {
+	    discardListeners = new ArrayList<ClickListener>();
+	}
+	discardListeners.add(listener);
+    }
+
+    public void removeDiscardListener(ClickListener listener) {
+	if (discardListeners != null) {
+	    discardListeners.remove(listener);
+	}
+    }
+
+    public void addCancelListener(ClickListener listener) {
+	if (cancelListeners == null) {
+	    cancelListeners = new ArrayList<ClickListener>();
+	}
+	cancelListeners.add(listener);
+    }
+
+    public void removeCancelListener(ClickListener listener) {
+	if (cancelListeners != null) {
+	    cancelListeners.remove(listener);
+	}
+    }
+
+    private void notifyListeners(Collection<ClickListener> listeners, ClickEvent event) {
+	if (listeners != null) {
+	    for (ClickListener listener : listeners) {
+		listener.buttonClick(event);
+	    }
+	}
     }
 }

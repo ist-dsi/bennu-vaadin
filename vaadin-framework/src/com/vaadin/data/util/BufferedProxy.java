@@ -30,9 +30,9 @@ import com.vaadin.data.Validator.InvalidValueException;
  */
 @SuppressWarnings("serial")
 public abstract class BufferedProxy implements Buffered {
-    private boolean writeThrough;
+    private boolean writeThrough = true;
 
-    private boolean readThrough;
+    private boolean readThrough = true;
 
     /**
      * @see com.vaadin.data.Buffered#isWriteThrough()

@@ -24,8 +24,15 @@ package com.vaadin.data.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -39,14 +46,20 @@ import com.vaadin.data.util.metamodel.PropertyDescriptor;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 public class DomainRelation<Host extends AbstractDomainObject, Type extends AbstractDomainObject> extends DomainProperty<Host>
-	implements Container {
+	implements Container, Container.ItemSetChangeNotifier, Container.PropertySetChangeNotifier {
     private final Collection<Object> propertyIds = new ArrayList<Object>();
+
+    private List<ItemSetChangeListener> itemSetChangeListeners;
+
+    private List<PropertySetChangeListener> propertySetChangeListeners;
 
     /**
      * Maps all domain objects (item ids) in the container (including filtered)
      * to their corresponding {@link DomainItem}.
      */
     private final Map<Type, DomainItem<Type>> items = new HashMap<Type, DomainItem<Type>>();
+
+    private final Map<UUID, DomainItem<Type>> newItems = new HashMap<UUID, DomainItem<Type>>();
 
     public DomainRelation(DomainItem<Host> item, PropertyDescriptor descriptor) {
 	super(item, descriptor);
@@ -56,9 +69,6 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	MetaModel model = MetaModel.findMetaModelForType(descriptor.getCollectionElementType());
 	for (PropertyDescriptor propertyDescriptor : model.getPropertyDescriptors()) {
 	    propertyIds.add(propertyDescriptor.getPropertyId());
-	}
-	for (Type instance : getValue()) {
-	    addItem(instance);
 	}
     }
 
@@ -119,7 +129,17 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
      */
     @Override
     public Object addItem() throws UnsupportedOperationException {
-	throw new UnsupportedOperationException();
+	DomainItem<Type> item = new DomainItem<Type>((Class<? extends Type>) getElementType());
+	item.addListener(new InstanceCreationListener() {
+	    @Override
+	    public void itemCreation(InstanceCreationEvent event) {
+		fireContainerItemSetChange();
+		event.getDomainItem().removeListener(this);
+	    }
+	});
+	UUID id = UUID.randomUUID();
+	newItems.put(id, item);
+	return id;
     }
 
     /**
@@ -128,11 +148,24 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
     @Override
     @SuppressWarnings("unchecked")
     public Item addItem(Object itemId) throws UnsupportedOperationException {
-	if (items.containsKey(itemId)) {
+	Collection<Type> ids = getValue();
+	if (ids.contains(itemId)) {
 	    return null;
 	}
-	DomainItem<Type> item = new DomainItem<Type>((Type) itemId);
+	DomainItem<Type> item = null;
+	for (Entry<UUID, DomainItem<Type>> entry : newItems.entrySet()) {
+	    if (entry.getValue().getInstance() != null && entry.getValue().getInstance().equals(itemId)) {
+		item = entry.getValue();
+	    }
+	}
+	if (item == null) {
+	    item = new DomainItem<Type>((Type) itemId);
+	}
 	items.put((Type) itemId, item);
+	Set<Type> newValue = new HashSet<Type>(getValue());
+	newValue.add((Type) itemId);
+	setValue(newValue);
+	fireContainerItemSetChange();
 	return item;
     }
 
@@ -144,11 +177,16 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	if (itemId == null) {
 	    return false;
 	}
-
-	if (items.remove(itemId) == null) {
+	if (!containsId(itemId)) {
 	    return false;
+	} else {
+	    items.remove(itemId);
+	    Set<Type> newValue = new HashSet<Type>(getValue());
+	    newValue.remove(itemId);
+	    setValue(newValue);
+	    fireContainerItemSetChange();
+	    return true;
 	}
-	return true;
     }
 
     /**
@@ -157,6 +195,8 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
     @Override
     public boolean removeAllItems() throws UnsupportedOperationException {
 	items.clear();
+	setValue(Collections.emptySet());
+	fireContainerItemSetChange();
 	return true;
     }
 
@@ -164,8 +204,8 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
      * @see com.vaadin.data.Container#getItemIds()
      */
     @Override
-    public Collection<?> getItemIds() {
-	return Collections.unmodifiableCollection(items.keySet());
+    public Collection<Type> getItemIds() {
+	return Collections.unmodifiableCollection(getValue());
     }
 
     /**
@@ -176,15 +216,25 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	if (itemId == null) {
 	    return false;
 	}
-	return items.containsKey(itemId);
+	return getItemIds().contains(itemId);
     }
 
     /**
      * @see com.vaadin.data.Container#getItem(java.lang.Object)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Item getItem(Object itemId) {
-	return items.get(itemId);
+	if (newItems.containsKey(itemId)) {
+	    return newItems.get(itemId);
+	}
+	if (containsId(itemId)) {
+	    if (!items.containsKey(itemId)) {
+		items.put((Type) itemId, new DomainItem<Type>((Type) itemId));
+	    }
+	    return items.get(itemId);
+	}
+	return null;
     }
 
     /**
@@ -192,7 +242,7 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
      */
     @Override
     public int size() {
-	return items.size();
+	return getValue().size();
     }
 
     public Class<? extends AbstractDomainObject> getElementType() {
@@ -206,5 +256,93 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
     public Class<?> getType(Object propertyId) {
 	return MetaModel.findMetaModelForType(descriptor.getCollectionElementType()).getPropertyDescriptor(propertyId)
 		.getPropertyType();
+    }
+
+    @SuppressWarnings("serial")
+    private class ItemSetChangeEvent extends EventObject implements Container.ItemSetChangeEvent {
+	private ItemSetChangeEvent(DomainRelation<Host, Type> source) {
+	    super(source);
+	}
+
+	@SuppressWarnings("unchecked")
+	public DomainRelation<Host, Type> getContainer() {
+	    return (DomainRelation<Host, Type>) getSource();
+	}
+    }
+
+    /**
+     * @see com.vaadin.data.Container.ItemSetChangeNotifier#addListener(com.vaadin
+     *      .data.Container.ItemSetChangeListener)
+     */
+    @Override
+    public void addListener(ItemSetChangeListener listener) {
+	if (itemSetChangeListeners == null) {
+	    itemSetChangeListeners = new LinkedList<ItemSetChangeListener>();
+	}
+	itemSetChangeListeners.add(listener);
+    }
+
+    /**
+     * @see com.vaadin.data.Container.ItemSetChangeNotifier#removeListener(com.vaadin
+     *      .data.Container.ItemSetChangeListener)
+     */
+    @Override
+    public void removeListener(ItemSetChangeListener listener) {
+	if (itemSetChangeListeners != null) {
+	    itemSetChangeListeners.remove(listener);
+	}
+    }
+
+    protected void fireContainerItemSetChange() {
+	if (itemSetChangeListeners != null) {
+	    final ItemSetChangeListener[] l = itemSetChangeListeners.toArray(new ItemSetChangeListener[0]);
+	    final Container.ItemSetChangeEvent event = new ItemSetChangeEvent(this);
+	    for (int i = 0; i < l.length; i++) {
+		l[i].containerItemSetChange(event);
+	    }
+	}
+    }
+
+    @SuppressWarnings("serial")
+    private class PropertySetChangeEvent extends EventObject implements Container.PropertySetChangeEvent {
+	private PropertySetChangeEvent(DomainRelation<Host, Type> source) {
+	    super(source);
+	}
+
+	@SuppressWarnings("unchecked")
+	public DomainRelation<Host, Type> getContainer() {
+	    return (DomainRelation<Host, Type>) getSource();
+	}
+    }
+
+    /**
+     * @see com.vaadin.data.Container.PropertySetChangeNotifier#addListener(com.vaadin.data.Container.PropertySetChangeListener)
+     */
+    @Override
+    public void addListener(PropertySetChangeListener listener) {
+	if (propertySetChangeListeners == null) {
+	    propertySetChangeListeners = new LinkedList<PropertySetChangeListener>();
+	}
+	propertySetChangeListeners.add(listener);
+    }
+
+    /**
+     * @see com.vaadin.data.Container.PropertySetChangeNotifier#removeListener(com.vaadin.data.Container.PropertySetChangeListener)
+     */
+    @Override
+    public void removeListener(PropertySetChangeListener listener) {
+	if (propertySetChangeListeners != null) {
+	    propertySetChangeListeners.remove(listener);
+	}
+    }
+
+    protected void fireContainerPropertySetChange() {
+	if (propertySetChangeListeners != null) {
+	    final PropertySetChangeListener[] l = propertySetChangeListeners.toArray(new PropertySetChangeListener[0]);
+	    final Container.PropertySetChangeEvent event = new PropertySetChangeEvent(this);
+	    for (int i = 0; i < l.length; i++) {
+		l[i].containerPropertySetChange(event);
+	    }
+	}
     }
 }

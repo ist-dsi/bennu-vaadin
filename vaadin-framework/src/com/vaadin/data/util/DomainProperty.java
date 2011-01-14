@@ -110,15 +110,11 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 		throw new Property.ConversionException(e);
 	    }
 	}
-	try {
-	    if (isWriteThrough()) {
-		setPersistentValue(newValue);
-	    } else {
-		value = newValue;
-		modified = true;
-	    }
-	} catch (Exception e) {
-	    throw new ConversionException(e);
+	if (isWriteThrough()) {
+	    setPersistentValue(newValue);
+	} else {
+	    value = newValue;
+	    modified = true;
 	}
 	if (!isReadThrough() || isWriteThrough()) {
 	    /*
