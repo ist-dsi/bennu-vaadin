@@ -94,7 +94,7 @@ public class TxForm extends Form {
 		    txCommit();
 		    notifyListeners(saveListeners, event);
 		    getWindow().showNotification("successful commit", Notification.TYPE_TRAY_NOTIFICATION);
-		    if (getWindow().isClosable()) {
+		    if (getWindow().isClosable() && getWindow().getParent() != null) {
 			getWindow().getParent().removeWindow(getWindow());
 		    }
 		}
@@ -164,6 +164,9 @@ public class TxForm extends Form {
 	    @Override
 	    public void doIt() {
 		TxForm.this.commit();
+		if (!isWriteThrough() && getItemDataSource() instanceof Buffered) {
+		    ((Buffered)getItemDataSource()).commit();
+		}
 	    }
 	});
 	Transaction.begin(true);
