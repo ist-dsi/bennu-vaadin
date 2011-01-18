@@ -28,6 +28,8 @@ import jvstm.TransactionalCommand;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.fenixframework.pstm.Transaction;
 
+import com.vaadin.data.Buffered;
+import com.vaadin.data.Item;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -122,6 +124,15 @@ public class TxForm extends Form {
 	    break;
 	default:
 	    break;
+	}
+    }
+
+    @Override
+    public void setItemDataSource(Item newDataSource, Collection propertyIds) {
+	super.setItemDataSource(newDataSource, propertyIds);
+	if (newDataSource instanceof Buffered) {
+	    ((Buffered) newDataSource).setWriteThrough(isWriteThrough());
+	    ((Buffered) newDataSource).setReadThrough(isReadThrough());
 	}
     }
 

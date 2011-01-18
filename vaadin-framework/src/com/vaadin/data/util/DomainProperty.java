@@ -58,6 +58,8 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 	this.item = item;
 	this.descriptor = descriptor;
 	this.value = getPersistentValue();
+	setWriteThrough(item.isWriteThrough());
+	setReadThrough(item.isReadThrough());
     }
 
     /**
