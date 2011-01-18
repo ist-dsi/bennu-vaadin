@@ -52,6 +52,8 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 
     private Collection<?> possibleValues;
 
+    private String label;
+
     private final Collection<Validator> validators = new ArrayList<Validator>();
 
     public DomainProperty(DomainItem<Type> item, PropertyDescriptor descriptor) {
@@ -173,6 +175,20 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 
     public void setPossibleValues(Object... possibleValues) {
 	this.possibleValues = Arrays.asList(possibleValues);
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+	return label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(String label) {
+	this.label = label;
     }
 
     /**

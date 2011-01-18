@@ -314,12 +314,19 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     }
 
     private void setCaption(Field field, Object propertyId, Property property) {
-	// String key = property.getType().getName() + "." + propertyId;
-	// if (bundle.containsKey(key)) {
-	// field.setCaption(bundle.getString(key));
-	// } else {
-	field.setCaption(DefaultFieldFactory.createCaptionByPropertyId(propertyId));
-	// }
+	if (property instanceof DomainProperty) {
+	    String label = ((DomainProperty) property).getLabel();
+	    if (label != null) {
+		field.setCaption(label);
+	    }
+	} else {
+	    // String key = property.getType().getName() + "." + propertyId;
+	    // if (bundle.containsKey(key)) {
+	    // field.setCaption(bundle.getString(key));
+	    // } else {
+	    field.setCaption(DefaultFieldFactory.createCaptionByPropertyId(propertyId));
+	    // }
+	}
     }
 
     private void setDescription(Field field, Object propertyId, Property property) {
