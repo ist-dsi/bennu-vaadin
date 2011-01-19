@@ -6,6 +6,6 @@
 		<jsp:include page="head.jsp"/>
 	</head>
 	<body class="top">
-		<div id="vaadin"/>
+		<div id="vaadin" class="v-app"/>
 	</body>
 </html:html>
