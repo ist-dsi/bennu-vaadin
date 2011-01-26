@@ -10,8 +10,19 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
 
 <script type="text/javascript">
-	var vaadin = { vaadinConfigurations: { 'vaadin': {appUri:'<%=request.getContextPath() + "/vaadin"%>', pathInfo: '/'}}};
+	var vaadin = {
+        vaadinConfigurations: {
+            'vaadin': {
+                appUri:'<%= request.getContextPath() + "/vaadin"%>',
+                pathInfo: '/',
+                themeUri: '<%= request.getContextPath() + "/VAADIN/themes/" + theme %>',
+                versionInfo : {
+                    vaadinVersion:"6.5.0-INTERNAL-NONVERSIONED-DEBUG-BUILD",
+                    applicationVersion:"NONVERSIONED"
+                }
+            }
+        }};
 </script>
 <script language='javascript'
 	src='<%=request.getContextPath()
-		    + "/VAADIN/widgetsets/com.vaadin.terminal.gwt.DefaultWidgetSet/com.vaadin.terminal.gwt.DefaultWidgetSet.nocache.js"%>'></script>
+		    + "/VAADIN/widgetsets/pt.ist.vaadinframework.AddonsWidgetSet/pt.ist.vaadinframework.AddonsWidgetSet.nocache.js"%>'></script>

@@ -22,6 +22,10 @@
 			<param-name>application</param-name>
 			<param-value>pt.ist.vaadinframework.EmbeddedApplication</param-value>
 		</init-param>
+        <init-param>
+            <param-name>widgetset</param-name>
+            <param-value>pt.ist.vaadinframework.AddonsWidgetSet</param-value>
+        </init-param>
 	</servlet>
 
 	<servlet-mapping>

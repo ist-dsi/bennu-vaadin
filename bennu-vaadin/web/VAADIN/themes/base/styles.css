@@ -1,9 +1,5 @@
 @import url(../reindeer/styles.css);
 
-.v-filterselect {
-	white-space: normal;
-}
-
 .float-right {
 	float: right;
 }
@@ -13,3 +9,8 @@
 .embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
 	padding-top: 0px;
 }
+
+.v-generated-body, .v-app {
+	background: none repeat scroll 0 0 #FFFFFF;
+}
+
