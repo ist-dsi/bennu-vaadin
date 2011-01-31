@@ -2,7 +2,7 @@
 <project name="vaadin-framework" default="jar">
 	<description>Vaadin Fenix Framework Integration Library</description>
 
-	<property name="src.dir" location="src" />
+	<property name="src.dir" location="src/main/java" />
 	<property name="build.dir" location="build" />
 	<property name="doc.dir" location="doc" />
 	<property name="dist.dir" location="dist" />
