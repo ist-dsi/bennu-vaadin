@@ -8,7 +8,11 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/VAADIN/themes/" + theme + "/styles.css"%>">
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
-
+	
+	<!--[if IE]>
+    	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
 <script type="text/javascript">
 	var vaadin = {
         vaadinConfigurations: {
@@ -26,3 +30,4 @@
 <script language='javascript'
 	src='<%=request.getContextPath()
 		    + "/VAADIN/widgetsets/pt.ist.vaadinframework.AddonsWidgetSet/pt.ist.vaadinframework.AddonsWidgetSet.nocache.js"%>'></script>
+     
