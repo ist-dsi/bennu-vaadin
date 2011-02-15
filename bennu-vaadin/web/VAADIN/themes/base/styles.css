@@ -14,3 +14,14 @@
 	background: none repeat scroll 0 0 #FFFFFF;
 }
 
+
+.flow .v-csslayout-margin,.v-csslayout-margin-top,.v-csslayout-margin-right,.v-csslayout-margin-bottom,.v-csslayout-margin-left {
+	padding: 4px;
+}
+
+.flow-part, .flow-separator {
+	display: inline !important;
+	white-space: normal;
+	vertical-align: top;
+	padding-right: 2px;
+}
