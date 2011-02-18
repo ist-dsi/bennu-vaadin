@@ -28,15 +28,13 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
-import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.Application;
-import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UriFragmentUtility;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -113,59 +111,56 @@ import com.vaadin.ui.Window;
  * @version 1.0
  */
 @SuppressWarnings("serial")
-public class EmbeddedApplication extends Application implements HttpServletRequestListener {
-    public static final String VAADIN_PARAM = "vaadin-param";
-
+public class EmbeddedApplication extends Application {
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
 
-    private final Window window;
+    private final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
 
-    {
-	setTheme("reindeer");
-	window = new Window();
-    }
+    private Component current;
 
     @Override
     public void init() {
-	setMainWindow(window);
-    }
-
-    @Override
-    public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
-	setLocale(Language.getLocale());
-	String param = (String) request.getSession().getAttribute(VAADIN_PARAM);
-	if (param != null) {
-	    request.getSession().removeAttribute(VAADIN_PARAM);
-	    for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
-		Matcher matcher = entry.getKey().matcher(param);
-		if (matcher.find()) {
-		    try {
-			EmbeddedComponentContainer container = entry.getValue().newInstance();
-			Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
-			for (int i = 0; i <= matcher.groupCount(); i++) {
-			    arguments.add(matcher.group(i));
+	setTheme("reindeer");
+	Window window = new Window();
+	final VerticalLayout layout = new VerticalLayout();
+	layout.addComponent(fragmentUtility);
+	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
+	    @Override
+	    public void fragmentChanged(FragmentChangedEvent source) {
+		String fragment = source.getUriFragmentUtility().getFragment();
+		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
+		    Matcher matcher = entry.getKey().matcher(fragment);
+		    if (matcher.find()) {
+			try {
+			    EmbeddedComponentContainer container = entry.getValue().newInstance();
+			    Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
+			    for (int i = 0; i <= matcher.groupCount(); i++) {
+				arguments.add(matcher.group(i));
+			    }
+			    container.setArguments(arguments.toArray(new String[0]));
+			    layout.replaceComponent(current, container);
+			    current = container;
+			    return;
+			} catch (InstantiationException e) {
+			    VaadinFrameworkLogger.getLogger().error(
+				    "Embedded component resolver could not instantiate matched pattern: <"
+					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
+			} catch (IllegalAccessException e) {
+			    VaadinFrameworkLogger.getLogger().error(
+				    "Embedded component resolver could not instantiate matched pattern: <"
+					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
 			}
-			container.setArguments(arguments.toArray(new String[0]));
-			window.setContent(container);
-			return;
-		    } catch (InstantiationException e) {
-			VaadinFrameworkLogger.getLogger().error(
-				"Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
-					+ ", " + entry.getValue().getName() + ">", e);
-		    } catch (IllegalAccessException e) {
-			VaadinFrameworkLogger.getLogger().error(
-				"Embedded component resolver could not instantiate matched pattern: <" + entry.getKey().pattern()
-					+ ", " + entry.getValue().getName() + ">", e);
 		    }
 		}
+		Component container = new NoMatchingPatternFoundComponent();
+		layout.replaceComponent(current, container);
+		current = container;
 	    }
-	    window.setContent(new NoMatchingPatternFoundComponent());
-	}
-    }
-
-    @Override
-    public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
-	// Nothing to do.
+	});
+	current = new VerticalLayout();
+	layout.addComponent(current);
+	window.setContent(layout);
+	setMainWindow(window);
     }
 
     /**
