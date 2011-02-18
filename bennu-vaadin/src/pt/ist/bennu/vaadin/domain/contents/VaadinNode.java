@@ -7,20 +7,20 @@ import pt.ist.fenixWebFramework.services.Service;
 
 public class VaadinNode extends VaadinNode_Base {
 
-    public VaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
-	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup) {
-        super();
-        init(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, true);
+    public VaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle, final String linkKey,
+	    final String argument, final PersistentGroup accessibilityGroup) {
+	super();
+	init(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, true);
     }
 
-    public VaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
-	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup, final boolean useBennuLayout) {
-        super();
-        init(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, useBennuLayout);
+    public VaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle, final String linkKey,
+	    final String argument, final PersistentGroup accessibilityGroup, final boolean useBennuLayout) {
+	super();
+	init(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, useBennuLayout);
     }
 
-    protected void init(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
-	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup, final boolean useBennuLayout) {
+    protected void init(final VirtualHost virtualHost, final Node parentNode, final String linkBundle, final String linkKey,
+	    final String argument, final PersistentGroup accessibilityGroup, final boolean useBennuLayout) {
 	final String method = useBennuLayout ? "forwardToVaadin" : "forwardToFullVaadin";
 	init(virtualHost, parentNode, "/vaadinContext", method, linkBundle, linkKey, accessibilityGroup);
 	setArgument(argument);
@@ -31,7 +31,7 @@ public class VaadinNode extends VaadinNode_Base {
 	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup) {
 	return new VaadinNode(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup);
     }
-    
+
     @Service
     public static VaadinNode createVaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
 	    final String linkKey, final String argument, final PersistentGroup accessibilityGroup, boolean useBennuLayout) {
@@ -39,9 +39,9 @@ public class VaadinNode extends VaadinNode_Base {
     }
 
     @Override
-    protected void appendUrlPrefix(StringBuilder stringBuilder) {
-	super.appendUrlPrefix(stringBuilder);
-	stringBuilder.append("&argument=");
+    protected void appendNodePath(StringBuilder stringBuilder) {
+	super.appendNodePath(stringBuilder);
+	stringBuilder.append("#");
 	stringBuilder.append(getArgument());
     }
 

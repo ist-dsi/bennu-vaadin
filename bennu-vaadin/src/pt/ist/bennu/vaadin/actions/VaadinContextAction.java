@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
-import pt.ist.vaadinframework.EmbeddedApplication;
 
 @Mapping(path = "/vaadinContext")
 public class VaadinContextAction extends ContextBaseAction {
@@ -38,20 +37,17 @@ public class VaadinContextAction extends ContextBaseAction {
 
     public final ActionForward forwardToVaadin(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-	final String argument = request.getParameter("argument");
-	return forwardToVaadin(request, argument, true);
+	return forwardToVaadin(request, true);
     }
 
     public final ActionForward forwardToFullVaadin(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-	final String argument = request.getParameter("argument");
-	return forwardToVaadin(request, argument, false);
+	return forwardToVaadin(request, false);
     }
 
-    public static ActionForward forwardToVaadin(final HttpServletRequest request, final String argument,
-	    final boolean useBennuLayout) {
-	request.getSession().setAttribute(EmbeddedApplication.VAADIN_PARAM, argument);
-	final Context context = useBennuLayout ? new VaadinLayoutContext(getContext(request).getPath()) : new FullVaadinLayoutContext();
+    public static ActionForward forwardToVaadin(final HttpServletRequest request, final boolean useBennuLayout) {
+	final Context context = useBennuLayout ? new VaadinLayoutContext(getContext(request).getPath())
+		: new FullVaadinLayoutContext();
 	setContext(request, context);
 	return forward(request, "/embedded/vaadin-embedded.jsp");
     }
