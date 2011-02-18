@@ -45,4 +45,9 @@ public class VaadinNode extends VaadinNode_Base {
 	stringBuilder.append(getArgument());
     }
 
+    @Override
+    public boolean isRedirect() {
+        return true;
+    }
+
 }
