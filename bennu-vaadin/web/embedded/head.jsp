@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
 	
 	<!--[if IE]>
-    	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    	<script src="<%= request.getContextPath() + "/VAADIN/js/html5.js"%>"></script>
     <![endif]-->
     
 <script type="text/javascript">
