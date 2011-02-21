@@ -24,7 +24,7 @@
 			if (!vaadin.themesLoaded) { vaadin.themesLoaded = {}; }
 				vaadin.debug = true;
 				document.write('<iframe tabIndex="-1" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0;overflow:hidden;" src="javascript:false"></iframe>');
-				document.write("<script language='javascript' src='<%= request.getContextPath() + "/VAADIN/widgetsets/com.vaadin.terminal.gwt.DefaultWidgetSet/com.vaadin.terminal.gwt.DefaultWidgetSet.nocache.js"%>'><\/script>");
+				document.write("<script language='javascript' src='<%= request.getContextPath() + "/VAADIN/widgetsets/pt.ist.vaadinframework.AddonsWidgetSet/pt.ist.vaadinframework.AddonsWidgetSet.nocache.js"%>'><\/script>");
 			}
 			vaadin.vaadinConfigurations["vaadin"] = {appUri:'<%= request.getContextPath() + "/vaadin"%>', pathInfo: '/', themeUri:'<%= request.getContextPath() + "/VAADIN/themes/" + theme %>', versionInfo : {vaadinVersion:"6.5.0",applicationVersion:"NONVERSIONED"}};
 		//]]>
