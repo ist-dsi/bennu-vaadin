@@ -9,10 +9,6 @@
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
 	
-	<!--[if IE]>
-    	<script src="<%= request.getContextPath() + "/VAADIN/js/html5.js"%>"></script>
-    <![endif]-->
-    
 <script type="text/javascript">
 	var vaadin = {
         vaadinConfigurations: {

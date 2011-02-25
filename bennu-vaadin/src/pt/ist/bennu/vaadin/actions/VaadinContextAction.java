@@ -19,7 +19,6 @@ public class VaadinContextAction extends ContextBaseAction {
     public static class VaadinLayoutContext extends LayoutContext {
 	public VaadinLayoutContext(String path) {
 	    super(path);
-	    addHead("/embedded/head.jsp");
 	}
     }
 
