@@ -189,4 +189,11 @@ public class EmbeddedApplication extends Application {
 	    // Not expecting any arguments
 	}
     }
+
+    /**
+     * @return the current
+     */
+    public Component getCurrent() {
+        return current;
+    }
 }
