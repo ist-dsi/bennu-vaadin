@@ -5,4 +5,30 @@
 
 <bean:define id="theme" name="virtualHost" property="theme.name"/>
 
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/VAADIN/themes/" + theme + "/styles.css"%>">
+
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/head.css"%>">
+	
+	<!--[if IE]>
+    	<script src="<%= request.getContextPath() + "/VAADIN/js/html5.js"%>"></script>
+    <![endif]-->
+    
+<script type="text/javascript">
+	var vaadin = {
+        vaadinConfigurations: {
+            'vaadin': {
+                appUri:'<%= request.getContextPath() + "/vaadin"%>',
+                pathInfo: '/',
+                themeUri: '<%= request.getContextPath() + "/VAADIN/themes/" + theme %>',
+                versionInfo : {
+                    vaadinVersion:"6.5.0-INTERNAL-NONVERSIONED-DEBUG-BUILD",
+                    applicationVersion:"NONVERSIONED"
+                }
+            }
+        }};
+</script>
+<script language='javascript'
+	src='<%=request.getContextPath()
+		    + "/VAADIN/widgetsets/pt.ist.vaadinframework.AddonsWidgetSet/pt.ist.vaadinframework.AddonsWidgetSet.nocache.js"%>'></script>
+
 <div id="vaadin" class="<%= "v-app v-theme-" + theme + " v-app-EmbeddedApplication" %>" />
