@@ -23,19 +23,11 @@ package pt.ist.vaadinframework;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.UriFragmentUtility;
-import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 /**
@@ -114,53 +106,35 @@ import com.vaadin.ui.Window;
 public class EmbeddedApplication extends Application {
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
 
-    private final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
-
-    private Component current;
-
     @Override
     public void init() {
 	setTheme("reindeer");
-	Window window = new Window();
-	final VerticalLayout layout = new VerticalLayout();
-	layout.addComponent(fragmentUtility);
-	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
-	    @Override
-	    public void fragmentChanged(FragmentChangedEvent source) {
-		String fragment = source.getUriFragmentUtility().getFragment();
-		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
-		    Matcher matcher = entry.getKey().matcher(fragment);
-		    if (matcher.find()) {
-			try {
-			    EmbeddedComponentContainer container = entry.getValue().newInstance();
-			    Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
-			    for (int i = 0; i <= matcher.groupCount(); i++) {
-				arguments.add(matcher.group(i));
-			    }
-			    container.setArguments(arguments.toArray(new String[0]));
-			    layout.replaceComponent(current, container);
-			    current = container;
-			    return;
-			} catch (InstantiationException e) {
-			    VaadinFrameworkLogger.getLogger().error(
-				    "Embedded component resolver could not instantiate matched pattern: <"
-					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
-			} catch (IllegalAccessException e) {
-			    VaadinFrameworkLogger.getLogger().error(
-				    "Embedded component resolver could not instantiate matched pattern: <"
-					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
-			}
-		    }
-		}
-		Component container = new NoMatchingPatternFoundComponent();
-		layout.replaceComponent(current, container);
-		current = container;
-	    }
-	});
-	current = new VerticalLayout();
-	layout.addComponent(current);
-	window.setContent(layout);
-	setMainWindow(window);
+	setMainWindow(new EmbeddedWindow(resolver));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.vaadin.Application#getWindow(java.lang.String)
+     */
+    @Override
+    public Window getWindow(String name) {
+	// If the window is identified by name, we are good to go
+	Window window = super.getWindow(name);
+
+	// If not, we must create a new window for this new browser window/tab
+	if (window == null) {
+	    window = new EmbeddedWindow(resolver);
+
+	    // Use the random name given by the framework to identify this
+	    // window in future
+	    window.setName(name);
+	    addWindow(window);
+
+	    // Move to the url to remember the name in the future
+	    // window.open(new ExternalResource(window.getURL()));
+	}
+	return window;
     }
 
     /**
@@ -177,23 +151,45 @@ public class EmbeddedApplication extends Application {
 	resolver.put(pattern, type);
     }
 
-    private class NoMatchingPatternFoundComponent extends VerticalLayout implements EmbeddedComponentContainer {
-	@Override
-	public void attach() {
-	    super.attach();
-	    addComponent(new Label("No matching component found"));
-	}
-
-	@Override
-	public void setArguments(String... arguments) {
-	    // Not expecting any arguments
-	}
-    }
-
-    /**
-     * @return the current
-     */
-    public Component getCurrent() {
-        return current;
-    }
+    // /**
+    // * @see
+    // com.vaadin.Application#terminalError(com.vaadin.terminal.Terminal.ErrorEvent)
+    // */
+    // @Override
+    // public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event)
+    // {
+    // final Throwable t = event.getThrowable();
+    // if (t instanceof SocketException) {
+    // // Most likely client browser closed socket
+    // VaadinFrameworkLogger.getLogger().error(
+    // "Warning: SocketException in CommunicationManager. Most likely client (browser) closed socket.",
+    // t);
+    // return;
+    // }
+    //
+    // // // Finds the original source of the error/exception
+    // // Object owner = null;
+    // // if (event instanceof VariableOwner.ErrorEvent) {
+    // // owner = ((VariableOwner.ErrorEvent) event).getVariableOwner();
+    // // } else if (event instanceof URIHandler.ErrorEvent) {
+    // // owner = ((URIHandler.ErrorEvent) event).getURIHandler();
+    // // } else if (event instanceof ParameterHandler.ErrorEvent) {
+    // // owner = ((ParameterHandler.ErrorEvent) event).getParameterHandler();
+    // // } else if (event instanceof ChangeVariablesErrorEvent) {
+    // // owner = ((ChangeVariablesErrorEvent) event).getComponent();
+    // // }
+    // //
+    // // // Shows the error in AbstractComponent
+    // // if (owner instanceof AbstractComponent) {
+    // // if (t instanceof ErrorMessage) {
+    // // ((AbstractComponent) owner).setComponentError((ErrorMessage) t);
+    // // } else {
+    // // ((AbstractComponent) owner).setComponentError(new SystemError(t));
+    // // }
+    // // }
+    // VaadinFrameworkLogger.getLogger().error("Unhandled exception", t);
+    // getMainWindow().showNotification("An Unexpected error occured!",
+    // t.toString(), Notification.TYPE_ERROR_MESSAGE);
+    //
+    // }
 }
