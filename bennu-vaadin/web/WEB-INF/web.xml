@@ -5,7 +5,7 @@
 	<context-param>
 		<description>Vaadin production mode</description>
 		<param-name>productionMode</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 
 	<servlet>
@@ -13,7 +13,7 @@
         <servlet-class>pt.ist.bennu.vaadin.EmbeddedApplicationInitializer</servlet-class>
         <load-on-startup>3</load-on-startup>
     </servlet>
-
+    
 	<servlet>
 		<servlet-name>VaadinEmbedded</servlet-name>
 		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
@@ -24,7 +24,7 @@
 		</init-param>
         <init-param>
             <param-name>widgetset</param-name>
-            <param-value>pt.ist.vaadinframework.AddonsWidgetSet</param-value>
+            <param-value>pt.ist.bennu.addons.widgetset.AddonsWidgetSet</param-value>
         </init-param>
 	</servlet>
 

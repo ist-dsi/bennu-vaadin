@@ -25,6 +25,6 @@
 </script>
 <script language='javascript'
 	src='<%=request.getContextPath()
-		    + "/VAADIN/widgetsets/pt.ist.vaadinframework.AddonsWidgetSet/pt.ist.vaadinframework.AddonsWidgetSet.nocache.js"%>'></script>
+		    + "/VAADIN/widgetsets/pt.ist.bennu.addons.widgetset.AddonsWidgetSet/pt.ist.bennu.addons.widgetset.AddonsWidgetSet.nocache.js"%>'></script>
 
 <div id="vaadin" class="<%= "v-app v-theme-" + theme + " v-app-EmbeddedApplication" %>" />

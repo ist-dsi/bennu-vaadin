@@ -25,3 +25,8 @@
 	vertical-align: top;
 	padding-right: 2px;
 }
+
+.flow-part *, .flow-separator * {
+	display: inline !important;
+	white-space: normal;
+}
