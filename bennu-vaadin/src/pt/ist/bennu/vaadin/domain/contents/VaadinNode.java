@@ -39,10 +39,12 @@ public class VaadinNode extends VaadinNode_Base {
     }
 
     @Override
-    protected void appendNodePath(StringBuilder stringBuilder) {
-	super.appendNodePath(stringBuilder);
+    public String getUrl() {
+	final StringBuilder stringBuilder = new StringBuilder();
+	stringBuilder.append(super.getUrl());
 	stringBuilder.append("#");
 	stringBuilder.append(getArgument());
+	return stringBuilder.toString();
     }
 
     @Override
