@@ -54,7 +54,7 @@ public class EmbeddedWindow extends Window {
 		String fragment = source.getUriFragmentUtility().getFragment();
 		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
 		    Matcher matcher = entry.getKey().matcher(fragment);
-		    if (matcher.find()) {
+		    if (matcher.matches()) {
 			try {
 			    EmbeddedComponentContainer container = entry.getValue().newInstance();
 			    Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
