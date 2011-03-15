@@ -29,6 +29,7 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Window.Notification;
 
 /**
  * <p>
@@ -149,6 +150,20 @@ public class EmbeddedApplication extends Application {
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);
+    }
+
+    /**
+     * @see com.vaadin.Application#terminalError(com.vaadin.terminal.Terminal.ErrorEvent)
+     */
+    @Override
+    public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
+	Throwable throwable = event.getThrowable();
+	if (throwable.getCause() instanceof UnauthorizedAccessException) {
+	    getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
+	    close();
+	} else {
+	    super.terminalError(event);
+	}
     }
 
     // /**

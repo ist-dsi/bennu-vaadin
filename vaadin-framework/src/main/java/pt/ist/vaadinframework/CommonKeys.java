@@ -26,7 +26,8 @@ package pt.ist.vaadinframework;
  * 
  */
 public enum CommonKeys implements MessageBundleKey {
-    BUTTON_SAVE("pt.ist.vaadinframework.common.button.save"), BUTTON_DISCARD("pt.ist.vaadinframework.common.button.discard");
+    BUTTON_SAVE("pt.ist.vaadinframework.common.button.save"), BUTTON_DISCARD("pt.ist.vaadinframework.common.button.discard"), ERROR_UNAUTHORIZED(
+	    "pt.ist.bennu.vaadin.error.pageAccessDenied");
 
     private final String key;
 
