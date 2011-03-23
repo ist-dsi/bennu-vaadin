@@ -222,6 +222,10 @@ public class DomainProperty<Type extends AbstractDomainObject> extends BufferedN
 	return descriptor.isRequired();
     }
 
+    public String getLabelKey() {
+	return item.getType().getName() + ".label." + descriptor.getPropertyId();
+    }
+
     /**
      * Returns the value of the <code>DomainProperty</code> in human readable
      * textual format. The return value should be assignable to the

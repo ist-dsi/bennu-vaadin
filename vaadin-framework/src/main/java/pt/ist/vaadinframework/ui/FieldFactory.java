@@ -27,12 +27,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
 import pt.ist.vaadinframework.data.validator.CharacterValidator;
@@ -79,6 +82,8 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     private static Map<Class<?>, FieldMaker> factories = new HashMap<Class<?>, FieldMaker>();
 
     private final Map<Class<?>, FieldMaker> customFactories = new HashMap<Class<?>, FieldMaker>();
+
+    private final ResourceBundle bundle;
 
     static {
 	addClassFactory(AbstractDomainObject.class, new FieldMaker() {
@@ -232,6 +237,19 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
     }
 
     /**
+     * Use {@link FieldFactory#FieldFactory(ResourceBundle)} for caption i18N
+     * conventions to work
+     */
+    @Deprecated
+    public FieldFactory() {
+	this.bundle = null;
+    }
+
+    public FieldFactory(ResourceBundle bundle) {
+	this.bundle = bundle;
+    }
+
+    /**
      * @see com.vaadin.ui.TableFieldFactory#createField(com.vaadin.data.Container,
      *      java.lang.Object, java.lang.Object, com.vaadin.ui.Component)
      */
@@ -318,6 +336,18 @@ public class FieldFactory implements FormFieldFactory, TableFieldFactory {
 	    String label = ((DomainProperty) property).getLabel();
 	    if (label != null) {
 		field.setCaption(label);
+	    } else {
+		String key = ((DomainProperty<?>) property).getLabelKey();
+		try {
+		    field.setCaption(bundle.getString(key));
+		} catch (MissingResourceException e) {
+		    VaadinFrameworkLogger.getLogger().warn(e.getMessage());
+		    field.setCaption('!' + key + '!');
+		} catch (NullPointerException e) {
+		    // FIXME: will be thrown if resource bundle is not supplied.
+		    // eliminate default constructor to eliminate this catch
+		    field.setCaption('!' + key + '!');
+		}
 	    }
 	} else {
 	    // String key = property.getType().getName() + "." + propertyId;
