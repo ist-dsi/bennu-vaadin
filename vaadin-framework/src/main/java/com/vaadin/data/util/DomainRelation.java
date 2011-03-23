@@ -21,7 +21,6 @@
  */
 package com.vaadin.data.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
@@ -47,7 +46,7 @@ import com.vaadin.data.util.metamodel.PropertyDescriptor;
  */
 public class DomainRelation<Host extends AbstractDomainObject, Type extends AbstractDomainObject> extends DomainProperty<Host>
 	implements Container, Container.ItemSetChangeNotifier, Container.PropertySetChangeNotifier {
-    private final Collection<Object> propertyIds = new ArrayList<Object>();
+    private final Collection<String> propertyIds;
 
     private List<ItemSetChangeListener> itemSetChangeListeners;
 
@@ -66,10 +65,7 @@ public class DomainRelation<Host extends AbstractDomainObject, Type extends Abst
 	if (!Collection.class.isAssignableFrom(descriptor.getPropertyType())) {
 	    throw new IllegalArgumentException("DomainRelation must be bound to relation properties");
 	}
-	MetaModel model = MetaModel.findMetaModelForType(descriptor.getCollectionElementType());
-	for (PropertyDescriptor propertyDescriptor : model.getPropertyDescriptors()) {
-	    propertyIds.add(propertyDescriptor.getPropertyId());
-	}
+	propertyIds = MetaModel.findMetaModelForType(descriptor.getCollectionElementType()).getPropertyIds();
     }
 
     /**
