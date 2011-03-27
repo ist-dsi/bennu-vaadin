@@ -10,8 +10,6 @@
 	</target>
 
 	<target name="appendProcessor" unless="containsEmbeddedProcessor">
-		<echo>Hello World 2</echo>
-		<echo>${build_home}/WEB-INF/classes/.compileProcessors</echo>
 		<echo file="${build_home}/WEB-INF/classes/.compileProcessors"
 			append="yes"
 			message=",vaadin.annotation.EmbeddedAnnotationProcessor"/>
