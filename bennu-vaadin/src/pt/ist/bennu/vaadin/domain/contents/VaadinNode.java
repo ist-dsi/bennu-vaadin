@@ -39,6 +39,15 @@ public class VaadinNode extends VaadinNode_Base {
     }
 
     @Override
+    public String getUrl() {
+	final StringBuilder stringBuilder = new StringBuilder();
+	stringBuilder.append(super.getUrl());
+	stringBuilder.append("#");
+	stringBuilder.append(getArgument());
+	return stringBuilder.toString();
+    }
+
+    @Override
     public String getUrl(final String appContext) {
 	final StringBuilder stringBuilder = new StringBuilder();
 	stringBuilder.append(super.getUrl(appContext));
