@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Instituto Superior Tecnico
+ * Copyright 2011 Instituto Superior Tecnico
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
@@ -21,200 +21,76 @@
  */
 package com.vaadin.data.util;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import jvstm.PerTxBox;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
-import com.vaadin.data.Buffered;
 import com.vaadin.data.Property;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.metamodel.MetaModel;
 import com.vaadin.data.util.metamodel.PropertyDescriptor;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * 
  */
-@SuppressWarnings("serial")
-public class DomainItem<Type extends AbstractDomainObject> extends BufferedNotifierItem {
-    private final PerTxBox<Type> instance;
+public class DomainItem extends AbstractDomainItem {
+    private PropertyDescriptor descriptor;
 
-    private final Class<? extends Type> type;
-
-    private final Collection<String> propertyIds;
-
-    private final Map<Object, DomainProperty<Type>> properties = new HashMap<Object, DomainProperty<Type>>();
-
-    private LinkedList<InstanceCreationListener> instanceCreationListeners;
-
-    public DomainItem(Class<? extends Type> type) {
-	this.type = type;
-	this.instance = new PerTxBox<Type>(null);
-	propertyIds = MetaModel.findMetaModelForType(type).getPropertyIds();
+    public DomainItem(AbstractDomainObject value) {
+	super(value);
     }
 
-    @SuppressWarnings("unchecked")
-    public DomainItem(Type instance) {
-	this.type = (Class<Type>) instance.getClass();
-	this.instance = new PerTxBox<Type>(instance);
-	propertyIds = MetaModel.findMetaModelForType(type).getPropertyIds();
+    public DomainItem(Class<? extends AbstractDomainObject> type) {
+	super(type);
     }
 
-    public Class<? extends Type> getType() {
-	return type;
+    public DomainItem(AbstractDomainItem host, PropertyDescriptor descriptor) {
+	super(host, descriptor.getPropertyType());
+	this.descriptor = descriptor;
     }
 
-    /* Instance management */
-
-    public Type getInstance() {
-	return instance.get();
+    /**
+     * @see com.vaadin.data.util.AbstractDomainProperty#getNullValue()
+     */
+    @Override
+    protected Object getNullValue() {
+	return null;
     }
 
-    protected Type getOrCreateInstance() throws SourceException {
-	if (instance.get() == null) {
-	    try {
-		instance.put(type.newInstance());
-		fireInstanceCreation();
-	    } catch (InstantiationException e) {
-		throw new SourceException(this, e);
-	    } catch (IllegalAccessException e) {
-		throw new SourceException(this, e);
+    /**
+     * @see com.vaadin.data.util.AbstractDomainProperty#getValueFrom(pt.ist.
+     *      fenixframework.pstm.AbstractDomainObject)
+     */
+    @Override
+    protected Object getValueFrom(AbstractDomainObject host) {
+	return descriptor.read(host);
+    }
+
+    /**
+     * @see com.vaadin.data.util.AbstractDomainProperty#setValueOn(pt.ist.fenixframework
+     *      .pstm.AbstractDomainObject, java.lang.Object)
+     */
+    @Override
+    protected void setValueOn(AbstractDomainObject host, Object newValue) throws ConversionException {
+	descriptor.write(host, newValue);
+    }
+
+    /**
+     * @see com.vaadin.data.util.AbstractDomainItem#lazyCreateProperty(java.lang.
+     *      Object)
+     */
+    @Override
+    protected Property lazyCreateProperty(Object propertyId) {
+	MetaModel model = MetaModel.findMetaModelForType(getType());
+	PropertyDescriptor descriptor = model.getPropertyDescriptor((String) propertyId);
+	if (descriptor != null) {
+	    if (descriptor.isCollection()) {
+		return new DomainContainer(this, descriptor);
+	    } else if (AbstractDomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
+		return new DomainItem(this, descriptor);
+	    } else {
+		return new DomainProperty(this, descriptor);
 	    }
 	}
-	return instance.get();
-    }
-
-    /* Proxy interfaces implementation */
-
-    /**
-     * @see com.vaadin.data.Item#getItemProperty(java.lang.Object)
-     */
-    @Override
-    public DomainProperty<Type> getItemProperty(Object id) {
-	if (!properties.containsKey(id)) {
-	    MetaModel model = MetaModel.findMetaModelForType(getType());
-	    PropertyDescriptor descriptor = model.getPropertyDescriptor(id);
-	    if (descriptor != null) {
-		if (descriptor.isCollection()) {
-		    properties.put(id, new DomainRelation<Type, AbstractDomainObject>(this, descriptor));
-		} else {
-		    properties.put(id, new DomainProperty<Type>(this, descriptor));
-		}
-	    }
-	}
-	return properties.get(id);
-    }
-
-    /**
-     * @see com.vaadin.data.Item#getItemPropertyIds()
-     */
-    @Override
-    public Collection<?> getItemPropertyIds() {
-	return Collections.unmodifiableCollection(propertyIds);
-    }
-
-    /**
-     * @see com.vaadin.data.Item#addItemProperty(java.lang.Object,
-     *      com.vaadin.data.Property)
-     */
-    @Override
-    public boolean addItemProperty(Object id, Property property) throws UnsupportedOperationException {
-	throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @see com.vaadin.data.Item#removeItemProperty(java.lang.Object)
-     */
-    @Override
-    public boolean removeItemProperty(Object id) throws UnsupportedOperationException {
-	if (properties.remove(id) != null) {
-	    fireItemPropertySetChange();
-	    return true;
-	}
-	return false;
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#commit()
-     */
-    @Override
-    public void commit() throws SourceException, InvalidValueException {
-	for (Property property : properties.values()) {
-	    if (property instanceof Buffered) {
-		((Buffered) property).commit();
-	    }
-	}
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#discard()
-     */
-    @Override
-    public void discard() throws SourceException {
-	for (Property property : properties.values()) {
-	    if (property instanceof Buffered) {
-		((Buffered) property).discard();
-	    }
-	}
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#isModified()
-     */
-    @Override
-    public boolean isModified() {
-	for (Property property : properties.values()) {
-	    if (property instanceof Buffered) {
-		if (((Buffered) property).isModified()) {
-		    return true;
-		}
-	    }
-	}
-	return false;
-    }
-
-    @SuppressWarnings("unused")
-    private class DomainItemInstanceCreationEvent extends EventObject implements InstanceCreationEvent {
-	protected DomainItemInstanceCreationEvent(DomainItem<Type> source) {
-	    super(source);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public DomainItem<Type> getDomainItem() {
-	    return (DomainItem<Type>) getSource();
-	}
-    }
-
-    public void addListener(InstanceCreationListener listener) {
-	if (instanceCreationListeners == null) {
-	    instanceCreationListeners = new LinkedList<InstanceCreationListener>();
-	}
-	instanceCreationListeners.add(listener);
-    }
-
-    public void removeListener(InstanceCreationListener listener) {
-	if (instanceCreationListeners != null) {
-	    instanceCreationListeners.remove(listener);
-	}
-    }
-
-    /**
-     * Sends a read only status change event to all registered listeners.
-     */
-    protected void fireInstanceCreation() {
-	if (instanceCreationListeners != null) {
-	    final Object[] l = instanceCreationListeners.toArray();
-	    final InstanceCreationEvent event = new DomainItemInstanceCreationEvent(this);
-	    for (int i = 0; i < l.length; i++) {
-		((InstanceCreationListener) l[i]).itemCreation(event);
-	    }
-	}
+	return null;
     }
 
 }

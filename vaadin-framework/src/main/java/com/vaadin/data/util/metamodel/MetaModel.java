@@ -82,7 +82,13 @@ public class MetaModel {
     /**
      * @param propertyId
      */
-    public PropertyDescriptor getPropertyDescriptor(Object propertyId) {
+    public PropertyDescriptor getPropertyDescriptor(String propertyId) {
+	if (!descriptors.containsKey(propertyId)) {
+	    int dotLocation = propertyId.indexOf('.');
+	    PropertyDescriptor descriptor = descriptors.get(propertyId.substring(0, dotLocation));
+	    MetaModel model = MetaModel.findMetaModelForType(descriptor.getPropertyType());
+	    descriptors.put(propertyId, model.getPropertyDescriptor(propertyId.substring(dotLocation + 1)));
+	}
 	return descriptors.get(propertyId);
     }
 

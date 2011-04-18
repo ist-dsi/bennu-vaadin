@@ -25,7 +25,7 @@ package com.vaadin.data.util.metamodel;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public class ModelIntroscpectionException extends Exception {
+public class ModelIntroscpectionException extends RuntimeException {
     public ModelIntroscpectionException(Throwable cause) {
 	super(cause);
     }

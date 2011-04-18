@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Instituto Superior Tecnico
+ * Copyright 2011 Instituto Superior Tecnico
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
@@ -21,220 +21,53 @@
  */
 package com.vaadin.data.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
-import com.vaadin.data.Buffered;
-import com.vaadin.data.Property;
-import com.vaadin.data.Validator;
-import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.data.util.metamodel.ModelIntroscpectionException;
 import com.vaadin.data.util.metamodel.PropertyDescriptor;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
-@SuppressWarnings("serial")
-public class DomainProperty<Type extends AbstractDomainObject> extends BufferedNotifierProperty implements Property,
-	Property.ValueChangeNotifier, Property.ReadOnlyStatusChangeNotifier, Buffered {
-    protected final DomainItem<Type> item;
+public class DomainProperty extends AbstractDomainProperty {
+    private final PropertyDescriptor descriptor;
 
-    protected final PropertyDescriptor descriptor;
-
-    private Object value;
-
-    private boolean modified = false;
-
-    private Collection<?> possibleValues;
-
-    private String label;
-
-    private final Collection<Validator> validators = new ArrayList<Validator>();
-
-    public DomainProperty(DomainItem<Type> item, PropertyDescriptor descriptor) {
-	this.item = item;
+    public DomainProperty(AbstractDomainObject host, PropertyDescriptor descriptor) {
+	super(host);
 	this.descriptor = descriptor;
-	this.value = getPersistentValue();
-	setWriteThrough(item.isWriteThrough());
-	setReadThrough(item.isReadThrough());
+    }
+
+    public DomainProperty(Class<? extends AbstractDomainObject> type, PropertyDescriptor descriptor) {
+	super(type);
+	this.descriptor = descriptor;
+    }
+
+    public DomainProperty(AbstractDomainItem host, PropertyDescriptor descriptor) {
+	super(host, descriptor.getPropertyType());
+	this.descriptor = descriptor;
     }
 
     /**
-     * @see com.vaadin.data.Property#getValue()
+     * @see com.vaadin.data.util.AbstractDomainProperty#getValueFrom(pt.ist.fenixframework.pstm.AbstractDomainObject)
      */
     @Override
-    public Object getValue() {
-	if (isReadThrough()) {
-	    return getPersistentValue();
-	}
-	return value;
-    }
-
-    protected Object getPersistentValue() throws SourceException {
-	try {
-	    return item.getInstance() != null ? descriptor.read(item.getInstance()) : descriptor.getDefaultValue();
-	} catch (ModelIntroscpectionException e) {
-	    throw new SourceException(this, e);
-	}
-    }
-
-    @Override
-    public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	// Checks the mode
-	if (isReadOnly()) {
-	    throw new Property.ReadOnlyException();
-	}
-	if (newValue != null && !getType().isAssignableFrom(newValue.getClass())) {
-	    try {
-		try {
-		    // try assignment by invoking constructor expecting the new
-		    // value's type
-		    Constructor<?> constructor = getType().getConstructor(newValue.getClass());
-		    newValue = constructor.newInstance(newValue);
-		} catch (NoSuchMethodException e) {
-		    // try assignment by invoking the String constructor and
-		    // passing the toString() of the new value
-		    Constructor<?> constructor = getType().getConstructor(String.class);
-		    newValue = constructor.newInstance(newValue.toString());
-		}
-	    } catch (NoSuchMethodException e) {
-		throw new Property.ConversionException(e);
-	    } catch (IllegalAccessException e) {
-		throw new Property.ConversionException(e);
-	    } catch (IllegalArgumentException e) {
-		throw new Property.ConversionException(e);
-	    } catch (InstantiationException e) {
-		throw new Property.ConversionException(e);
-	    } catch (InvocationTargetException e) {
-		throw new Property.ConversionException(e);
-	    }
-	}
-	if (isWriteThrough()) {
-	    setPersistentValue(newValue);
-	} else {
-	    value = newValue;
-	    modified = true;
-	}
-	if (!isReadThrough() || isWriteThrough()) {
-	    /*
-	     * We don't want to notify the listeners if we have only updated the
-	     * cached value and they are watching the real value.
-	     */
-	    fireValueChange();
-	}
-    }
-
-    protected void setPersistentValue(Object newValue) {
-	try {
-	    descriptor.write(item.getOrCreateInstance(), newValue);
-	} catch (ModelIntroscpectionException e) {
-	    throw new SourceException(this, e);
-	}
+    protected Object getValueFrom(AbstractDomainObject host) {
+	return descriptor.read(host);
     }
 
     /**
-     * @see com.vaadin.data.Property#getType()
+     * @see com.vaadin.data.util.AbstractDomainProperty#setValueOn(pt.ist.fenixframework
+     *      .pstm.AbstractDomainObject, java.lang.Object)
      */
     @Override
-    public Class<?> getType() {
-	return descriptor.getPropertyType();
-    }
-
-    public Collection<Validator> getValidators() {
-	return validators;
-    }
-
-    public DomainProperty<Type> addValidator(Validator validator) {
-	validators.add(validator);
-	return this;
-    }
-
-    public DomainProperty<Type> removeValidator(Validator validator) {
-	validators.remove(validator);
-	return this;
+    protected void setValueOn(AbstractDomainObject host, Object newValue) throws ConversionException {
+	descriptor.write(host, newValue);
     }
 
     /**
-     * @return the possibleValues
-     */
-    public Collection<?> getPossibleValues() {
-	return possibleValues;
-    }
-
-    /**
-     * @param possibleValues the possibleValues to set
-     */
-    public void setPossibleValues(Collection<?> possibleValues) {
-	this.possibleValues = possibleValues;
-    }
-
-    public void setPossibleValues(Object... possibleValues) {
-	this.possibleValues = Arrays.asList(possibleValues);
-    }
-
-    /**
-     * @return the label
-     */
-    public String getLabel() {
-	return label;
-    }
-
-    /**
-     * @param label the label to set
-     */
-    public void setLabel(String label) {
-	this.label = label;
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#commit()
+     * @see com.vaadin.data.util.AbstractDomainProperty#getNullValue()
      */
     @Override
-    public void commit() throws SourceException, InvalidValueException {
-	setPersistentValue(value);
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#discard()
-     */
-    @Override
-    public void discard() throws SourceException {
-	value = getPersistentValue();
-    }
-
-    /**
-     * @see com.vaadin.data.Buffered#isModified()
-     */
-    @Override
-    public boolean isModified() {
-	return modified;
-    }
-
-    /**
-     * @return the required
-     */
-    public boolean isRequired() {
-	return descriptor.isRequired();
-    }
-
-    public String getLabelKey() {
-	return item.getType().getName() + ".label." + descriptor.getPropertyId();
-    }
-
-    /**
-     * Returns the value of the <code>DomainProperty</code> in human readable
-     * textual format. The return value should be assignable to the
-     * <code>setValue</code> method if the Property is not in read-only mode.
-     * 
-     * @return String representation of the value stored in the Property
-     */
-    @Override
-    public String toString() {
-	return getValue() != null ? getValue().toString() : null;
+    protected Object getNullValue() {
+	return null;
     }
 }

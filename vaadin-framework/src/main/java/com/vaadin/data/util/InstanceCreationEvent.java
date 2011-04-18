@@ -24,5 +24,5 @@ package com.vaadin.data.util;
 import java.io.Serializable;
 
 public interface InstanceCreationEvent extends Serializable {
-    public DomainItem<?> getDomainItem();
+    public AbstractDomainItem getDomainItem();
 }

@@ -36,7 +36,7 @@ import com.vaadin.ui.Window.Notification;
  * Application to manage components embedded in JSPs sharing the same session.
  * This application needs to be configured at startup with the mappings between
  * textual patterns and the {@link EmbeddedComponentContainer}'s that will be
- * attached to the embedded {@link Window}. On embedding a component the host
+ * attached to the embedded {@link Window}. On embedding a component the hostItem
  * application must set the {@link EmbeddedApplication#VAADIN_PARAM } to a
  * textual parameter that will be matched to the patterns specified, the first
  * pattern to match will define the {@link EmbeddedComponentContainer} that will
@@ -50,7 +50,7 @@ import com.vaadin.ui.Window.Notification;
  * 
  * <pre>{@code EmbeddedApplication.addResolutionPattern(Pattern.compile("product-(.*)"), ProductContainer.class);}</pre>
  * 
- * In the host application set the {@link EmbeddedApplication#VAADIN_PARAM }
+ * In the hostItem application set the {@link EmbeddedApplication#VAADIN_PARAM }
  * like:
  * 
  * <pre>{@code request.getSession().setAttribute(EmbeddedApplication.VAADIN_PARAM, "product-10042786");}</pre>
