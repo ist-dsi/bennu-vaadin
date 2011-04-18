@@ -24,7 +24,7 @@
 		</init-param>
         <init-param>
             <param-name>widgetset</param-name>
-            <param-value>pt.ist.bennu.addons.widgetset.AddonsWidgetSet</param-value>
+            <param-value>pt.ist.bennu.widgetset.BennuWidgetSet</param-value>
         </init-param>
 	</servlet>
 
