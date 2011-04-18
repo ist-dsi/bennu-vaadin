@@ -39,9 +39,8 @@ import com.vaadin.data.Property;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container, Container.Ordered,
-/* Container.Filterable, Container.Ordered, Container.Sortable, */Container.ItemSetChangeNotifier,
-	Container.PropertySetChangeNotifier {
+public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container,
+	Container.ItemSetChangeNotifier, Container.PropertySetChangeNotifier {
     private final Map<Object, Class<?>> model = new HashMap<Object, Class<?>>();
 
     private final Map<Object, AbstractDomainItem> items = new HashMap<Object, AbstractDomainItem>();
