@@ -78,14 +78,15 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 	    Property property;
 	    if (propertyId instanceof String) {
 		String id = (String) propertyId;
-		String[] parts = id.split("\\.");
-		property = lazyCreateProperty(parts[0]);
-		for (int i = 1; i < parts.length; i++) {
-		    if (property instanceof AbstractDomainItem) {
-			property = ((AbstractDomainItem) property).lazyCreateProperty(parts[i]);
-		    } else {
-			return null;
-		    }
+		int split = id.indexOf('.');
+		if (split == -1) {
+		    property = lazyCreateProperty(id);
+		} else {
+		    String first = id.substring(0, split);
+		    String rest = id.substring(split + 1);
+		    property = getItemProperty(first);
+		    properties.put(first, property);
+		    property = ((AbstractDomainItem) property).getItemProperty(rest);
 		}
 	    } else {
 		property = lazyCreateProperty(propertyId);
