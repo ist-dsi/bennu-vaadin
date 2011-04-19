@@ -49,6 +49,8 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 
     private final Class<?> type;
 
+    private Instantiator instantiator = null;
+
     public AbstractDomainProperty(AbstractDomainObject host) {
 	this.value = new PerTxBox<AbstractDomainObject>(host);
 	this.type = host.getClass();
@@ -82,6 +84,9 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
     }
 
     protected AbstractDomainObject createNewInstance() {
+	if (instantiator != null) {
+	    return instantiator.createInstance();
+	}
 	try {
 	    return (AbstractDomainObject) type.newInstance();
 	} catch (InstantiationException e) {
@@ -89,6 +94,10 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 	} catch (IllegalAccessException e) {
 	    throw new RuntimeException(e);
 	}
+    }
+
+    public void setInstantiator(Instantiator instantiator) {
+	this.instantiator = instantiator;
     }
 
     /**
