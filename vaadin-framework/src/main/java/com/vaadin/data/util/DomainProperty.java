@@ -68,6 +68,9 @@ public class DomainProperty extends AbstractDomainProperty {
      */
     @Override
     protected Object getNullValue() {
+	if (Boolean.class.isAssignableFrom(getType())) {
+	    return Boolean.FALSE;
+	}
 	return null;
     }
 }

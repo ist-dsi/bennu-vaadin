@@ -22,10 +22,13 @@
 package com.vaadin.data.util.metamodel;
 
 import java.beans.IntrospectionException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
@@ -46,6 +49,16 @@ public class MetaModel {
     /**
      * @param type
      */
+    
+    private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName) {
+	for(Method method : type.getMethods()) {
+	    if (method.getName().equals("set" + StringUtils.capitalize(fieldName))) {
+		return method;
+	    }
+	}
+	return null;
+    }
+    
     private MetaModel(Class<? extends AbstractDomainObject> type) {
 	for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz = (DomainClass) clazz
 		.getSuperclass()) {
@@ -67,6 +80,35 @@ public class MetaModel {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
 		} catch (ClassNotFoundException e) {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+		}
+	    }
+	}
+	for (Method method : type.getMethods()) {
+	    final String methodName = method.getName();
+	    String fieldName = StringUtils.uncapitalize(methodName.substring(3,methodName.length()));
+	    
+	    if (descriptors.get(fieldName) != null) {
+		continue;
+	    }
+	    
+	    Method readMethod = null;
+	    Method writeMethod = null;
+	    
+	    if (!methodName.contains("$")) {
+		if (methodName.startsWith("get")) {
+		    readMethod = method;
+		}
+		writeMethod = getSetMethod(type, fieldName);
+	    }
+	    
+	    if (readMethod != null && writeMethod != null) {
+		java.beans.PropertyDescriptor propertyDescriptor;
+		try {
+		    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName,readMethod,writeMethod);
+		    descriptors.put(fieldName,new BeanPropertyDescriptor(propertyDescriptor, false));
+		    System.out.printf("Add fieldName %s of class %s\n", fieldName, type.getName());
+		} catch (IntrospectionException e) {
+		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
 		}
 	    }
 	}

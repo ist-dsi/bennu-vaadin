@@ -108,14 +108,9 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 
     public AbstractDomainObject getOrCreateValue() {
 	if (getValue() == null) {
-	    try {
-		setValue(getType().newInstance());
+//		setValue(getType().newInstance());
+	    	setValue(createNewInstance());
 		fireInstanceCreation();
-	    } catch (InstantiationException e) {
-		throw new RuntimeException(e);
-	    } catch (IllegalAccessException e) {
-		throw new RuntimeException(e);
-	    }
 	}
 	return getValue();
     }
