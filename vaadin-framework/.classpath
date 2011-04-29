@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/vaadin-6.4.5.jar" sourcepath="/Users/pedro/.m2/repository/com/vaadin/vaadin/6.4.5/vaadin-6.4.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/fenix-framework-r49417.jar" sourcepath="/fenix-framework"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
+	<classpathentry kind="lib" path="lib/bennu-widgetset-0.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-pool-1.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/confirmdialog-1.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/customfield-0.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/db-ojb-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/easyuploads-0.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/fenix-framework-r49417.jar"/>
+	<classpathentry kind="lib" path="lib/fenix-tools.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-user-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/gwt-visualization-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jvstm.jar"/>
-	<classpathentry kind="lib" path="lib/db-ojb-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-pool-1.5.4.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.5-bin.jar"/>
-	<classpathentry kind="lib" path="lib-dev/servlet-api-2.3.jar"/>
-	<classpathentry kind="lib" path="lib/fenix-tools.jar"/>
+	<classpathentry kind="lib" path="lib/vaadin-6.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/visualizationsforvaadin-1.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/fenix-web-framework-r51756.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

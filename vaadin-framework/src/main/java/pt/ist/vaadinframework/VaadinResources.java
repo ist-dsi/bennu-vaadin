@@ -31,6 +31,29 @@ import pt.utl.ist.fenix.tools.util.i18n.Language;
  * 
  */
 public class VaadinResources {
+    public static enum CommonKeys implements MessageBundleKey {
+	COMMONS_ACTION_SUBMIT("pt.ist.vaadinframework.commons.action.submit"), COMMONS_ACTION_DISCARD(
+		"pt.ist.vaadinframework.commons.action.discard"), COMMONS_ACTION_CANCEL(
+		"pt.ist.vaadinframework.commons.action.cancel"), COMMONS_MESSAGE_SUBMIT(
+		"pt.ist.vaadinframework.commons.message.submit"), COMMONS_MESSAGE_DISCARD(
+		"pt.ist.vaadinframework.commons.message.discard"), COMMONS_MESSAGE_CANCEL(
+		"pt.ist.vaadinframework.commons.message.cancel");
+
+	private String key;
+
+	private CommonKeys(String key) {
+	    this.key = key;
+	}
+
+	/**
+	 * @see pt.ist.vaadinframework.MessageBundleKey#getKey()
+	 */
+	@Override
+	public String getKey() {
+	    return key;
+	}
+    }
+
     private static final String BUNDLE_NAME = "resources/VaadinResources"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Language.getLocale());

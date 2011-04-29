@@ -3,6 +3,7 @@
 	<description>Vaadin Fenix Framework Integration Library</description>
 
 	<property name="src.dir" location="src/main/java" />
+	<property name="resource.dir" location="src/main/resources" />
 	<property name="build.dir" location="build" />
 	<property name="doc.dir" location="doc" />
 	<property name="dist.dir" location="dist" />
@@ -28,9 +29,25 @@
 	<target name="compile" description="Compiles the plugin">
 		<mkdir dir="${build.dir}" />
 		<javac destdir="${build.dir}" target="1.5" debug="on">
+        	<compilerarg line="-processor pt.ist.fenixWebFramework.services.ServiceAnnotationProcessor" />
 			<src path="${src.dir}" />
 			<classpath refid="class.path.ref" />
 		</javac>
+        <java classname="pt.ist.fenixWebFramework.services.ServiceAnnotationInjector"
+              failonerror="true">
+        	<classpath>
+        		<path refid="class.path.ref" />
+                <pathelement path="${build.dir}" />
+        	</classpath>
+            <arg value="${build.dir}" />
+            <arg value="lib/jvstm.jar" />
+            <arg value="lib/fenix-framework-r*.jar" />
+            <arg value="lib/fenix-web-framework-r*.jar" />
+            <arg value="lib/vaadin-*.jar" />
+        </java>
+		<copy todir="${build.dir}">
+			<fileset dir="${resource.dir}" />
+		</copy>
 	</target>
 
 	<target name="doc" depends="compile" description="Generate javadoc documentation">

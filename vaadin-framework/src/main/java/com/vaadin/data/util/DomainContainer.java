@@ -84,6 +84,14 @@ public class DomainContainer extends AbstractDomainContainer {
     }
 
     /**
+     * @see com.vaadin.data.util.AbstractDomainContainer#addItem()
+     */
+    @Override
+    public Object addItem() throws UnsupportedOperationException {
+	return addItem(descriptor.getCollectionElementType());
+    }
+
+    /**
      * @see com.vaadin.data.util.AbstractDomainContainer#lazyCreateItem(pt.ist.
      *      fenixframework.pstm.AbstractDomainObject)
      */

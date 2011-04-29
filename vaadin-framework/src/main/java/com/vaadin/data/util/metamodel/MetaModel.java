@@ -49,16 +49,16 @@ public class MetaModel {
     /**
      * @param type
      */
-    
+
     private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName) {
-	for(Method method : type.getMethods()) {
+	for (Method method : type.getMethods()) {
 	    if (method.getName().equals("set" + StringUtils.capitalize(fieldName))) {
 		return method;
 	    }
 	}
 	return null;
     }
-    
+
     private MetaModel(Class<? extends AbstractDomainObject> type) {
 	for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz = (DomainClass) clazz
 		.getSuperclass()) {
@@ -85,27 +85,27 @@ public class MetaModel {
 	}
 	for (Method method : type.getMethods()) {
 	    final String methodName = method.getName();
-	    String fieldName = StringUtils.uncapitalize(methodName.substring(3,methodName.length()));
-	    
+	    String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
+
 	    if (descriptors.get(fieldName) != null) {
 		continue;
 	    }
-	    
+
 	    Method readMethod = null;
 	    Method writeMethod = null;
-	    
+
 	    if (!methodName.contains("$")) {
 		if (methodName.startsWith("get")) {
 		    readMethod = method;
 		}
 		writeMethod = getSetMethod(type, fieldName);
 	    }
-	    
+
 	    if (readMethod != null && writeMethod != null) {
 		java.beans.PropertyDescriptor propertyDescriptor;
 		try {
-		    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName,readMethod,writeMethod);
-		    descriptors.put(fieldName,new BeanPropertyDescriptor(propertyDescriptor, false));
+		    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName, readMethod, writeMethod);
+		    descriptors.put(fieldName, new BeanPropertyDescriptor(propertyDescriptor, false));
 		    System.out.printf("Add fieldName %s of class %s\n", fieldName, type.getName());
 		} catch (IntrospectionException e) {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
@@ -127,9 +127,13 @@ public class MetaModel {
     public PropertyDescriptor getPropertyDescriptor(String propertyId) {
 	if (!descriptors.containsKey(propertyId)) {
 	    int dotLocation = propertyId.indexOf('.');
-	    PropertyDescriptor descriptor = descriptors.get(propertyId.substring(0, dotLocation));
-	    MetaModel model = MetaModel.findMetaModelForType(descriptor.getPropertyType());
-	    descriptors.put(propertyId, model.getPropertyDescriptor(propertyId.substring(dotLocation + 1)));
+	    if (dotLocation != -1) {
+		PropertyDescriptor descriptor = descriptors.get(propertyId.substring(0, dotLocation));
+		MetaModel model = MetaModel.findMetaModelForType(descriptor.getPropertyType());
+		descriptors.put(propertyId, model.getPropertyDescriptor(propertyId.substring(dotLocation + 1)));
+	    } else {
+		throw new Error("could not find property: " + propertyId);
+	    }
 	}
 	return descriptors.get(propertyId);
     }
