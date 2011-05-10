@@ -8,7 +8,15 @@
 
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>
+			<logic:notEmpty name="virtualHost" property="htmlTitle">
+				<bean:write name="virtualHost" property="htmlTitle" />
+			</logic:notEmpty> 
+			<logic:empty name="virtualHost" property="htmlTitle">
+				<bean:write name="virtualHost" property="applicationTitle" />
+			</logic:empty>
+		</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta http-equiv="X-UA-Compatible" content="chrome=1"/>
 		
 		<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() + "/VAADIN/themes/" + theme + "/styles.css"%>">
