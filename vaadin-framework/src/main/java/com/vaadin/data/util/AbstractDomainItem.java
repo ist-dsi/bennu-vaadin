@@ -21,6 +21,7 @@
  */
 package com.vaadin.data.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
@@ -39,6 +40,8 @@ import com.vaadin.data.Property;
  * 
  */
 public abstract class AbstractDomainItem extends AbstractDomainProperty implements Item, Item.PropertySetChangeNotifier {
+    private final List<Object> propertyIds = new ArrayList<Object>();
+
     private final Map<Object, Property> properties = new HashMap<Object, Property>();
 
     /**
@@ -85,6 +88,7 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 		    String first = id.substring(0, split);
 		    String rest = id.substring(split + 1);
 		    property = getItemProperty(first);
+		    propertyIds.add(first);
 		    properties.put(first, property);
 		    property = ((AbstractDomainItem) property).getItemProperty(rest);
 		}
@@ -92,6 +96,7 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 		property = lazyCreateProperty(propertyId);
 	    }
 	    if (property != null) {
+		propertyIds.add(propertyId);
 		properties.put(propertyId, property);
 	    }
 	}
@@ -108,9 +113,9 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 
     public AbstractDomainObject getOrCreateValue() {
 	if (getValue() == null) {
-//		setValue(getType().newInstance());
-	    	setValue(createNewInstance());
-		fireInstanceCreation();
+	    // setValue(getType().newInstance());
+	    setValue(createNewInstance());
+	    fireInstanceCreation();
 	}
 	return getValue();
     }
@@ -134,7 +139,7 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
      */
     @Override
     public Collection<?> getItemPropertyIds() {
-	return Collections.unmodifiableCollection(properties.keySet());
+	return Collections.unmodifiableCollection(propertyIds);
     }
 
     /**
@@ -149,6 +154,7 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 	if (properties.containsKey(id)) {
 	    return false;
 	}
+	propertyIds.add(id);
 	properties.put(id, property);
 	fireItemPropertySetChange();
 	return true;
@@ -162,6 +168,7 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 	if (properties.remove(id) == null) {
 	    return false;
 	}
+	propertyIds.remove(id);
 	fireItemPropertySetChange();
 	return true;
     }
