@@ -190,12 +190,16 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	item.addListener(new InstanceCreationListener() {
 	    @Override
 	    public void itemCreation(InstanceCreationEvent event) {
-		addItem(event.getDomainItem().getValue());
+		getOrCreateHost();
+		final AbstractDomainItem domainItem = event.getDomainItem();
+		final AbstractDomainObject itemId = domainItem.getValue();
+		items.put(itemId, domainItem);
+		getValue().add((AbstractDomainObject) itemId);
 		// this is needed because sometimes the creation already links
 		// the object, and the container then thinks the object was
 		// already there and doesn't fire the event.
 		fireContainerItemSetChange();
-		event.getDomainItem().removeListener(this);
+		domainItem.removeListener(this);
 	    }
 	});
 	return item;

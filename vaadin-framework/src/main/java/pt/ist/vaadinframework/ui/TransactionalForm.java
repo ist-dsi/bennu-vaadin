@@ -24,12 +24,12 @@ import com.vaadin.ui.Window.Notification;
 
 public class TransactionalForm extends Form {
     private final ControlsLayout controls = new ControlsLayout();
-
     public TransactionalForm() {
 	setFormFieldFactory(new FieldFactory());
 	setFooter(controls);
+	setWriteThrough(false);
     }
-
+    
     public void addSubmitButton() {
 	addButton(VaadinResources.getString(CommonKeys.COMMONS_ACTION_SUBMIT), new ClickListener() {
 	    @Override

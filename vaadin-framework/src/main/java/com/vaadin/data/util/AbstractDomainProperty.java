@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;
 import java.util.LinkedList;
 
-import jvstm.PerTxBox;
+import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 import com.vaadin.data.Item;
@@ -45,22 +45,28 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 
     private AbstractDomainItem host;
 
-    private PerTxBox<AbstractDomainObject> value;
+    private jvstm.VBox<AbstractDomainObject> value;
 
     private final Class<?> type;
 
     private Instantiator instantiator = null;
 
     public AbstractDomainProperty(AbstractDomainObject host) {
-	this.value = new PerTxBox<AbstractDomainObject>(host);
+	initValue(host);
 	this.type = host.getClass();
     }
 
     public AbstractDomainProperty(Class<? extends AbstractDomainObject> type) {
-	this.value = new PerTxBox<AbstractDomainObject>(null);
+	initValue(null);
 	this.type = type;
     }
-
+    
+    @Service
+    public void initValue(AbstractDomainObject host) {
+	this.value = new jvstm.VBox<AbstractDomainObject>(host);
+    }
+    
+    
     public AbstractDomainProperty(AbstractDomainItem host, Class<?> type) {
 	this.host = host;
 	this.type = type;

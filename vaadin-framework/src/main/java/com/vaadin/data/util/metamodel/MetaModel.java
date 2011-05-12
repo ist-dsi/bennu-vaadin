@@ -71,7 +71,9 @@ public class MetaModel {
 	    }
 	    for (Role role : clazz.getRoleSlotsList()) {
 		try {
-		    descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
+		    if (role.getName() != null && !role.getName().isEmpty()) {
+			descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
+		    }
 		} catch (SecurityException e) {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
 		} catch (IntrospectionException e) {
