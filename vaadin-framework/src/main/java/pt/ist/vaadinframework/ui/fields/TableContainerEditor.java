@@ -6,6 +6,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -82,7 +83,7 @@ public class TableContainerEditor extends CustomField {
 	public ElementEditOrCreateWindow(String caption, Item item) {
 	    super(caption);
 	    getContent().setSizeUndefined();
-	    TransactionalForm form = new TransactionalForm();
+	    TransactionalForm form = new TransactionalForm(bundle);
 	    form.setWriteThrough(false);
 	    form.setFormFieldFactory((FormFieldFactory) table.getTableFieldFactory());
 	    form.setItemDataSource(item, Arrays.asList(properties));
@@ -102,7 +103,10 @@ public class TableContainerEditor extends CustomField {
 
     private final String[] properties;
 
-    public TableContainerEditor(String... properties) {
+    private final ResourceBundle bundle;
+
+    public TableContainerEditor(ResourceBundle bundle, String... properties) {
+	this.bundle = bundle;
 	this.properties = properties;
 	VerticalLayout layout = new VerticalLayout();
 	table = new Table();

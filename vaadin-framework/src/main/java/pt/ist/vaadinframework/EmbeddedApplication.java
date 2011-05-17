@@ -21,24 +21,27 @@
  */
 package pt.ist.vaadinframework;
 
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 
 /**
  * <p>
  * Application to manage components embedded in JSPs sharing the same session.
  * This application needs to be configured at startup with the mappings between
  * textual patterns and the {@link EmbeddedComponentContainer}'s that will be
- * attached to the embedded {@link Window}. On embedding a component the hostItem
- * application must set the {@link EmbeddedApplication#VAADIN_PARAM } to a
- * textual parameter that will be matched to the patterns specified, the first
+ * attached to the embedded {@link Window}. On embedding a component the
+ * hostItem application must set the {@link EmbeddedApplication#VAADIN_PARAM } to
+ * a textual parameter that will be matched to the patterns specified, the first
  * pattern to match will define the {@link EmbeddedComponentContainer} that will
  * be instantiated. The parameter will also be sent to the newly instantiated
  * container.
@@ -104,7 +107,7 @@ import com.vaadin.ui.Window.Notification;
  * @version 1.0
  */
 @SuppressWarnings("serial")
-public class EmbeddedApplication extends Application {
+public class EmbeddedApplication extends Application implements VaadinResourceConstants {
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
 
     @Override
@@ -113,9 +116,7 @@ public class EmbeddedApplication extends Application {
 	setMainWindow(new EmbeddedWindow(resolver));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see com.vaadin.Application#getWindow(java.lang.String)
      */
     @Override
@@ -152,17 +153,93 @@ public class EmbeddedApplication extends Application {
 	resolver.put(pattern, type);
     }
 
+    public static SystemMessages getSystemMessages() {
+	return new CustomizedSystemMessages() {
+	    @Override
+	    public String getSessionExpiredCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_SESSION_EXPIRED);
+	    }
+
+	    @Override
+	    public String getSessionExpiredMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_SESSION_EXPIRED);
+	    }
+
+	    @Override
+	    public String getCommunicationErrorCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_COMMUNICATION_ERROR);
+	    }
+
+	    @Override
+	    public String getCommunicationErrorMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_COMMUNICATION_ERROR);
+	    }
+
+	    @Override
+	    public String getAuthenticationErrorCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_AUTHENTICATION_ERROR);
+	    }
+
+	    @Override
+	    public String getAuthenticationErrorMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_AUTHENTICATION_ERROR);
+	    }
+
+	    @Override
+	    public String getInternalErrorCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_INTERNAL_ERROR);
+	    }
+
+	    @Override
+	    public String getInternalErrorMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_INTERNAL_ERROR);
+	    }
+
+	    @Override
+	    public String getOutOfSyncCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_OUTOFSYNC_ERROR);
+	    }
+
+	    @Override
+	    public String getOutOfSyncMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_OUTOFSYNC_ERROR);
+	    }
+
+	    @Override
+	    public String getCookiesDisabledCaption() {
+		return VaadinResources.getString(SYSTEM_TITLE_COOKIES_DISABLED_ERROR);
+	    }
+
+	    @Override
+	    public String getCookiesDisabledMessage() {
+		return VaadinResources.getString(SYSTEM_MESSAGE_COOKIES_DISABLED_ERROR);
+	    }
+	};
+    }
+
     /**
      * @see com.vaadin.Application#terminalError(com.vaadin.terminal.Terminal.ErrorEvent)
      */
     @Override
     public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
+	Logger logger = VaadinFrameworkLogger.getLogger();
 	Throwable throwable = event.getThrowable();
-	if (throwable.getCause() instanceof UnauthorizedAccessException) {
-	    getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
-	    close();
-	} else {
-	    super.terminalError(event);
+	if (throwable instanceof SocketException) {
+	    // Most likely client browser closed socket
+	    logger.info("SocketException in CommunicationManager. Most likely client (browser) closed socket.");
+	    return;
+	}
+	getMainWindow().addWindow(new TerminalErrorWindow(throwable));
+	logger.error("Terminal error:", throwable);
+    }
+
+    public static class TerminalErrorWindow extends Window {
+	public TerminalErrorWindow(Throwable throwable) {
+	    setCaption(VaadinResources.getString(SYSTEM_TITLE_TERMINAL_ERROR));
+	    addComponent(new Label(VaadinResources.getString(SYSTEM_MESSAGE_TERMINAL_ERROR), Label.CONTENT_XHTML));
+	    setModal(true);
+	    getContent().setSizeUndefined();
+	    center();
 	}
     }
 

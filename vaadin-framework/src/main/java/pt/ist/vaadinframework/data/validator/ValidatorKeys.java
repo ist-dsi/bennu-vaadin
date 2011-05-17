@@ -35,7 +35,8 @@ public enum ValidatorKeys implements MessageBundleKey {
 	    "pt.ist.vaadinframework.data.validator.double.error"), CHARACTER_VALIDATOR_ERROR(
 	    "pt.ist.vaadinframework.data.validator.character.error"), BIG_DECIMAL_VALIDATOR_ERROR(
 	    "pt.ist.vaadinframework.data.validator.bigdecimal.error"), URL_VALIDATOR_ERROR(
-	    "pt.ist.vaadinframework.data.validator.url.error");
+	    "pt.ist.vaadinframework.data.validator.url.error"), REQUIRED_ERROR(
+	    "pt.ist.vaadinframework.data.validator.required.error");
 
     private String key;
 

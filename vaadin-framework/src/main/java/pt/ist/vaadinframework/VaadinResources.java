@@ -61,19 +61,20 @@ public class VaadinResources {
     private VaadinResources() {
     }
 
-    public static String getString(MessageBundleKey key) {
-	return getString(key.getKey());
+    public static String getString(MessageBundleKey key, String... args) {
+	return getString(key.getKey(), args);
     }
 
-    private static String getString(String key) {
+    public static String getString(String key, String... args) {
 	try {
-	    return RESOURCE_BUNDLE.getString(key);
+	    String message = RESOURCE_BUNDLE.getString(key);
+	    for (int i = 0; i < args.length; i++) {
+		message = message.replaceAll("\\{" + i + "\\}", args[i]);
+	    }
+	    return message;
 	} catch (MissingResourceException e) {
+	    VaadinFrameworkLogger.getLogger().warn(e.getMessage());
 	    return '!' + key + '!';
 	}
-    }
-
-    private static ResourceBundle getBundle() {
-	return RESOURCE_BUNDLE;
     }
 }

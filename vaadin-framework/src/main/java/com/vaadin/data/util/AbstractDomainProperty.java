@@ -60,13 +60,12 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 	initValue(null);
 	this.type = type;
     }
-    
+
     @Service
     public void initValue(AbstractDomainObject host) {
 	this.value = new jvstm.VBox<AbstractDomainObject>(host);
     }
-    
-    
+
     public AbstractDomainProperty(AbstractDomainItem host, Class<?> type) {
 	this.host = host;
 	this.type = type;
@@ -193,6 +192,8 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
     public Class<?> getType() {
 	return type;
     }
+
+    public abstract boolean isRequired();
 
     /**
      * @see com.vaadin.data.Property#isReadOnly()

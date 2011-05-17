@@ -47,6 +47,14 @@ public class DomainProperty extends AbstractDomainProperty {
     }
 
     /**
+     * @see com.vaadin.data.util.AbstractDomainProperty#isRequired()
+     */
+    @Override
+    public boolean isRequired() {
+	return descriptor.isRequired();
+    }
+
+    /**
      * @see com.vaadin.data.util.AbstractDomainProperty#getValueFrom(pt.ist.fenixframework.pstm.AbstractDomainObject)
      */
     @Override

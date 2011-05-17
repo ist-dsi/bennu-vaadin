@@ -24,6 +24,7 @@ package pt.ist.vaadinframework.ui.fields;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import pt.ist.vaadinframework.ui.FieldFactory;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
@@ -117,9 +118,9 @@ public class MultiLanguageStringField extends Form {
 
     private final Language[] languages;
 
-    public MultiLanguageStringField(Language... languages) {
+    public MultiLanguageStringField(ResourceBundle bundle, Language... languages) {
 	this.languages = languages;
-	setFormFieldFactory(new FieldFactory());
+	setFormFieldFactory(new FieldFactory(bundle));
 	setWriteThrough(true);
 	setImmediate(true);
     }

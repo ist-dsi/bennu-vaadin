@@ -2,6 +2,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
 import jvstm.cps.ConsistencyException;
 import pt.ist.fenixWebFramework.services.Service;
@@ -24,12 +25,13 @@ import com.vaadin.ui.Window.Notification;
 
 public class TransactionalForm extends Form {
     private final ControlsLayout controls = new ControlsLayout();
-    public TransactionalForm() {
-	setFormFieldFactory(new FieldFactory());
+
+    public TransactionalForm(ResourceBundle bundle) {
+	setFormFieldFactory(new FieldFactory(bundle));
 	setFooter(controls);
 	setWriteThrough(false);
     }
-    
+
     public void addSubmitButton() {
 	addButton(VaadinResources.getString(CommonKeys.COMMONS_ACTION_SUBMIT), new ClickListener() {
 	    @Override

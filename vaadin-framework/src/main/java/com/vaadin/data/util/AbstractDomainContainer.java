@@ -21,6 +21,7 @@
  */
 package com.vaadin.data.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -39,9 +41,11 @@ import com.vaadin.data.Property;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container,
+public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container.Ordered,
 	Container.ItemSetChangeNotifier, Container.PropertySetChangeNotifier {
     private final Map<Object, Class<?>> model = new HashMap<Object, Class<?>>();
+
+    private final List<Object> itemIds = new ArrayList<Object>();
 
     private final Map<Object, AbstractDomainItem> items = new HashMap<Object, AbstractDomainItem>();
 
@@ -71,11 +75,8 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	super(host, type);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.vaadin.data.util.AbstractDomainProperty#setValue(java.lang.Object)
+    /**
+     * @see com.vaadin.data.util.AbstractDomainProperty#setValue(java.lang.Object)
      */
     @Override
     public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
@@ -98,6 +99,7 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	if (!items.containsKey(itemId)) {
 	    AbstractDomainItem item = lazyCreateItem((AbstractDomainObject) itemId);
 	    if (item != null) {
+		itemIds.add(itemId);
 		items.put(itemId, item);
 	    }
 	}
@@ -119,6 +121,11 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
      */
     @Override
     public Collection<?> getItemIds() {
+	if (itemIds.isEmpty()) {
+	    for (Object itemId : getValue()) {
+		getItem(itemId);
+	    }
+	}
 	return Collections.unmodifiableCollection(getValue());
     }
 
@@ -193,8 +200,9 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 		getOrCreateHost();
 		final AbstractDomainItem domainItem = event.getDomainItem();
 		final AbstractDomainObject itemId = domainItem.getValue();
+		itemIds.add(itemId);
 		items.put(itemId, domainItem);
-		getValue().add((AbstractDomainObject) itemId);
+		getValue().add(itemId);
 		// this is needed because sometimes the creation already links
 		// the object, and the container then thinks the object was
 		// already there and doesn't fire the event.
@@ -222,6 +230,7 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	if (!containsId(itemId)) {
 	    return false;
 	}
+	itemIds.remove(itemId);
 	items.remove(itemId);
 	getValue().remove(itemId);
 	fireContainerItemSetChange();
@@ -264,10 +273,100 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
      */
     @Override
     public boolean removeAllItems() throws UnsupportedOperationException {
+	itemIds.clear();
 	items.clear();
 	setValue(Collections.emptySet());
 	fireContainerItemSetChange();
 	return true;
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#nextItemId(java.lang.Object)
+     */
+    @Override
+    public Object nextItemId(Object itemId) {
+	try {
+	    int idx = itemIds.indexOf(itemId);
+	    if (idx == -1) {
+		// If the given Item is not found in the Container,
+		// null is returned.
+		return null;
+	    }
+	    return itemIds.get(idx + 1);
+	} catch (final IndexOutOfBoundsException e) {
+	    return null;
+	}
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#prevItemId(java.lang.Object)
+     */
+    @Override
+    public Object prevItemId(Object itemId) {
+	try {
+	    return itemIds.get(itemIds.indexOf(itemId) - 1);
+	} catch (final IndexOutOfBoundsException e) {
+	    return null;
+	}
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#firstItemId()
+     */
+    @Override
+    public Object firstItemId() {
+	try {
+	    return itemIds.get(0);
+	} catch (final IndexOutOfBoundsException e) {
+	} catch (final NoSuchElementException e) {
+	}
+	return null;
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#lastItemId()
+     */
+    @Override
+    public Object lastItemId() {
+	try {
+	    return itemIds.get(itemIds.size() - 1);
+	} catch (final IndexOutOfBoundsException e) {
+	}
+	return null;
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#isFirstId(java.lang.Object)
+     */
+    @Override
+    public boolean isFirstId(Object itemId) {
+	return (size() >= 1 && itemIds.get(0).equals(itemId));
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#isLastId(java.lang.Object)
+     */
+    @Override
+    public boolean isLastId(Object itemId) {
+	final int s = size();
+	return (s >= 1 && itemIds.get(s - 1).equals(itemId));
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#addItemAfter(java.lang.Object)
+     */
+    @Override
+    public Object addItemAfter(Object previousItemId) throws UnsupportedOperationException {
+	throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Ordered#addItemAfter(java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
+	throw new UnsupportedOperationException();
     }
 
     private class PropertySetChangeEvent extends EventObject implements Container.PropertySetChangeEvent {

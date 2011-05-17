@@ -255,4 +255,20 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 	    }
 	}
     }
+
+    /**
+     * @param propertyId
+     * @return
+     */
+    public String getLabelKey(Object propertyId) {
+	return getType().getName() + "." + propertyId;
+    }
+
+    /**
+     * @param propertyId
+     * @return
+     */
+    public String getDescriptionKey(Object propertyId) {
+	return getLabelKey(propertyId) + ".description";
+    }
 }
