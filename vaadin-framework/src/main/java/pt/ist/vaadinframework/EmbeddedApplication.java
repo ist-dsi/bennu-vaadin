@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 
@@ -229,8 +230,14 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    logger.info("SocketException in CommunicationManager. Most likely client (browser) closed socket.");
 	    return;
 	}
-	getMainWindow().addWindow(new TerminalErrorWindow(throwable));
-	logger.error("Terminal error:", throwable);
+
+	if (throwable instanceof InvalidValueException
+		|| (throwable.getCause() != null && throwable.getCause() instanceof InvalidValueException)) {
+	    // ignore, validation errors are handled by the fields
+	} else {
+	    getMainWindow().addWindow(new TerminalErrorWindow(throwable));
+	    logger.error("Terminal error:", throwable);
+	}
     }
 
     public static class TerminalErrorWindow extends Window {
