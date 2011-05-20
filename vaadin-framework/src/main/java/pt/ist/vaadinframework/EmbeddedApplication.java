@@ -34,6 +34,7 @@ import com.vaadin.Application;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Window.Notification;
 
 /**
  * <p>
@@ -234,6 +235,10 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	if (throwable instanceof InvalidValueException
 		|| (throwable.getCause() != null && throwable.getCause() instanceof InvalidValueException)) {
 	    // ignore, validation errors are handled by the fields
+	} else if (throwable instanceof UserErrorException) {
+	    getMainWindow().showNotification(throwable.getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
+	} else if (throwable.getCause() != null && throwable.getCause() instanceof UserErrorException) {
+	    getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
 	} else {
 	    getMainWindow().addWindow(new TerminalErrorWindow(throwable));
 	    logger.error("Terminal error:", throwable);
