@@ -23,6 +23,7 @@ package com.vaadin.data.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -34,11 +35,18 @@ import com.vaadin.data.util.metamodel.PropertyDescriptor;
  * 
  */
 public class DomainContainer extends AbstractDomainContainer {
-    private final PropertyDescriptor descriptor;
+    private PropertyDescriptor descriptor;
+
+    private Class<? extends AbstractDomainObject> elementType;
 
     public DomainContainer(AbstractDomainItem host, PropertyDescriptor descriptor) {
 	super(host, descriptor.getPropertyType());
 	this.descriptor = descriptor;
+    }
+
+    public DomainContainer(Set<? extends AbstractDomainObject> valueSet, Class<? extends AbstractDomainObject> elementType) {
+	super(valueSet);
+	this.elementType = elementType;
     }
 
     /**
@@ -46,7 +54,7 @@ public class DomainContainer extends AbstractDomainContainer {
      */
     @Override
     public boolean isRequired() {
-	return descriptor.isRequired();
+	return descriptor != null ? descriptor.isRequired() : false;
     }
 
     /**
@@ -54,7 +62,7 @@ public class DomainContainer extends AbstractDomainContainer {
      */
     @Override
     protected Object getNullValue() {
-	return Collections.emptyList();
+	return Collections.emptySet();
     }
 
     /**
@@ -77,18 +85,21 @@ public class DomainContainer extends AbstractDomainContainer {
 
     public void setContainerProperties(String... propertyIds) {
 	for (String propertyId : propertyIds) {
-	    PropertyDescriptor propertyDescriptor = MetaModel.findMetaModelForType(descriptor.getCollectionElementType())
-		    .getPropertyDescriptor(propertyId);
+	    PropertyDescriptor propertyDescriptor = MetaModel.findMetaModelForType(getElementType()).getPropertyDescriptor(
+		    propertyId);
 	    addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
 	}
     }
 
     public void discoverAllContainerProperties() {
-	Collection<PropertyDescriptor> descriptors = MetaModel.findMetaModelForType(descriptor.getCollectionElementType())
-		.getPropertyDescriptors();
+	Collection<PropertyDescriptor> descriptors = MetaModel.findMetaModelForType(getElementType()).getPropertyDescriptors();
 	for (PropertyDescriptor descriptor : descriptors) {
 	    addContainerProperty(descriptor.getPropertyId(), descriptor.getPropertyType(), descriptor.getDefaultValue());
 	}
+    }
+
+    private Class<? extends AbstractDomainObject> getElementType() {
+	return descriptor != null ? descriptor.getCollectionElementType() : elementType;
     }
 
     /**
@@ -96,7 +107,10 @@ public class DomainContainer extends AbstractDomainContainer {
      */
     @Override
     public Object addItem() throws UnsupportedOperationException {
-	return addItem(descriptor.getCollectionElementType());
+	if (descriptor != null) {
+	    return addItem(descriptor.getCollectionElementType());
+	}
+	return addItem(elementType);
     }
 
     /**

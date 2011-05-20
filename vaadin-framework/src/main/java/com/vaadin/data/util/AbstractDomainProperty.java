@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;
 import java.util.LinkedList;
+import java.util.Set;
 
 import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
@@ -47,18 +48,30 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 
     private jvstm.VBox<AbstractDomainObject> value;
 
+    private jvstm.VBox<Set<? extends AbstractDomainObject>> valueSet;
+
     private final Class<?> type;
 
     private Instantiator instantiator = null;
 
-    public AbstractDomainProperty(AbstractDomainObject host) {
-	initValue(host);
-	this.type = host.getClass();
+    public AbstractDomainProperty(AbstractDomainObject value) {
+	initValue(value);
+	this.type = value.getClass();
     }
 
     public AbstractDomainProperty(Class<? extends AbstractDomainObject> type) {
-	initValue(null);
+	initValue((AbstractDomainObject) null);
 	this.type = type;
+    }
+
+    public AbstractDomainProperty(Set<? extends AbstractDomainObject> valueSet) {
+	initValue(valueSet);
+	this.type = Set.class;
+    }
+
+    @Service
+    private void initValue(Set<? extends AbstractDomainObject> valueSet) {
+	this.valueSet = new jvstm.VBox<Set<? extends AbstractDomainObject>>(valueSet);
     }
 
     @Service
@@ -69,6 +82,12 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
     public AbstractDomainProperty(AbstractDomainItem host, Class<?> type) {
 	this.host = host;
 	this.type = type;
+	host.addListener(new ValueChangeListener() {
+	    @Override
+	    public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
+		fireValueChange();
+	    }
+	});
     }
 
     public final AbstractDomainObject getHost() {
@@ -113,6 +132,9 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 	if (value != null) {
 	    return value.get() != null ? value.get() : getNullValue();
 	}
+	if (valueSet != null) {
+	    return valueSet.get();
+	}
 	return host.getValue() != null ? getValueFrom(host.getValue()) : getNullValue();
     }
 
@@ -137,6 +159,7 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
      * @see com.vaadin.data.Property#setValue(java.lang.Object)
      */
     @Override
+    @Service
     public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
 	if (isReadOnly()) {
 	    throw new ReadOnlyException();
@@ -168,6 +191,8 @@ public abstract class AbstractDomainProperty implements Property, Property.Value
 	}
 	if (value != null) {
 	    value.put((AbstractDomainObject) newValue);
+	} else if (valueSet != null) {
+	    valueSet.put((Set) newValue);
 	} else {
 	    setValueOn(getOrCreateHost(), newValue);
 	}

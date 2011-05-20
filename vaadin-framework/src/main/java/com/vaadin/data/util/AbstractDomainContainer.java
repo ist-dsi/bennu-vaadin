@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -60,6 +61,10 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
      */
     public AbstractDomainContainer(AbstractDomainObject value) {
 	super(value);
+    }
+
+    public AbstractDomainContainer(Set<? extends AbstractDomainObject> valueSet) {
+	super(valueSet);
     }
 
     /**
@@ -177,8 +182,9 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	    return null;
 	}
 	getValue().add((AbstractDomainObject) itemId);
+	Item item = getItem(itemId);
 	fireContainerItemSetChange();
-	return getItem(itemId);
+	return item;
     }
 
     /**

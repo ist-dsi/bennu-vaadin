@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
+import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
@@ -51,6 +52,7 @@ public class EmbeddedWindow extends Window {
 	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
 	    @Override
 	    public void fragmentChanged(FragmentChangedEvent source) {
+		setLocale(Language.getLocale());
 		String fragment = source.getUriFragmentUtility().getFragment();
 		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
 		    Matcher matcher = entry.getKey().matcher(fragment);
