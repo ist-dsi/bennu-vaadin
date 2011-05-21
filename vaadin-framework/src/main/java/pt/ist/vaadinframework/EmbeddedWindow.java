@@ -52,7 +52,6 @@ public class EmbeddedWindow extends Window {
 	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
 	    @Override
 	    public void fragmentChanged(FragmentChangedEvent source) {
-		setLocale(Language.getLocale());
 		String fragment = source.getUriFragmentUtility().getFragment();
 		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
 		    Matcher matcher = entry.getKey().matcher(fragment);
@@ -86,6 +85,12 @@ public class EmbeddedWindow extends Window {
 	current = new VerticalLayout();
 	layout.addComponent(current);
 	setContent(layout);
+    }
+
+    @Override
+    public void attach() {
+	setLocale(Language.getLocale());
+	super.attach();
     }
 
     private class NoMatchingPatternFoundComponent extends VerticalLayout implements EmbeddedComponentContainer {

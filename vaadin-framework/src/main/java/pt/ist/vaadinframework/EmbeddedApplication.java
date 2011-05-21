@@ -135,9 +135,9 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 		@Override
 		public void windowClose(CloseEvent e) {
 		    removeWindow(e.getWindow());
-		    if (getMainWindow() == null) {
-			setMainWindow(new EmbeddedWindow(resolver));
-		    }
+		    // if (getMainWindow() == null) {
+		    // setMainWindow(new EmbeddedWindow(resolver));
+		    // }
 		}
 	    });
 
@@ -265,46 +265,4 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    center();
 	}
     }
-
-    // /**
-    // * @see
-    // com.vaadin.Application#terminalError(com.vaadin.terminal.Terminal.ErrorEvent)
-    // */
-    // @Override
-    // public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event)
-    // {
-    // final Throwable t = event.getThrowable();
-    // if (t instanceof SocketException) {
-    // // Most likely client browser closed socket
-    // VaadinFrameworkLogger.getLogger().error(
-    // "Warning: SocketException in CommunicationManager. Most likely client (browser) closed socket.",
-    // t);
-    // return;
-    // }
-    //
-    // // // Finds the original source of the error/exception
-    // // Object owner = null;
-    // // if (event instanceof VariableOwner.ErrorEvent) {
-    // // owner = ((VariableOwner.ErrorEvent) event).getVariableOwner();
-    // // } else if (event instanceof URIHandler.ErrorEvent) {
-    // // owner = ((URIHandler.ErrorEvent) event).getURIHandler();
-    // // } else if (event instanceof ParameterHandler.ErrorEvent) {
-    // // owner = ((ParameterHandler.ErrorEvent) event).getParameterHandler();
-    // // } else if (event instanceof ChangeVariablesErrorEvent) {
-    // // owner = ((ChangeVariablesErrorEvent) event).getComponent();
-    // // }
-    // //
-    // // // Shows the error in AbstractComponent
-    // // if (owner instanceof AbstractComponent) {
-    // // if (t instanceof ErrorMessage) {
-    // // ((AbstractComponent) owner).setComponentError((ErrorMessage) t);
-    // // } else {
-    // // ((AbstractComponent) owner).setComponentError(new SystemError(t));
-    // // }
-    // // }
-    // VaadinFrameworkLogger.getLogger().error("Unhandled exception", t);
-    // getMainWindow().showNotification("An Unexpected error occured!",
-    // t.toString(), Notification.TYPE_ERROR_MESSAGE);
-    //
-    // }
 }
