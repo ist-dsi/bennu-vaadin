@@ -63,8 +63,9 @@ public class EmbeddedWindow extends Window {
 				arguments.add(matcher.group(i));
 			    }
 			    container.setArguments(arguments.toArray(new String[0]));
-			    layout.replaceComponent(current, container);
-			    current = container;
+			    layout.removeAllComponents();
+			    layout.addComponent(fragmentUtility);
+			    layout.addComponent(container);
 			    return;
 			} catch (InstantiationException e) {
 			    VaadinFrameworkLogger.getLogger().error(
@@ -77,13 +78,11 @@ public class EmbeddedWindow extends Window {
 			}
 		    }
 		}
-		Component container = new NoMatchingPatternFoundComponent();
-		layout.replaceComponent(current, container);
-		current = container;
+		layout.removeAllComponents();
+		layout.addComponent(fragmentUtility);
+		layout.addComponent(new NoMatchingPatternFoundComponent());
 	    }
 	});
-	current = new VerticalLayout();
-	layout.addComponent(current);
 	setContent(layout);
     }
 
