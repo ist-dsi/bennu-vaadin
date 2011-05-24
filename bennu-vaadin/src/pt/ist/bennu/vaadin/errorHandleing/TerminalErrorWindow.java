@@ -120,7 +120,7 @@ public class TerminalErrorWindow extends Window implements ClickListener {
 	    builder.append("   localized message: ");
 	    builder.append(cause.getLocalizedMessage());
 	    builder.append("\n");
-	    builder.append("   stack\n");
+	    builder.append("   stack trace:\n");
 	    for (final StackTraceElement stackTraceElement : cause.getStackTrace()) {
 		builder.append(stackTraceElement.toString());
 		builder.append("\n");
