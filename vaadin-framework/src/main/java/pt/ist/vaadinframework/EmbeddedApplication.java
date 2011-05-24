@@ -32,6 +32,7 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.terminal.Terminal;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
@@ -113,6 +114,7 @@ import com.vaadin.ui.Window.Notification;
 @SuppressWarnings("serial")
 public class EmbeddedApplication extends Application implements VaadinResourceConstants {
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
+    private static ApplicationErrorListener errorListener = null;
 
     @Override
     public void init() {
@@ -235,24 +237,10 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      */
     @Override
     public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
-	Logger logger = VaadinFrameworkLogger.getLogger();
-	Throwable throwable = event.getThrowable();
-	if (throwable instanceof SocketException) {
-	    // Most likely client browser closed socket
-	    logger.info("SocketException in CommunicationManager. Most likely client (browser) closed socket.");
-	    return;
-	}
-
-	if (throwable instanceof InvalidValueException
-		|| (throwable.getCause() != null && throwable.getCause() instanceof InvalidValueException)) {
-	    // ignore, validation errors are handled by the fields
-	} else if (throwable instanceof UserErrorException) {
-	    getMainWindow().showNotification(throwable.getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
-	} else if (throwable.getCause() != null && throwable.getCause() instanceof UserErrorException) {
-	    getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
+	if (errorListener != null) {
+	    errorListener.terminalError(event, this);
 	} else {
-	    getMainWindow().addWindow(new TerminalErrorWindow(throwable));
-	    logger.error("Terminal error:", throwable);
+	    super.terminalError(event);
 	}
     }
 
@@ -265,4 +253,9 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    center();
 	}
     }
+
+    public static void registerErrorListener(final ApplicationErrorListener errorListenerArg) {
+	errorListener = errorListenerArg;
+    }
+
 }
