@@ -4,7 +4,7 @@
 	<target name="pre-compile">
 		<condition property="containsEmbeddedProcessor">
 			<resourcecontains resource="${build.prefix}bennu/WEB-INF/classes/.compileProcessors"
-					substring="vaadin.annotation.EmbeddedAnnotationProcessor"/>
+					substring="pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor"/>
 		</condition>
 		<antcall target="appendProcessor"/>
 	</target>
@@ -12,7 +12,7 @@
 	<target name="appendProcessor" unless="containsEmbeddedProcessor">
 		<echo file="${build_home}/WEB-INF/classes/.compileProcessors"
 			append="yes"
-			message=",vaadin.annotation.EmbeddedAnnotationProcessor"/>
+			message=",pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor"/>
 	</target>
 
 	<target name="post-compile">

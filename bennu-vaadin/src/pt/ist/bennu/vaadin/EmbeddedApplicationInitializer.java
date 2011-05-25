@@ -17,8 +17,8 @@ import pt.ist.vaadinframework.ApplicationErrorListener;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 import pt.utl.ist.fenix.tools.util.FileUtils;
-import vaadin.annotation.EmbeddedAnnotationProcessor;
-import vaadin.annotation.EmbeddedComponent;
+import pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor;
+import pt.ist.vaadinframework.annotation.EmbeddedComponent;
 
 @SuppressWarnings("serial")
 public class EmbeddedApplicationInitializer extends HttpServlet {
