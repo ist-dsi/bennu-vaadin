@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import myorg._development.PropertiesManager;
-import pt.ist.bennu.vaadin.errorHandleing.VirtualHostAwareErrorHandler;
+import pt.ist.bennu.vaadin.errorHandling.VirtualHostAwareErrorHandler;
 import pt.ist.vaadinframework.ApplicationErrorListener;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
