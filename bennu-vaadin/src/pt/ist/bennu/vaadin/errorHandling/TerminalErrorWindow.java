@@ -1,4 +1,4 @@
-package pt.ist.bennu.vaadin.errorHandleing;
+package pt.ist.bennu.vaadin.errorHandling;
 
 import java.util.Collections;
 
