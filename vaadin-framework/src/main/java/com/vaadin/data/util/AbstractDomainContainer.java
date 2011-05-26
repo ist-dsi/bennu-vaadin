@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +43,17 @@ import com.vaadin.data.Property;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container.Ordered,
+public abstract class AbstractDomainContainer extends AbstractDomainProperty implements Container.Sortable,
 	Container.ItemSetChangeNotifier, Container.PropertySetChangeNotifier {
+    private final List<Object> propertyIds = new ArrayList<Object>();
+
     private final Map<Object, Class<?>> model = new HashMap<Object, Class<?>>();
 
     private final List<Object> itemIds = new ArrayList<Object>();
 
     private final Map<Object, AbstractDomainItem> items = new HashMap<Object, AbstractDomainItem>();
+
+    private ItemSorter itemSorter = new DefaultItemSorter();
 
     private List<PropertySetChangeListener> propertySetChangeListeners;
 
@@ -118,7 +123,7 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
      */
     @Override
     public Collection<?> getContainerPropertyIds() {
-	return Collections.unmodifiableCollection(model.keySet());
+	return Collections.unmodifiableCollection(propertyIds);
     }
 
     /**
@@ -256,6 +261,7 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	if (model.containsKey(propertyId)) {
 	    return false;
 	}
+	propertyIds.add(propertyId);
 	model.put(propertyId, type);
 	fireContainerPropertySetChange();
 	return true;
@@ -269,6 +275,7 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
 	if (!model.containsKey(propertyId)) {
 	    return false;
 	}
+	propertyIds.remove(propertyId);
 	model.remove(propertyId);
 	fireContainerPropertySetChange();
 	return true;
@@ -373,6 +380,64 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
     @Override
     public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
 	throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Sortable#sort(java.lang.Object[],
+     *      boolean[])
+     */
+    @Override
+    public void sort(Object[] propertyId, boolean[] ascending) {
+	// Set up the item sorter for the sort operation
+	itemSorter.setSortProperties(this, propertyId, ascending);
+
+	// Perform the actual sort
+	doSort();
+
+	// Post sort updates
+	fireContainerItemSetChange();
+    }
+
+    protected void doSort() {
+	Collections.sort(itemIds, getItemSorter());
+    }
+
+    /**
+     * @see com.vaadin.data.Container.Sortable#getSortableContainerPropertyIds()
+     */
+    @Override
+    public Collection<?> getSortableContainerPropertyIds() {
+	final List<Object> list = new LinkedList<Object>();
+	for (final Iterator<?> i = propertyIds.iterator(); i.hasNext();) {
+	    final Object id = i.next();
+	    final Class<?> type = getType(id);
+	    if (type != null && Comparable.class.isAssignableFrom(type)) {
+		list.add(id);
+	    }
+	}
+
+	return list;
+    }
+
+    /**
+     * Returns the ItemSorter used for comparing items in a sort. See
+     * {@link #setItemSorter(ItemSorter)} for more information.
+     * 
+     * @return The ItemSorter used for comparing two items in a sort.
+     */
+    public ItemSorter getItemSorter() {
+	return itemSorter;
+    }
+
+    /**
+     * Sets the ItemSorter used for comparing items in a sort. The ItemSorter is
+     * called for each collection that needs sorting. A default ItemSorter is
+     * used if this is not explicitly set.
+     * 
+     * @param itemSorter The ItemSorter used for comparing two items in a sort.
+     */
+    public void setItemSorter(ItemSorter itemSorter) {
+	this.itemSorter = itemSorter;
     }
 
     private class PropertySetChangeEvent extends EventObject implements Container.PropertySetChangeEvent {
