@@ -21,23 +21,15 @@
  */
 package pt.ist.vaadinframework;
 
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
-import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.terminal.Terminal;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.CloseEvent;
-import com.vaadin.ui.Window.CloseListener;
-import com.vaadin.ui.Window.Notification;
 
 /**
  * <p>
@@ -133,15 +125,18 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	// If not, we must create a new window for this new browser window/tab
 	if (window == null) {
 	    window = new EmbeddedWindow(resolver);
-	    window.addListener(new CloseListener() {
-		@Override
-		public void windowClose(CloseEvent e) {
-		    removeWindow(e.getWindow());
-		    // if (getMainWindow() == null) {
-		    // setMainWindow(new EmbeddedWindow(resolver));
-		    // }
-		}
-	    });
+	    // FIXME: this was commented out because it didn't work in IE. We
+	    // won't have page refresh this way.
+
+	    // window.addListener(new CloseListener() {
+	    // @Override
+	    // public void windowClose(CloseEvent e) {
+	    // removeWindow(e.getWindow());
+	    // // if (getMainWindow() == null) {
+	    // // setMainWindow(new EmbeddedWindow(resolver));
+	    // // }
+	    // }
+	    // });
 
 	    // Use the random name given by the framework to identify this
 	    // window in future
