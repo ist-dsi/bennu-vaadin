@@ -3,7 +3,7 @@
 
 	<target name="pre-compile">
 		<condition property="containsEmbeddedProcessor">
-			<resourcecontains resource="${build.prefix}bennu/WEB-INF/classes/.compileProcessors"
+			<resourcecontains resource="${build_home}/WEB-INF/classes/.compileProcessors"
 					substring="pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor"/>
 		</condition>
 		<antcall target="appendProcessor"/>
