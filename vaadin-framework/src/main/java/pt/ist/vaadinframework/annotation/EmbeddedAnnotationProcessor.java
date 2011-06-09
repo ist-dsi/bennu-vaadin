@@ -17,7 +17,7 @@ import javax.lang.model.element.TypeElement;
 import pt.utl.ist.fenix.tools.util.FileUtils;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-@SupportedAnnotationTypes({ "vaadin.annotation.EmbeddedComponent" })
+@SupportedAnnotationTypes({ "pt.ist.vaadinframework.annotation.EmbeddedComponent" })
 public class EmbeddedAnnotationProcessor extends AbstractProcessor {
 
     public static final String LOG_FILENAME = ".embeddedAnnotationLog";
