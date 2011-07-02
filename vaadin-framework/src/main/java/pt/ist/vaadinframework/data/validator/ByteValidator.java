@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.data.validator;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -29,9 +30,9 @@ import com.vaadin.data.validator.AbstractStringValidator;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class ByteValidator extends AbstractStringValidator {
+public class ByteValidator extends AbstractStringValidator implements VaadinResourceConstants {
     public ByteValidator() {
-	super(VaadinResources.getString(ValidatorKeys.BYTE_VALIDATOR_ERROR));
+	super(VaadinResources.getString(BYTE_VALIDATOR_ERROR));
     }
 
     @Override

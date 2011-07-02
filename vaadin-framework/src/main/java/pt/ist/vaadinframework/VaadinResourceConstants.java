@@ -40,4 +40,33 @@ public interface VaadinResourceConstants {
     public static final String SYSTEM_MESSAGE_OUTOFSYNC_ERROR = "pt.ist.vaadinframework.system.message.outofsyncerror";
     public static final String SYSTEM_TITLE_COOKIES_DISABLED_ERROR = "pt.ist.vaadinframework.system.title.cookiesdisablederror";
     public static final String SYSTEM_MESSAGE_COOKIES_DISABLED_ERROR = "pt.ist.vaadinframework.system.message.cookiesdisablederror";
+
+    public static final String BYTE_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.byte.error";
+    public static final String LONG_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.byte.error";
+    public static final String SHORT_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.short.error";
+    public static final String INTEGER_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.integer.error";
+    public static final String FLOAT_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.float.error";
+    public static final String DOUBLE_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.double.error";
+    public static final String CHARACTER_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.character.error";
+    public static final String BIG_DECIMAL_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.bigdecimal.error";
+    public static final String URL_VALIDATOR_ERROR = "pt.ist.vaadinframework.data.validator.url.error";
+    public static final String REQUIRED_ERROR = "pt.ist.vaadinframework.data.validator.required.error";
+
+    public static final String BUTTON_SAVE = "pt.ist.vaadinframework.common.button.save";
+    public static final String BUTTON_DISCARD = "pt.ist.vaadinframework.common.button.discard";
+    public static final String ERROR_UNAUTHORIZED = "pt.ist.bennu.vaadin.error.pageAccessDenied";
+
+    public static final String COMMONS_ACTION_SUBMIT = "pt.ist.vaadinframework.commons.action.submit";
+    public static final String COMMONS_ACTION_DISCARD = "pt.ist.vaadinframework.commons.action.discard";
+    public static final String COMMONS_ACTION_CANCEL = "pt.ist.vaadinframework.commons.action.cancel";
+    public static final String COMMONS_MESSAGE_SUBMIT = "pt.ist.vaadinframework.commons.message.submit";
+    public static final String COMMONS_MESSAGE_DISCARD = "pt.ist.vaadinframework.commons.message.discard";
+    public static final String COMMONS_MESSAGE_CANCEL = "pt.ist.vaadinframework.commons.message.cancel";
+
+    public static final String COMMONS_GROUPBY_LABEL = "org.sotis.web.commons.label.groupBy";
+    public static final String COMMONS_SORTBY_LABEL = "org.sotis.web.commons.label.sortBy";
+    public static final String COMMONS_FILTERBY_LABEL = "org.sotis.web.commons.label.filterBy";
+    public static final String COMMONS_ITEMS_PER_PAGE_LABEL = "org.sotis.web.commons.label.itemsPerPage";
+    public static final String COMMONS_PAGE_LABEL = "org.sotis.web.commons.label.page";
+
 }

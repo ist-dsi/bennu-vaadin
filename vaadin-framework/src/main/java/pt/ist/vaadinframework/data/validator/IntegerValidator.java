@@ -21,14 +21,15 @@
  */
 package pt.ist.vaadinframework.data.validator;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class IntegerValidator extends com.vaadin.data.validator.IntegerValidator {
+public class IntegerValidator extends com.vaadin.data.validator.IntegerValidator implements VaadinResourceConstants {
     public IntegerValidator() {
-	super(VaadinResources.getString(ValidatorKeys.INTEGER_VALIDATOR_ERROR));
+	super(VaadinResources.getString(INTEGER_VALIDATOR_ERROR));
     }
 }

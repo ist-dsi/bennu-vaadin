@@ -21,14 +21,15 @@
  */
 package pt.ist.vaadinframework.data.validator;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class DoubleValidator extends com.vaadin.data.validator.DoubleValidator {
+public class DoubleValidator extends com.vaadin.data.validator.DoubleValidator implements VaadinResourceConstants {
     public DoubleValidator() {
-	super(VaadinResources.getString(ValidatorKeys.DOUBLE_VALIDATOR_ERROR));
+	super(VaadinResources.getString(DOUBLE_VALIDATOR_ERROR));
     }
 }

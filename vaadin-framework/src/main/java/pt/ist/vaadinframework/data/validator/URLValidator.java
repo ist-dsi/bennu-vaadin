@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.data.validator;
 
 import java.net.URL;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -32,9 +33,9 @@ import com.vaadin.data.validator.AbstractStringValidator;
  * 
  */
 @SuppressWarnings("serial")
-public class URLValidator extends AbstractStringValidator {
+public class URLValidator extends AbstractStringValidator implements VaadinResourceConstants {
     public URLValidator() {
-	super(VaadinResources.getString(ValidatorKeys.URL_VALIDATOR_ERROR));
+	super(VaadinResources.getString(URL_VALIDATOR_ERROR));
     }
 
     @Override

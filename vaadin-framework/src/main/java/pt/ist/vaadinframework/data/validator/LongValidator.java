@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.data.validator;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -33,9 +34,9 @@ import com.vaadin.data.validator.AbstractStringValidator;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class LongValidator extends AbstractStringValidator {
+public class LongValidator extends AbstractStringValidator implements VaadinResourceConstants {
     public LongValidator() {
-	super(VaadinResources.getString(ValidatorKeys.LONG_VALIDATOR_ERROR));
+	super(VaadinResources.getString(LONG_VALIDATOR_ERROR));
     }
 
     @Override

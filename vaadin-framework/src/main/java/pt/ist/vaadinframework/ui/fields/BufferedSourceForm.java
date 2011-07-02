@@ -21,7 +21,7 @@
  */
 package pt.ist.vaadinframework.ui.fields;
 
-import pt.ist.vaadinframework.CommonKeys;
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 import com.vaadin.data.Buffered;
@@ -36,16 +36,16 @@ import com.vaadin.ui.Layout.SpacingHandler;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class BufferedSourceForm extends Form {
+public class BufferedSourceForm extends Form implements VaadinResourceConstants {
     public BufferedSourceForm() {
 	Layout controls = getFooter();
 	if (controls instanceof SpacingHandler) {
 	    ((SpacingHandler) controls).setSpacing(true);
 	}
 	controls.setMargin(true, false, false, false);
-	Button save = new Button(VaadinResources.getString(CommonKeys.BUTTON_SAVE));
+	Button save = new Button(VaadinResources.getString(BUTTON_SAVE));
 	controls.addComponent(save);
-	Button discard = new Button(VaadinResources.getString(CommonKeys.BUTTON_DISCARD));
+	Button discard = new Button(VaadinResources.getString(BUTTON_DISCARD));
 	controls.addComponent(discard);
 	setFooter(controls);
 	save.addListener(new Button.ClickListener() {

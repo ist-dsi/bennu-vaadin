@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.data.validator;
 
 import java.math.BigDecimal;
 
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -31,9 +32,9 @@ import com.vaadin.data.validator.AbstractStringValidator;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
-public class BigDecimalValidator extends AbstractStringValidator {
+public class BigDecimalValidator extends AbstractStringValidator implements VaadinResourceConstants {
     public BigDecimalValidator() {
-	super(VaadinResources.getString(ValidatorKeys.BIG_DECIMAL_VALIDATOR_ERROR));
+	super(VaadinResources.getString(BIG_DECIMAL_VALIDATOR_ERROR));
     }
 
     @Override

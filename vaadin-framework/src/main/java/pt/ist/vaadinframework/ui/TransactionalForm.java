@@ -8,8 +8,8 @@ import jvstm.cps.ConsistencyException;
 import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
 import pt.ist.fenixframework.pstm.IllegalWriteException;
+import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
-import pt.ist.vaadinframework.VaadinResources.CommonKeys;
 import pt.ist.vaadinframework.ui.layout.ControlsLayout;
 
 import com.vaadin.data.Buffered;
@@ -23,21 +23,21 @@ import com.vaadin.ui.Form;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Window.Notification;
 
-public class TransactionalForm extends Form {
+public class TransactionalForm extends Form implements VaadinResourceConstants {
     private final ControlsLayout controls = new ControlsLayout();
 
     public TransactionalForm(ResourceBundle bundle) {
-	setFormFieldFactory(new FieldFactory(bundle));
+	setFormFieldFactory(new DefaultFieldFactory(bundle));
 	setFooter(controls);
 	setWriteThrough(false);
     }
 
     public void addSubmitButton() {
-	addButton(VaadinResources.getString(CommonKeys.COMMONS_ACTION_SUBMIT), new ClickListener() {
+	addButton(VaadinResources.getString(COMMONS_ACTION_SUBMIT), new ClickListener() {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
 		commit();
-		getWindow().showNotification(VaadinResources.getString(CommonKeys.COMMONS_MESSAGE_SUBMIT),
+		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_SUBMIT),
 			Notification.TYPE_TRAY_NOTIFICATION);
 		if (getWindow().isClosable() && getWindow().getParent() != null) {
 		    getWindow().getParent().removeWindow(getWindow());
@@ -47,22 +47,22 @@ public class TransactionalForm extends Form {
     }
 
     public void addClearButton() {
-	addButton(VaadinResources.getString(CommonKeys.COMMONS_ACTION_DISCARD), new ClickListener() {
+	addButton(VaadinResources.getString(COMMONS_ACTION_DISCARD), new ClickListener() {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
 		discard();
-		getWindow().showNotification(VaadinResources.getString(CommonKeys.COMMONS_MESSAGE_DISCARD),
+		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_DISCARD),
 			Notification.TYPE_TRAY_NOTIFICATION);
 	    }
 	});
     }
 
     public void addCancelButton() {
-	addButton(VaadinResources.getString(CommonKeys.COMMONS_ACTION_CANCEL), new ClickListener() {
+	addButton(VaadinResources.getString(COMMONS_ACTION_CANCEL), new ClickListener() {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
 		discard();
-		getWindow().showNotification(VaadinResources.getString(CommonKeys.COMMONS_MESSAGE_CANCEL),
+		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_CANCEL),
 			Notification.TYPE_TRAY_NOTIFICATION);
 		if (getWindow().isClosable()) {
 		    getWindow().getParent().removeWindow(getWindow());
