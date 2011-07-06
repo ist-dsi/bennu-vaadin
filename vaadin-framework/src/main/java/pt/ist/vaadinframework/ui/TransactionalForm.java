@@ -64,7 +64,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 		discard();
 		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_CANCEL),
 			Notification.TYPE_TRAY_NOTIFICATION);
-		if (getWindow().isClosable()) {
+		if (getWindow().isClosable() && getWindow().getParent() != null) {
 		    getWindow().getParent().removeWindow(getWindow());
 		}
 	    }
@@ -171,7 +171,31 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Service
     public void commit() {
 	try {
-	    super.commit();
+	    if (!isWriteThrough()) {
+		super.commit();
+	    }
+	    if (getItemDataSource() instanceof Buffered) {
+		Buffered buffer = (Buffered) getItemDataSource();
+		if (!buffer.isWriteThrough()) {
+		    buffer.commit();
+		}
+	    }
+	} catch (Buffered.SourceException e) {
+	    findIllegalWritesInside(e);
+	    focus();
+	    throw e;
+	}
+    }
+
+    @Override
+    @Service
+    public void discard() throws SourceException {
+	try {
+	    if (getItemDataSource() instanceof Buffered) {
+		Buffered buffer = (Buffered) getItemDataSource();
+		buffer.discard();
+	    }
+	    super.discard();
 	} catch (Buffered.SourceException e) {
 	    findIllegalWritesInside(e);
 	    focus();
