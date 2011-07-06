@@ -19,6 +19,7 @@ import pt.ist.fenixframework.pstm.IllegalWriteException;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.AbstractProperty;
@@ -97,10 +98,9 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 
     protected void setPropertyValue(PropertyId propertyId, Object newValue) throws SourceException, InvalidValueException {
 	propertyValues.put(propertyId, newValue);
+	modified = true;
 	if (isWriteThrough()) {
 	    commit(Collections.singletonList(propertyId));
-	} else {
-	    modified = true;
 	}
     }
 
@@ -169,9 +169,19 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 
     @Override
     public boolean addItemProperty(Object propertyId, Property property) {
-	Type value = getValue();
-	propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, (PropertyId) propertyId));
-	return super.addItemProperty(propertyId, property);
+	if (super.addItemProperty(propertyId, property)) {
+	    Type value = getValue();
+	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, (PropertyId) propertyId));
+	    if (property instanceof Buffered) {
+		((Buffered) property).setWriteThrough(isWriteThrough());
+		((Buffered) property).setReadThrough(isReadThrough());
+	    }
+	    if (property instanceof Validatable) {
+		((Validatable) property).setInvalidAllowed(isInvalidAllowed());
+	    }
+	    return true;
+	}
+	return false;
     }
 
     @Override
@@ -269,6 +279,9 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 	LinkedList<Throwable> problems = null;
 	for (PropertyId propertyId : savingIds) {
 	    try {
+		if (getItemProperty(propertyId) instanceof Buffered) {
+		    ((Buffered) getItemProperty(propertyId)).commit();
+		}
 		writePropertyValue(getValue(), propertyId, propertyValues.get(propertyId));
 	    } catch (Throwable e) {
 		handleException(e);
@@ -281,6 +294,7 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 	if (problems != null) {
 	    throw new SourceException(this, problems.toArray(new Throwable[0]));
 	}
+	modified = false;
     }
 
     private void handleException(Throwable throwable) {
@@ -323,6 +337,9 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
     public void discard() throws SourceException {
 	Type value = getValue();
 	for (PropertyId propertyId : getItemPropertyIds()) {
+	    if (getItemProperty(propertyId) instanceof Buffered) {
+		((Buffered) getItemProperty(propertyId)).discard();
+	    }
 	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, propertyId));
 	}
 	modified = false;

@@ -32,9 +32,6 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
 	Property property = super.getItemProperty(propertyId);
 	if (property == null) {
 	    property = attemptPropertyCreation((String) propertyId);
-	    if (property != null) {
-		addItemProperty(propertyId, property);
-	    }
 	}
 	return property;
     }
@@ -44,11 +41,15 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
 	Property property;
 	if (split == -1) {
 	    property = fromDescriptor(propertyId);
+	    if (property != null) {
+		addItemProperty(propertyId, property);
+	    }
 	} else {
 	    String first = propertyId.substring(0, split);
 	    String rest = propertyId.substring(split + 1);
 	    property = getItemProperty(first);
 	    if (property != null && property instanceof Item) {
+		addItemProperty(first, property);
 		property = ((Item) property).getItemProperty(rest);
 	    } else {
 		throw new RuntimeException("could not load property: " + propertyId + " for type: " + getType());
