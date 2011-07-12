@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -60,10 +60,10 @@ public class PartialPopupField extends PopupDateField {
 	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
 	    Date date = (Date) newValue;
 	    Partial partial = (Partial) property.getValue();
-	    if (partial == null) {
-		partial = new Partial();
-	    }
 	    if (date != null) {
+		if (partial == null) {
+		    partial = new Partial();
+		}
 		DateTime dateTime = new DateTime(date);
 		if (field.getResolution() <= RESOLUTION_YEAR) {
 		    partial = partial.with(DateTimeFieldType.year(), dateTime.get(DateTimeFieldType.year()));
@@ -86,6 +86,8 @@ public class PartialPopupField extends PopupDateField {
 		if (field.getResolution() <= RESOLUTION_MSEC) {
 		    partial = partial.with(DateTimeFieldType.millisOfSecond(), dateTime.get(DateTimeFieldType.millisOfSecond()));
 		}
+	    } else {
+		partial = null;
 	    }
 	    property.setValue(partial);
 	}
