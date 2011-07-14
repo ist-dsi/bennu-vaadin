@@ -62,11 +62,4 @@ public interface VaadinResourceConstants {
     public static final String COMMONS_MESSAGE_SUBMIT = "pt.ist.vaadinframework.commons.message.submit";
     public static final String COMMONS_MESSAGE_DISCARD = "pt.ist.vaadinframework.commons.message.discard";
     public static final String COMMONS_MESSAGE_CANCEL = "pt.ist.vaadinframework.commons.message.cancel";
-
-    public static final String COMMONS_GROUPBY_LABEL = "org.sotis.web.commons.label.groupBy";
-    public static final String COMMONS_SORTBY_LABEL = "org.sotis.web.commons.label.sortBy";
-    public static final String COMMONS_FILTERBY_LABEL = "org.sotis.web.commons.label.filterBy";
-    public static final String COMMONS_ITEMS_PER_PAGE_LABEL = "org.sotis.web.commons.label.itemsPerPage";
-    public static final String COMMONS_PAGE_LABEL = "org.sotis.web.commons.label.page";
-
 }

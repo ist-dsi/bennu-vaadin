@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -108,7 +108,6 @@ public class MetaModel {
 		try {
 		    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName, readMethod, writeMethod);
 		    descriptors.put(fieldName, new BeanPropertyDescriptor(propertyDescriptor, false));
-		    System.out.printf("Add fieldName %s of class %s\n", fieldName, type.getName());
 		} catch (IntrospectionException e) {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
 		}
