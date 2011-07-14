@@ -17,7 +17,6 @@ public class VirtualHostAwareErrorHandler implements ApplicationErrorListener {
 
     @Override
     public void terminalError(final ErrorEvent event, final Application application) {
-	System.out.println("handleing....");
 	final Logger logger = VaadinFrameworkLogger.getLogger();
 
 	final Throwable throwable = event.getThrowable();
