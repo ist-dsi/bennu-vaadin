@@ -26,7 +26,7 @@ import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.PropertysetItem;
 
 public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem implements Property, BufferedValidatable,
-	Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
+Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty {
 	private final PropertyId propertyId;
 
@@ -210,40 +210,50 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 
     @Service
     private void commit(Collection<PropertyId> savingPropertyIds) throws SourceException, InvalidValueException {
+	LinkedList<Throwable> problems = new LinkedList<Throwable>();
 	LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
+	for (PropertyId propertyId : savingIds) {
+	    try {
+		if (getItemProperty(propertyId) instanceof Buffered) {
+		    ((Buffered) getItemProperty(propertyId)).commit();
+		}
+	    } catch (Throwable e) {
+		handleException(e);
+		problems.add(e);
+	    }
+	}
 	if (getValue() == null) {
 	    // construction
 	    if (constructor != null) {
 		try {
-		    Method method = constructor.getClass().getMethod("construct",
-			    getArgumentTypes(constructor.getOrderedArguments()));
+		    Method method = findMethod(constructor.getClass(), getArgumentTypes(constructor.getOrderedArguments()));
 		    setValue(method.invoke(constructor, readArguments(constructor.getOrderedArguments())));
 		    savingIds.removeAll(Arrays.asList(constructor.getOrderedArguments()));
 		} catch (SecurityException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (NoSuchMethodException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (IllegalArgumentException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (IllegalAccessException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (InvocationTargetException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		}
 	    } else {
 		try {
 		    setValue(getType().newInstance());
 		} catch (InstantiationException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (IllegalAccessException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		}
 	    }
 	} else {
@@ -252,7 +262,7 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 		    LinkedList<Class<?>> argumentTypes = new LinkedList<Class<?>>();
 		    argumentTypes.add(getType());
 		    argumentTypes.addAll(Arrays.asList(getArgumentTypes(writer.getOrderedArguments())));
-		    Method method = writer.getClass().getMethod("write", argumentTypes.toArray(new Class<?>[0]));
+		    Method method = findMethod(writer.getClass(), argumentTypes.toArray(new Class<?>[0]));
 		    LinkedList<Object> argumentValues = new LinkedList<Object>();
 		    argumentValues.add(getValue());
 		    argumentValues.addAll(Arrays.asList(readArguments(writer.getOrderedArguments())));
@@ -260,41 +270,56 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 		    savingIds.removeAll(Arrays.asList(writer.getOrderedArguments()));
 		} catch (IllegalArgumentException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (IllegalAccessException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (InvocationTargetException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (SecurityException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		} catch (NoSuchMethodException e) {
 		    handleException(e);
-		    throw new SourceException(this, e);
+		    problems.add(e);
 		}
 	    }
 	}
-	LinkedList<Throwable> problems = null;
 	for (PropertyId propertyId : savingIds) {
 	    try {
-		if (getItemProperty(propertyId) instanceof Buffered) {
-		    ((Buffered) getItemProperty(propertyId)).commit();
-		}
 		writePropertyValue(getValue(), propertyId, propertyValues.get(propertyId));
 	    } catch (Throwable e) {
 		handleException(e);
-		if (problems == null) {
-		    problems = new LinkedList<Throwable>();
-		}
 		problems.add(e);
 	    }
 	}
-	if (problems != null) {
+	if (!problems.isEmpty()) {
 	    throw new SourceException(this, problems.toArray(new Throwable[0]));
 	}
 	modified = false;
+    }
+
+    private Method findMethod(Class<?> type, Class<?>[] types) throws NoSuchMethodException {
+	for (Method method : type.getMethods()) {
+	    Class<?>[] mTypes = method.getParameterTypes();
+	    boolean match = true;
+	    for (int i = 0; i < types.length; i++) {
+		if (i >= mTypes.length) {
+		    match = false;
+		    break;
+		}
+		if (!mTypes[i].isAssignableFrom(types[i])) {
+		    match = false;
+		    break;
+		}
+	    }
+	    if (match) {
+		return method;
+	    }
+	}
+	throw new NoSuchMethodException(
+		"Must specify a method with a signature compatible with the arguments in getOrderedArguments()");
     }
 
     private void handleException(Throwable throwable) {
@@ -352,9 +377,7 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 
     @Override
     public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	if (writeThrough != this.writeThrough) {
 	    this.writeThrough = writeThrough;
-	}
     }
 
     @Override
@@ -364,9 +387,7 @@ public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem imp
 
     @Override
     public void setReadThrough(boolean readThrough) throws SourceException {
-	if (readThrough != this.readThrough) {
 	    this.readThrough = readThrough;
-	}
     }
 
     @Override
