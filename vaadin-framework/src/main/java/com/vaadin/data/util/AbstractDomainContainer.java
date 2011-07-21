@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -288,7 +289,8 @@ public abstract class AbstractDomainContainer extends AbstractDomainProperty imp
     public boolean removeAllItems() throws UnsupportedOperationException {
 	itemIds.clear();
 	items.clear();
-	setValue(Collections.emptySet());
+//	setValue(Collections.emptySet());
+	setValue(new HashSet());
 	fireContainerItemSetChange();
 	return true;
     }

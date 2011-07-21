@@ -63,7 +63,7 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
 
     protected String makeCaption(Item item, Object propertyId, Component uiContext) {
 	if (item instanceof AbstractDomainItem) {
-	    String key = ((AbstractDomainItem) item).getLabelKey(propertyId);
+	    String key = ((AbstractDomainItem) item).getLabelKey(bundle,propertyId);
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }
@@ -74,7 +74,7 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
 
     protected String makeDescription(Item item, Object propertyId, Component uiContext) {
 	if (item instanceof AbstractDomainItem) {
-	    String key = ((AbstractDomainItem) item).getDescriptionKey(propertyId);
+	    String key = ((AbstractDomainItem) item).getDescriptionKey(bundle,propertyId);
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }

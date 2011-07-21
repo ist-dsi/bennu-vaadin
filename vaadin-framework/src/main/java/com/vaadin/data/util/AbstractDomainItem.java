@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -255,20 +256,34 @@ public abstract class AbstractDomainItem extends AbstractDomainProperty implemen
 	    }
 	}
     }
-
+    
+    @SuppressWarnings("unchecked")
+    private String getBundleKey(ResourceBundle bundle, Class<? extends AbstractDomainObject> clazz, Object propertyId) {
+	if (AbstractDomainObject.class.equals(clazz)) {
+	    return null;
+	}
+	String key = clazz.getName() + "." + propertyId;
+	if (bundle.containsKey(key)) {
+	    return bundle.getString(key);
+	}
+	final Class<? extends AbstractDomainObject> superclass = (Class<? extends AbstractDomainObject>)clazz.getSuperclass();
+	return getBundleKey(bundle,superclass, propertyId);
+    }
+    
     /**
      * @param propertyId
      * @return
      */
-    public String getLabelKey(Object propertyId) {
-	return getType().getName() + "." + propertyId;
+    public String getLabelKey(ResourceBundle bundle, Object propertyId) {
+//	return getType().getName() + "." + propertyId;
+	return getBundleKey(bundle, getType(), propertyId);
     }
 
     /**
      * @param propertyId
      * @return
      */
-    public String getDescriptionKey(Object propertyId) {
-	return getLabelKey(propertyId) + ".description";
+    public String getDescriptionKey(ResourceBundle bundle, Object propertyId) {
+	return getBundleKey(bundle,getType(),propertyId + ".description");
     }
 }

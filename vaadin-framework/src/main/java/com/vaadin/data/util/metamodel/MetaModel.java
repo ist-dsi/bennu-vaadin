@@ -50,11 +50,13 @@ public class MetaModel {
      * @param type
      */
 
-    private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName) {
-	for (Method method : type.getMethods()) {
-	    if (method.getName().equals("set" + StringUtils.capitalize(fieldName))) {
-		return method;
-	    }
+    private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName, Class<?> paramType) {
+	try {
+	    final String setterName = "set" + StringUtils.capitalize(fieldName);
+	    final Method setMethod = type.getDeclaredMethod(setterName, paramType);
+	    return setMethod;
+	} catch (SecurityException e) {
+	} catch (NoSuchMethodException e) {
 	}
 	return null;
     }
@@ -85,7 +87,8 @@ public class MetaModel {
 		}
 	    }
 	}
-	for (Method method : type.getMethods()) {
+	
+	for (Method method : type.getDeclaredMethods()) {
 	    final String methodName = method.getName();
 	    String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
 
@@ -96,18 +99,18 @@ public class MetaModel {
 	    Method readMethod = null;
 	    Method writeMethod = null;
 
-	    if (!methodName.contains("$")) {
-		if (methodName.startsWith("get")) {
-		    readMethod = method;
-		}
-		writeMethod = getSetMethod(type, fieldName);
+	    if (!methodName.contains("$") && methodName.startsWith("get")) {
+		readMethod = method;
+		Class<?> returnType = readMethod.getReturnType();
+		writeMethod = getSetMethod(type,fieldName, returnType);
 	    }
 
-	    if (readMethod != null && writeMethod != null) {
+	    if (readMethod != null) {
 		java.beans.PropertyDescriptor propertyDescriptor;
 		try {
 		    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName, readMethod, writeMethod);
-		    descriptors.put(fieldName, new BeanPropertyDescriptor(propertyDescriptor, false));
+		    final BeanPropertyDescriptor beanPropertyDesc = new BeanPropertyDescriptor(propertyDescriptor, false);
+		    descriptors.put(fieldName, beanPropertyDesc);
 		} catch (IntrospectionException e) {
 		    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
 		}

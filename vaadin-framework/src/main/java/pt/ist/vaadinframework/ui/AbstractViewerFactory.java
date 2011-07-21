@@ -2,6 +2,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.ResourceBundle;
 
+import pt.ist.bennu.ui.viewers.ViewerFactory;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 
 import com.vaadin.data.Item;
@@ -27,9 +28,9 @@ public abstract class AbstractViewerFactory implements ViewerFactory {
 	return viewer;
     }
 
-    protected String makeCaption(Item item, Object propertyId, Component uiContext) {
+    public String makeCaption(Item item, Object propertyId, Component uiContext) {
 	if (item instanceof AbstractDomainItem) {
-	    String key = ((AbstractDomainItem) item).getLabelKey(propertyId);
+	    String key = ((AbstractDomainItem) item).getLabelKey(bundle,propertyId);
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }
@@ -40,7 +41,7 @@ public abstract class AbstractViewerFactory implements ViewerFactory {
 
     protected String makeDescription(Item item, Object propertyId, Component uiContext) {
 	if (item instanceof AbstractDomainItem) {
-	    String key = ((AbstractDomainItem) item).getDescriptionKey(propertyId);
+	    String key = ((AbstractDomainItem) item).getDescriptionKey(bundle,propertyId);
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }

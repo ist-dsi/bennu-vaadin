@@ -22,7 +22,7 @@
 package com.vaadin.data.util;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
@@ -62,7 +62,7 @@ public class DomainContainer extends AbstractDomainContainer {
      */
     @Override
     protected Object getNullValue() {
-	return Collections.emptySet();
+	return new HashSet();
     }
 
     /**
@@ -98,7 +98,7 @@ public class DomainContainer extends AbstractDomainContainer {
 	}
     }
 
-    private Class<? extends AbstractDomainObject> getElementType() {
+    protected Class<? extends AbstractDomainObject> getElementType() {
 	return descriptor != null ? descriptor.getCollectionElementType() : elementType;
     }
 

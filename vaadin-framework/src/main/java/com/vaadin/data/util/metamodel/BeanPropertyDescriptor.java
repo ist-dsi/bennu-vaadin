@@ -23,6 +23,7 @@ package com.vaadin.data.util.metamodel;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
@@ -113,7 +114,10 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     @Override
     public void write(Object host, Object newValue) throws ModelIntroscpectionException {
 	try {
-	    getWriteMethod().invoke(host, newValue);
+	    final Method writeMethod = getWriteMethod();
+	    if (writeMethod != null) {
+		writeMethod.invoke(host, newValue);
+	    }
 	} catch (IllegalArgumentException e) {
 	    throw new ModelIntroscpectionException(e);
 	} catch (IllegalAccessException e) {
