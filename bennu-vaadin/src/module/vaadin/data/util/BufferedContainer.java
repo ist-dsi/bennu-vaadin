@@ -44,8 +44,15 @@ Container.PropertySetChangeNotifier {
 
     private List<Validator> validators;
 
-    public BufferedContainer(Property value) {
+    private ItemConstructor<PropertyId, ItemId> constructor;
+
+    private ItemWriter<PropertyId, ItemId> writer;
+
+    private final Class<? extends ItemId> elementType;
+
+    public BufferedContainer(Property value, Class<? extends ItemId> elementType) {
 	this.value = value;
+	this.elementType = elementType;
 	if (!Collection.class.isAssignableFrom(value.getType())) {
 	    throw new UnsupportedOperationException("Containers work with Collection typed properties");
 	}
@@ -69,7 +76,11 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public Class<? extends Collection<? extends ItemId>> getType() {
-	return (Class<? extends Collection<? extends ItemId>>) value.getValue();
+	return (Class<? extends Collection<? extends ItemId>>) value.getType();
+    }
+
+    public Class<? extends ItemId> getElementType() {
+	return elementType;
     }
 
     @Override
@@ -121,6 +132,15 @@ Container.PropertySetChangeNotifier {
     // end of property implementation
 
     // BufferedValidatable implementation
+
+    public void setConstructor(ItemConstructor<PropertyId, ItemId> constructor) {
+	this.constructor = constructor;
+    }
+
+    public void setWriter(ItemWriter<PropertyId, ItemId> writer) {
+	this.writer = writer;
+    }
+
     @Override
     @Service
     public void commit() throws SourceException, InvalidValueException {
@@ -397,7 +417,12 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public Item addItemAt(int index, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAt(index, (ItemId) newItemId, makeItem((ItemId) newItemId), true);
+	ItemType item = makeItem((ItemId) newItemId);
+	if (item instanceof BufferedItem) {
+	    ((BufferedItem) item).setConstructor(constructor);
+	    ((BufferedItem) item).setWriter(writer);
+	}
+	return internalAddItemAt(index, (ItemId) newItemId, item, true);
     }
 
     @Override
@@ -407,7 +432,12 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAfter((ItemId) previousItemId, (ItemId) newItemId, makeItem((ItemId) newItemId), true);
+	ItemType item = makeItem((ItemId) newItemId);
+	if (item instanceof BufferedItem) {
+	    ((BufferedItem) item).setConstructor(constructor);
+	    ((BufferedItem) item).setWriter(writer);
+	}
+	return internalAddItemAfter((ItemId) previousItemId, (ItemId) newItemId, item, true);
     }
 
     public Item addItem(Class<? extends ItemId> type) {
@@ -415,21 +445,28 @@ Container.PropertySetChangeNotifier {
 	    return null;
 	}
 	ItemType item = makeItem(type);
-	if (item instanceof InstanceCreationNotifier) {
-	    ((InstanceCreationNotifier<ItemId, ItemType>) item).addListener(new InstanceCreationListener<ItemId, ItemType>() {
-		@Override
-		public void itemCreation(ItemId itemId, ItemType item) {
-		    internalAddItemAtEnd(itemId, item, true);
-		    ((InstanceCreationNotifier) item).removeListener(this);
-		}
-	    });
-	}
+	internalAddItemAtEnd(null, item, true);
+	// if (item instanceof InstanceCreationNotifier) {
+	// ((InstanceCreationNotifier<ItemId, ItemType>) item).addListener(new
+	// InstanceCreationListener<ItemId, ItemType>() {
+	// @Override
+	// public void itemCreation(ItemId itemId, ItemType item) {
+	// internalAddItemAtEnd(itemId, item, true);
+	// ((InstanceCreationNotifier) item).removeListener(this);
+	// }
+	// });
+	// }
 	return item;
     }
 
     @Override
     public Item addItem(Object itemId) throws UnsupportedOperationException {
-	return internalAddItemAtEnd((ItemId) itemId, makeItem((ItemId) itemId), true);
+	ItemType item = makeItem((ItemId) itemId);
+	if (item instanceof BufferedItem) {
+	    ((BufferedItem) item).setConstructor(constructor);
+	    ((BufferedItem) item).setWriter(writer);
+	}
+	return internalAddItemAtEnd((ItemId) itemId, item, true);
     }
 
     @Override

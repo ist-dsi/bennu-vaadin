@@ -65,8 +65,7 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
 	    if (AbstractDomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
 		return new DomainItem(property);
 	    } else if (descriptor.isCollection()) {
-		// TODO: wrap collection
-		return property;
+		return new DomainContainer(property, descriptor.getCollectionElementType());
 	    }
 	    return property;
 	}
