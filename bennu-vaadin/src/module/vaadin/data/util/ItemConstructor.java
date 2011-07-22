@@ -9,9 +9,7 @@ package module.vaadin.data.util;
  * 
  * @param <PropertyId>
  *            Type of the Ids of the properties
- * @param <Type>
- *            Type of the object mapped by the {@link Item}
  */
-public interface ItemConstructor<PropertyId, Type> {
+public interface ItemConstructor<PropertyId> {
     public PropertyId[] getOrderedArguments();
 }

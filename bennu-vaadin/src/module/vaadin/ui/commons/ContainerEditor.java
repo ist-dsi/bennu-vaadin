@@ -3,6 +3,7 @@ package module.vaadin.ui.commons;
 import java.util.Collection;
 
 import module.vaadin.data.util.BufferedContainer;
+import module.vaadin.data.util.VBoxProperty;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -15,19 +16,23 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 
 public class ContainerEditor extends CustomField {
     private final Table table;
 
-    public ContainerEditor() {
+    public ContainerEditor(TableFieldFactory factory) {
 	VerticalLayout layout = new VerticalLayout();
 	layout.setSpacing(true);
 	table = new Table();
 	layout.addComponent(table);
 	table.setWidth(100, UNITS_PERCENTAGE);
 	table.setPageLength(0);
+	table.setTableFieldFactory(factory);
+	table.setEditable(true);
+	table.setImmediate(true);
 	table.addGeneratedColumn(StringUtils.EMPTY, new ColumnGenerator() {
 	    @Override
 	    public Component generateCell(final Table source, final Object itemId, Object columnId) {
@@ -49,7 +54,7 @@ public class ContainerEditor extends CustomField {
 	    public void buttonClick(ClickEvent event) {
 		if (table.getContainerDataSource() instanceof BufferedContainer) {
 		    BufferedContainer container = (BufferedContainer) table.getContainerDataSource();
-		    container.addItem(container.getElementType());
+		    container.addItem(new VBoxProperty(container.getElementType()));
 		} else {
 		    table.getContainerDataSource().addItem();
 		}

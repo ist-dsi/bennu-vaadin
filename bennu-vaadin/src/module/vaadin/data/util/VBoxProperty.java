@@ -36,6 +36,7 @@ public class VBoxProperty extends AbstractProperty {
 	    throw new ReadOnlyException();
 	}
 	instance.put(newValue);
+	fireValueChange();
     }
 
     @Override

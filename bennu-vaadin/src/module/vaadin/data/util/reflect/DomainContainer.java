@@ -8,7 +8,8 @@ import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 import com.vaadin.data.Property;
 
-public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, String, DomainItem<Type>> {
+public class DomainContainer<Type extends AbstractDomainObject> extends
+BufferedContainer<Type, String, DomainItem<Type>> {
     public DomainContainer(Property value, Class<? extends Type> elementType) {
 	super(value, elementType);
     }
@@ -22,12 +23,7 @@ public class DomainContainer<Type extends AbstractDomainObject> extends Buffered
     }
 
     @Override
-    public DomainItem<Type> makeItem(Type itemId) {
+    public DomainItem<Type> makeItem(Property itemId) {
 	return new DomainItem<Type>(itemId);
-    }
-
-    @Override
-    public DomainItem<Type> makeItem(Class<? extends Type> type) {
-	return new DomainItem<Type>(type);
     }
 }

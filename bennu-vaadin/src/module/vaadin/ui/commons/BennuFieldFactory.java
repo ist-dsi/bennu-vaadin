@@ -20,7 +20,7 @@ public class BennuFieldFactory extends DefaultFieldFactory {
     protected Field makeField(Item item, Object propertyId, Component uiContext) {
 	Class<?> type = item.getItemProperty(propertyId).getType();
 	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof BufferedContainer) {
-	    return new ContainerEditor();
+	    return new ContainerEditor(this);
 	}
 	return super.makeField(item, propertyId, uiContext);
     }

@@ -18,6 +18,7 @@ import pt.ist.fenixframework.pstm.IllegalWriteException;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
@@ -66,9 +67,9 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     private final Map<Object, Object> propertyValues = new HashMap<Object, Object>();
 
-    private ItemConstructor<PropertyId, Type> constructor;
+    private ItemConstructor<PropertyId> constructor;
 
-    private ItemWriter<PropertyId, Type> writer;
+    private ItemWriter<PropertyId> writer;
 
     private boolean readThrough = true;
 
@@ -195,11 +196,11 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 	return (Collection<PropertyId>) super.getItemPropertyIds();
     }
 
-    public void setConstructor(ItemConstructor<PropertyId, Type> constructor) {
+    public void setConstructor(ItemConstructor<PropertyId> constructor) {
 	this.constructor = constructor;
     }
 
-    public void setWriter(ItemWriter<PropertyId, Type> writer) {
+    public void setWriter(ItemWriter<PropertyId> writer) {
 	this.writer = writer;
     }
 
@@ -214,7 +215,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 	LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
 	for (PropertyId propertyId : savingIds) {
 	    try {
-		if (getItemProperty(propertyId) instanceof Buffered) {
+		if (getItemProperty(propertyId) instanceof Buffered && getItemProperty(propertyId) instanceof Item) {
 		    ((Buffered) getItemProperty(propertyId)).commit();
 		}
 	    } catch (Throwable e) {
@@ -377,7 +378,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     @Override
     public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	    this.writeThrough = writeThrough;
+	this.writeThrough = writeThrough;
     }
 
     @Override
@@ -387,7 +388,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     @Override
     public void setReadThrough(boolean readThrough) throws SourceException {
-	    this.readThrough = readThrough;
+	this.readThrough = readThrough;
     }
 
     @Override
