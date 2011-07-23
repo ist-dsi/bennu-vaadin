@@ -50,6 +50,8 @@ Container.PropertySetChangeNotifier {
 
     private final Class<? extends ItemId> elementType;
 
+    private boolean disableCommitPropagation = false;
+
     public BufferedContainer(Property value, Class<? extends ItemId> elementType) {
 	this.value = value;
 	this.elementType = elementType;
@@ -144,16 +146,20 @@ Container.PropertySetChangeNotifier {
     @Override
     @Service
     public void commit() throws SourceException, InvalidValueException {
-	for (Property itemId : getItemIds()) {
-	    if (getItem(itemId) instanceof Buffered) {
-		((Buffered) getItem(itemId)).commit();
+	if (!disableCommitPropagation) {
+	    disableCommitPropagation = true;
+	    for (Property itemId : getItemIds()) {
+		if (getItem(itemId) instanceof Buffered) {
+		    ((Buffered) getItem(itemId)).commit();
+		}
 	    }
+	    Collection<ItemId> values = new ArrayList<ItemId>();
+	    for (Property property : getItemIds()) {
+		values.add((ItemId) property.getValue());
+	    }
+	    setValue(values);
+	    disableCommitPropagation = false;
 	}
-	Collection<ItemId> values = new ArrayList<ItemId>();
-	for (Property property : getItemIds()) {
-	    values.add((ItemId) property.getValue());
-	}
-	setValue(values);
     }
 
     @Override

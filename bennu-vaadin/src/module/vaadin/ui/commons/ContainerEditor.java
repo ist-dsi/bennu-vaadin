@@ -9,11 +9,14 @@ import org.apache.commons.lang.StringUtils;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TableFieldFactory;
@@ -26,13 +29,26 @@ public class ContainerEditor extends CustomField {
     public ContainerEditor(TableFieldFactory factory) {
 	VerticalLayout layout = new VerticalLayout();
 	layout.setSpacing(true);
-	table = new Table();
+	table = new Table() {
+	    @Override
+	    protected Object getPropertyValue(Object rowId, Object colId, Property property) {
+		Object v = super.getPropertyValue(rowId, colId, property);
+		if (v instanceof Field) {
+		    Field field = (Field) v;
+		    field.setWriteThrough(isWriteThrough());
+		    field.setReadOnly(isReadOnly());
+		    if (isImmediate() && field instanceof AbstractComponent) {
+			((AbstractComponent) field).setImmediate(true);
+		    }
+		}
+		return v;
+	    }
+	};
 	layout.addComponent(table);
 	table.setWidth(100, UNITS_PERCENTAGE);
 	table.setPageLength(0);
 	table.setTableFieldFactory(factory);
 	table.setEditable(true);
-	table.setImmediate(true);
 	table.addGeneratedColumn(StringUtils.EMPTY, new ColumnGenerator() {
 	    @Override
 	    public Component generateCell(final Table source, final Object itemId, Object columnId) {
@@ -67,6 +83,24 @@ public class ContainerEditor extends CustomField {
     public void setPropertyDataSource(Property newDataSource) {
 	super.setPropertyDataSource(newDataSource);
 	table.setContainerDataSource((Container) newDataSource);
+    }
+
+    @Override
+    public void setWriteThrough(boolean writeTrough) throws SourceException, InvalidValueException {
+	super.setWriteThrough(writeTrough);
+	table.setWriteThrough(writeTrough);
+    }
+
+    @Override
+    public void setImmediate(boolean immediate) {
+	super.setImmediate(immediate);
+	table.setImmediate(immediate);
+    }
+
+    @Override
+    public void setReadThrough(boolean readTrough) throws SourceException {
+	super.setReadThrough(readTrough);
+	table.setReadThrough(true);
     }
 
     @Override

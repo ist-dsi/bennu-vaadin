@@ -18,7 +18,6 @@ import pt.ist.fenixframework.pstm.IllegalWriteException;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
@@ -215,7 +214,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 	LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
 	for (PropertyId propertyId : savingIds) {
 	    try {
-		if (getItemProperty(propertyId) instanceof Buffered && getItemProperty(propertyId) instanceof Item) {
+		if (getItemProperty(propertyId) instanceof Buffered) {
 		    ((Buffered) getItemProperty(propertyId)).commit();
 		}
 	    } catch (Throwable e) {
