@@ -14,4 +14,7 @@ public interface VaadinResourceConstants {
     public static final String COMMONS_FILTERBY_LABEL = "vaadin.commons.label.filterBy";
     public static final String COMMONS_ITEMS_PER_PAGE_LABEL = "vaadin.commons.label.itemsPerPage";
     public static final String COMMONS_PAGE_LABEL = "vaadin.commons.label.page";
+
+    public static final String COMMONS_DELETE_ACTION = "vaadin.commons.action.delete";
+    public static final String COMMONS_ADD_ACTION = "vaadin.commons.action.add";
 }

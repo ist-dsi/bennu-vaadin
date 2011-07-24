@@ -21,9 +21,9 @@ import com.vaadin.data.util.AbstractInMemoryContainer;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 
 public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Item> extends
-AbstractInMemoryContainer<Property, PropertyId, ItemType> implements Property, BufferedValidatable,
-Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
-Container.PropertySetChangeNotifier {
+	AbstractInMemoryContainer<Property, PropertyId, ItemType> implements Property, BufferedValidatable,
+	Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
+	Container.PropertySetChangeNotifier {
     private final Property value;
 
     private final List<PropertyId> propertyIds = new ArrayList<PropertyId>();
@@ -429,8 +429,13 @@ Container.PropertySetChangeNotifier {
 	    });
 	}
 	if (item instanceof BufferedItem) {
-	    ((BufferedItem) item).setConstructor(constructor);
-	    ((BufferedItem) item).setWriter(writer);
+	    BufferedItem<PropertyId, ItemId> buffered = (BufferedItem<PropertyId, ItemId>) item;
+	    buffered.setConstructor(constructor);
+	    buffered.setWriter(writer);
+	    buffered.setWriteThrough(writeThrough);
+	    buffered.setReadThrough(readThrough);
+	    buffered.setInvalidAllowed(invalidAllowed);
+	    buffered.setInvalidCommitted(invalidCommited);
 	}
     }
 

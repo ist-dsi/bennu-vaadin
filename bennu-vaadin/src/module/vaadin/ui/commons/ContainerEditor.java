@@ -1,22 +1,25 @@
 package module.vaadin.ui.commons;
 
 import java.util.Collection;
+import java.util.ResourceBundle;
 
 import module.vaadin.data.util.BufferedContainer;
 import module.vaadin.data.util.VBoxProperty;
+import module.vaadin.resources.VaadinResourceConstants;
+import module.vaadin.resources.VaadinResources;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TableFieldFactory;
@@ -26,24 +29,10 @@ import com.vaadin.ui.themes.BaseTheme;
 public class ContainerEditor extends CustomField {
     private final Table table;
 
-    public ContainerEditor(TableFieldFactory factory) {
+    public ContainerEditor(TableFieldFactory factory, ResourceBundle bundle) {
 	VerticalLayout layout = new VerticalLayout();
 	layout.setSpacing(true);
-	table = new Table() {
-	    @Override
-	    protected Object getPropertyValue(Object rowId, Object colId, Property property) {
-		Object v = super.getPropertyValue(rowId, colId, property);
-		if (v instanceof Field) {
-		    Field field = (Field) v;
-		    field.setWriteThrough(isWriteThrough());
-		    field.setReadOnly(isReadOnly());
-		    if (isImmediate() && field instanceof AbstractComponent) {
-			((AbstractComponent) field).setImmediate(true);
-		    }
-		}
-		return v;
-	    }
-	};
+	table = new TransactionalTable(bundle);
 	layout.addComponent(table);
 	table.setWidth(100, UNITS_PERCENTAGE);
 	table.setPageLength(0);
@@ -52,7 +41,7 @@ public class ContainerEditor extends CustomField {
 	table.addGeneratedColumn(StringUtils.EMPTY, new ColumnGenerator() {
 	    @Override
 	    public Component generateCell(final Table source, final Object itemId, Object columnId) {
-		Button delete = new Button("delete");
+		Button delete = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_DELETE_ACTION));
 		delete.addStyleName(BaseTheme.BUTTON_LINK);
 		delete.addListener(new ClickListener() {
 		    @Override
@@ -63,7 +52,15 @@ public class ContainerEditor extends CustomField {
 		return delete;
 	    }
 	});
-	Button add = new Button("add");
+	table.setVisible(table.size() > 0);
+	table.addListener(new ItemSetChangeListener() {
+	    @Override
+	    public void containerItemSetChange(ItemSetChangeEvent event) {
+		table.setVisible(event.getContainer().size() > 0);
+	    }
+	});
+	Button add = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_ADD_ACTION));
+	add.addStyleName(BaseTheme.BUTTON_LINK);
 	layout.addComponent(add);
 	add.addListener(new ClickListener() {
 	    @Override
