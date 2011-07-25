@@ -52,7 +52,7 @@ public class DomainItem extends AbstractDomainItem {
      */
     @Override
     public boolean isRequired() {
-	return descriptor.isRequired();
+	return descriptor != null ? descriptor.isRequired() : false;
     }
 
     /**
