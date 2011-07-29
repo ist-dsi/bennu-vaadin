@@ -29,7 +29,6 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     public TransactionalForm(ResourceBundle bundle) {
 	setFormFieldFactory(new DefaultFieldFactory(bundle));
 	setFooter(controls);
-	setWriteThrough(false);
     }
 
     public void addSubmitButton() {
@@ -171,10 +170,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Service
     public void commit() {
 	try {
-	    if (!isWriteThrough()) {
-		super.commit();
-	    }
-	    if (getItemDataSource() instanceof Buffered) {
+	    super.commit();
+	    if (isValid() && getItemDataSource() instanceof Buffered) {
 		Buffered buffer = (Buffered) getItemDataSource();
 		if (!buffer.isWriteThrough()) {
 		    buffer.commit();

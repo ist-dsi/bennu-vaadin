@@ -29,18 +29,16 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
     public final Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
 	Item item = container.getItem(itemId);
 	Field field = makeField(item, propertyId, uiContext);
-	initField(field, item, propertyId, uiContext);
-	return field;
+	return initField(field, item, propertyId, uiContext);
     }
 
     @Override
     public final Field createField(Item item, Object propertyId, Component uiContext) {
 	Field field = makeField(item, propertyId, uiContext);
-	initField(field, item, propertyId, uiContext);
-	return field;
+	return initField(field, item, propertyId, uiContext);
     }
 
-    private void initField(Field field, Item item, Object propertyId, Component uiContext) {
+    protected Field initField(Field field, Item item, Object propertyId, Component uiContext) {
 	String caption = makeCaption(item, propertyId, uiContext);
 	field.setCaption(caption);
 	field.setDescription(makeDescription(item, propertyId, uiContext));
@@ -50,6 +48,7 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
 	if (field instanceof AbstractSelect) {
 	    ((AbstractSelect) field).setNullSelectionAllowed(!required);
 	}
+	return field;
     }
 
     private boolean isRequired(Property property) {
