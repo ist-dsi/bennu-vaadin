@@ -1,23 +1,31 @@
 package module.vaadin.data.util;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import jvstm.VBox;
 import pt.ist.fenixWebFramework.services.Service;
 
 import com.vaadin.data.util.AbstractProperty;
 
-public class VBoxProperty extends AbstractProperty {
+public class VBoxProperty extends AbstractProperty implements HintedProperty {
     private VBox<Object> instance;
 
     private final Class<?> type;
 
-    public VBoxProperty(Object instance) {
+    private final Collection<Hint> hints;
+
+    public VBoxProperty(Object instance, Hint... hints) {
 	initVBox(instance);
 	this.type = instance.getClass();
+	this.hints = Arrays.asList(hints);
     }
 
-    public VBoxProperty(Class<?> type) {
+    public VBoxProperty(Class<?> type, Hint... hints) {
 	initVBox(null);
 	this.type = type;
+	this.hints = Arrays.asList(hints);
     }
 
     @Service
@@ -37,6 +45,11 @@ public class VBoxProperty extends AbstractProperty {
 	}
 	instance.put(newValue);
 	fireValueChange();
+    }
+
+    @Override
+    public Collection<Hint> getHints() {
+	return Collections.unmodifiableCollection(hints);
     }
 
     @Override

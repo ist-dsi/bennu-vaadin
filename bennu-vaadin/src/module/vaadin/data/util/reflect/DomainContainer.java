@@ -3,14 +3,13 @@ package module.vaadin.data.util.reflect;
 import java.util.Collection;
 
 import module.vaadin.data.util.BufferedContainer;
+import module.vaadin.data.util.HintedProperty;
 import module.vaadin.data.util.VBoxProperty;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
-import com.vaadin.data.Property;
-
 public class DomainContainer<Type extends AbstractDomainObject> extends
 BufferedContainer<Type, String, DomainItem<Type>> {
-    public DomainContainer(Property value, Class<? extends Type> elementType) {
+    public DomainContainer(HintedProperty value, Class<? extends Type> elementType) {
 	super(value, elementType);
     }
 
@@ -23,7 +22,7 @@ BufferedContainer<Type, String, DomainItem<Type>> {
     }
 
     @Override
-    public DomainItem<Type> makeItem(Property itemId) {
+    public DomainItem<Type> makeItem(HintedProperty itemId) {
 	return new DomainItem<Type>(itemId);
     }
 }

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 import module.vaadin.data.util.BufferedContainer;
+import module.vaadin.data.util.HintedProperty;
+import module.vaadin.data.util.HintedProperty.Hint;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.ui.DefaultFieldFactory;
 
@@ -25,6 +27,19 @@ public class BennuFieldFactory extends DefaultFieldFactory {
 	    return new ContainerEditor(this, bundle);
 	}
 	return super.makeField(item, propertyId, uiContext);
+    }
+
+    @Override
+    protected Field initField(Field field, Item item, Object propertyId, Component uiContext) {
+	field = super.initField(field, item, propertyId, uiContext);
+	if (item.getItemProperty(propertyId) instanceof HintedProperty) {
+	    for (Hint hint : ((HintedProperty) item.getItemProperty(propertyId)).getHints()) {
+		if (hint.appliesTo(field)) {
+		    field = hint.applyHint(field);
+		}
+	    }
+	}
+	return field;
     }
 
     @Override

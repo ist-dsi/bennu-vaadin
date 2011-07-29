@@ -21,10 +21,10 @@ import com.vaadin.data.util.AbstractInMemoryContainer;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 
 public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Item> extends
-	AbstractInMemoryContainer<Property, PropertyId, ItemType> implements Property, BufferedValidatable,
-	Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
-	Container.PropertySetChangeNotifier {
-    private final Property value;
+AbstractInMemoryContainer<HintedProperty, PropertyId, ItemType> implements Property, HintedProperty, BufferedValidatable,
+Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
+Container.PropertySetChangeNotifier {
+    private final HintedProperty value;
 
     private final List<PropertyId> propertyIds = new ArrayList<PropertyId>();
 
@@ -52,7 +52,7 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
 
     private boolean disableCommitPropagation = false;
 
-    public BufferedContainer(Property value, Class<? extends ItemId> elementType) {
+    public BufferedContainer(HintedProperty value, Class<? extends ItemId> elementType) {
 	this.value = value;
 	this.elementType = elementType;
 	if (!Collection.class.isAssignableFrom(value.getType())) {
@@ -74,6 +74,11 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
     @Override
     public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
 	value.setValue(newValue);
+    }
+
+    @Override
+    public Collection<Hint> getHints() {
+	return value.getHints();
     }
 
     @Override
@@ -411,10 +416,10 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
 	return null;
     }
 
-    public abstract ItemType makeItem(Property itemId);
+    public abstract ItemType makeItem(HintedProperty itemId);
 
     @Override
-    protected void registerNewItem(int position, final Property itemId, ItemType item) {
+    protected void registerNewItem(int position, final HintedProperty itemId, ItemType item) {
 	items.put(itemId, item);
 	if (itemId instanceof ValueChangeNotifier) {
 	    ((ValueChangeNotifier) itemId).addListener(new ValueChangeListener() {
@@ -446,7 +451,7 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
 
     @Override
     public Item addItemAt(int index, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAt(index, (Property) newItemId, makeItem((Property) newItemId), true);
+	return internalAddItemAt(index, (HintedProperty) newItemId, makeItem((HintedProperty) newItemId), true);
     }
 
     @Override
@@ -456,12 +461,13 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
 
     @Override
     public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAfter((Property) previousItemId, (Property) newItemId, makeItem((Property) newItemId), true);
+	return internalAddItemAfter((HintedProperty) previousItemId, (HintedProperty) newItemId,
+		makeItem((HintedProperty) newItemId), true);
     }
 
     @Override
     public Item addItem(Object itemId) throws UnsupportedOperationException {
-	return internalAddItemAtEnd((Property) itemId, makeItem((Property) itemId), true);
+	return internalAddItemAtEnd((HintedProperty) itemId, makeItem((HintedProperty) itemId), true);
     }
 
     @Override
@@ -470,7 +476,7 @@ public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Ite
     }
 
     @Override
-    protected ItemType internalAddItemAt(int index, Property newItemId, ItemType item, boolean filter) {
+    protected ItemType internalAddItemAt(int index, HintedProperty newItemId, ItemType item, boolean filter) {
 	ItemType result = super.internalAddItemAt(index, newItemId, item, filter);
 	if (isWriteThrough()) {
 	    commit();

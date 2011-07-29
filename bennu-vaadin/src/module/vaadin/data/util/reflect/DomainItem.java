@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import module.vaadin.data.util.BufferedItem;
+import module.vaadin.data.util.HintedProperty;
 import module.vaadin.data.util.VBoxProperty;
+import module.vaadin.data.util.hints.Required;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 import com.vaadin.data.Item;
@@ -15,7 +17,7 @@ import com.vaadin.data.util.metamodel.PropertyDescriptor;
 public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<String, Type> {
     private final Map<String, PropertyDescriptor> descriptorCache = new HashMap<String, PropertyDescriptor>();
 
-    public DomainItem(Property value) {
+    public DomainItem(HintedProperty value) {
 	super(value);
     }
 
@@ -61,7 +63,12 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     private Property fromDescriptor(String propertyId) {
 	PropertyDescriptor descriptor = getDescriptor(propertyId);
 	if (descriptor != null) {
-	    BufferedProperty property = new BufferedProperty(propertyId, descriptor.getPropertyType());
+	    BufferedProperty property;
+	    if (descriptor.isRequired()) {
+		property = new BufferedProperty(propertyId, descriptor.getPropertyType(), new Required());
+	    } else {
+		property = new BufferedProperty(propertyId, descriptor.getPropertyType());
+	    }
 	    if (AbstractDomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
 		return new DomainItem(property);
 	    } else if (descriptor.isCollection()) {

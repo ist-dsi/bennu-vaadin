@@ -25,16 +25,24 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.PropertysetItem;
 
-public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem implements Property, BufferedValidatable,
+public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem implements Property, HintedProperty,
+BufferedValidatable,
 Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
-    public class BufferedProperty extends AbstractProperty {
+    public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
 
 	private final Class<?> type;
 
-	public BufferedProperty(PropertyId propertyId, Class<?> type) {
+	private final Collection<Hint> hints;
+
+	public BufferedProperty(PropertyId propertyId, Class<?> type, Hint... hints) {
+	    this(propertyId, type, Arrays.asList(hints));
+	}
+
+	public BufferedProperty(PropertyId propertyId, Class<?> type, Collection<Hint> hints) {
 	    this.propertyId = propertyId;
 	    this.type = type;
+	    this.hints = hints;
 	}
 
 	@Override
@@ -52,6 +60,11 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 	}
 
 	@Override
+	public Collection<Hint> getHints() {
+	    return Collections.unmodifiableCollection(hints);
+	}
+
+	@Override
 	public Class<?> getType() {
 	    return type;
 	}
@@ -62,7 +75,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 	}
     }
 
-    private final Property value;
+    private final HintedProperty value;
 
     private final Map<Object, Object> propertyValues = new HashMap<Object, Object>();
 
@@ -82,7 +95,7 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     private List<Validator> validators;
 
-    public BufferedItem(Property value) {
+    public BufferedItem(HintedProperty value) {
 	this.value = value;
     }
 
@@ -129,6 +142,11 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     @Override
     public void setReadOnly(boolean newStatus) {
 	value.setReadOnly(newStatus);
+    }
+
+    @Override
+    public Collection<Hint> getHints() {
+	return value.getHints();
     }
 
     @Override
