@@ -21,7 +21,7 @@ import com.vaadin.data.util.AbstractInMemoryContainer;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 
 public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Item> extends
-AbstractInMemoryContainer<HintedProperty, PropertyId, ItemType> implements Property, HintedProperty, BufferedValidatable,
+AbstractInMemoryContainer<Object, PropertyId, ItemType> implements Property, HintedProperty, BufferedValidatable,
 Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
 Container.PropertySetChangeNotifier {
     private final HintedProperty value;
@@ -30,7 +30,7 @@ Container.PropertySetChangeNotifier {
 
     private final Map<PropertyId, Class<?>> types = new HashMap<PropertyId, Class<?>>();
 
-    private final Map<Property, ItemType> items = new HashMap<Property, ItemType>();
+    private final Map<Object, ItemType> items = new HashMap<Object, ItemType>();
 
     private boolean readThrough = true;
 
@@ -153,14 +153,14 @@ Container.PropertySetChangeNotifier {
     public void commit() throws SourceException, InvalidValueException {
 	if (!disableCommitPropagation) {
 	    disableCommitPropagation = true;
-	    for (Property itemId : getItemIds()) {
+	    for (Object itemId : getItemIds()) {
 		if (getItem(itemId) instanceof Buffered) {
 		    ((Buffered) getItem(itemId)).commit();
 		}
 	    }
 	    Collection<ItemId> values = new ArrayList<ItemId>();
-	    for (Property property : getItemIds()) {
-		values.add((ItemId) property.getValue());
+	    for (Object itemId : getItemIds()) {
+		values.add((ItemId) itemId);
 	    }
 	    setValue(values);
 	    disableCommitPropagation = false;
@@ -331,7 +331,7 @@ Container.PropertySetChangeNotifier {
 	types.remove(propertyId);
 
 	// If remove the Property from all Items
-	for (Property itemId : getAllItemIds()) {
+	for (Object itemId : getAllItemIds()) {
 	    items.get(itemId).removeItemProperty(propertyId);
 	}
 
@@ -361,8 +361,8 @@ Container.PropertySetChangeNotifier {
      * @see com.vaadin.data.util.AbstractInMemoryContainer#getItemIds()
      */
     @Override
-    public Collection<Property> getItemIds() {
-	return (Collection<Property>) super.getItemIds();
+    public Collection<?> getItemIds() {
+	return Collections.unmodifiableCollection(super.getItemIds());
     }
 
     /**
@@ -416,23 +416,46 @@ Container.PropertySetChangeNotifier {
 	return null;
     }
 
-    public abstract ItemType makeItem(HintedProperty itemId);
-
-    @Override
-    protected void registerNewItem(int position, final HintedProperty itemId, ItemType item) {
-	items.put(itemId, item);
-	if (itemId instanceof ValueChangeNotifier) {
-	    ((ValueChangeNotifier) itemId).addListener(new ValueChangeListener() {
+    private ItemType internalMakeItem(Object itemId) {
+	final HintedProperty property;
+	if (itemId instanceof HintedProperty) {
+	    property = (HintedProperty) itemId;
+	    // react to creation of object, replacing the key from the promise
+	    // of a value to an actual value.
+	    property.addListener(new ValueChangeListener() {
 		@Override
 		public void valueChange(ValueChangeEvent event) {
-		    if (isWriteThrough()) {
-			((ValueChangeNotifier) itemId).removeListener(this);
-			commit();
-			((ValueChangeNotifier) itemId).addListener(this);
+		    if (property.getValue() != null) {
+			ItemType item = items.get(property);
+			items.remove(property);
+			items.put(property.getValue(), item);
+			property.removeListener(this);
+			// TODO: check if this is really needed
+			fireItemSetChange();
 		    }
 		}
 	    });
+	} else {
+	    property = new VBoxProperty(itemId);
 	}
+	property.addListener(new ValueChangeListener() {
+	    @Override
+	    public void valueChange(ValueChangeEvent event) {
+		if (isWriteThrough()) {
+		    property.removeListener(this);
+		    commit();
+		    property.addListener(this);
+		}
+	    }
+	});
+	return makeItem(property);
+    }
+
+    protected abstract ItemType makeItem(HintedProperty itemId);
+
+    @Override
+    protected void registerNewItem(int position, final Object itemId, ItemType item) {
+	items.put(itemId, item);
 	if (item instanceof BufferedItem) {
 	    BufferedItem<PropertyId, ItemId> buffered = (BufferedItem<PropertyId, ItemId>) item;
 	    buffered.setConstructor(constructor);
@@ -451,7 +474,7 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public Item addItemAt(int index, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAt(index, (HintedProperty) newItemId, makeItem((HintedProperty) newItemId), true);
+	return internalAddItemAt(index, newItemId, internalMakeItem(newItemId), true);
     }
 
     @Override
@@ -461,13 +484,16 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public Item addItemAfter(Object previousItemId, Object newItemId) throws UnsupportedOperationException {
-	return internalAddItemAfter((HintedProperty) previousItemId, (HintedProperty) newItemId,
-		makeItem((HintedProperty) newItemId), true);
+	return internalAddItemAfter(previousItemId, newItemId, internalMakeItem(newItemId), true);
     }
 
     @Override
     public Item addItem(Object itemId) throws UnsupportedOperationException {
-	return internalAddItemAtEnd((HintedProperty) itemId, makeItem((HintedProperty) itemId), true);
+	return internalAddItemAtEnd(itemId, internalMakeItem(itemId), true);
+    }
+
+    public Item addItem(Class<? extends ItemId> type) {
+	return addItem(new VBoxProperty(type));
     }
 
     @Override
@@ -476,7 +502,7 @@ Container.PropertySetChangeNotifier {
     }
 
     @Override
-    protected ItemType internalAddItemAt(int index, HintedProperty newItemId, ItemType item, boolean filter) {
+    protected ItemType internalAddItemAt(int index, Object newItemId, ItemType item, boolean filter) {
 	ItemType result = super.internalAddItemAt(index, newItemId, item, filter);
 	if (isWriteThrough()) {
 	    commit();

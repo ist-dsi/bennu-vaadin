@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 import module.vaadin.data.util.BufferedContainer;
-import module.vaadin.data.util.VBoxProperty;
 import module.vaadin.resources.VaadinResourceConstants;
 import module.vaadin.resources.VaadinResources;
 
@@ -30,7 +29,7 @@ public class ContainerEditor extends CustomField {
     private final Table table;
 
     public ContainerEditor(TableFieldFactory factory, ResourceBundle bundle) {
-	VerticalLayout layout = new VerticalLayout();
+	final VerticalLayout layout = new VerticalLayout();
 	layout.setSpacing(true);
 	table = new TransactionalTable(bundle);
 	layout.addComponent(table);
@@ -67,13 +66,25 @@ public class ContainerEditor extends CustomField {
 	    public void buttonClick(ClickEvent event) {
 		if (table.getContainerDataSource() instanceof BufferedContainer) {
 		    BufferedContainer container = (BufferedContainer) table.getContainerDataSource();
-		    container.addItem(new VBoxProperty(container.getElementType()));
+		    container.addItem(container.getElementType());
 		} else {
 		    table.getContainerDataSource().addItem();
 		}
 	    }
 	});
 	setCompositionRoot(layout);
+    }
+
+    public void setColumnHeaderMode(int columnHeaderMode) {
+	table.setColumnHeaderMode(columnHeaderMode);
+    }
+
+    public void setColumnExpandRatio(Object propertyId, float expandRatio) {
+	table.setColumnExpandRatio(propertyId, expandRatio);
+    }
+
+    public void setColumnWidth(Object propertyId, int width) {
+	table.setColumnWidth(propertyId, width);
     }
 
     @Override

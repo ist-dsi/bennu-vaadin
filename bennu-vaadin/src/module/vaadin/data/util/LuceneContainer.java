@@ -49,7 +49,7 @@ public class LuceneContainer<Type extends AbstractDomainObject> extends DomainCo
 	final List<? extends AbstractDomainObject> searchResult = DomainIndexer.getInstance().search(getElementType(), expr,
 		maxHits);
 	for (AbstractDomainObject domainObject : searchResult) {
-	    addItem(new VBoxProperty(domainObject));
+	    addItem(domainObject);
 	}
     }
 }
