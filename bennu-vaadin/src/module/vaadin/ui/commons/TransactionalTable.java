@@ -36,8 +36,8 @@ public class TransactionalTable extends Table {
 	Object v = super.getPropertyValue(rowId, colId, property);
 	if (v instanceof Field) {
 	    Field field = (Field) v;
-	    field.setWriteThrough(isWriteThrough());
-	    field.setReadOnly(isReadOnly());
+	    // field.setWriteThrough(isWriteThrough());
+	    // field.setReadOnly(isReadOnly());
 	    if (isImmediate() && field instanceof AbstractComponent) {
 		((AbstractComponent) field).setImmediate(true);
 	    }

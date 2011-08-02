@@ -52,6 +52,8 @@ Container.PropertySetChangeNotifier {
 
     private boolean disableCommitPropagation = false;
 
+    private ItemRemover<ItemId> itemRemover;
+
     public BufferedContainer(HintedProperty value, Class<? extends ItemId> elementType) {
 	this.value = value;
 	this.elementType = elementType;
@@ -138,6 +140,10 @@ Container.PropertySetChangeNotifier {
 
     // end of property implementation
 
+    public void setItemRemover(ItemRemover<ItemId> itemRemover) {
+	this.itemRemover = itemRemover;
+    }
+
     // BufferedValidatable implementation
 
     public void setConstructor(ItemConstructor<PropertyId> constructor) {
@@ -162,6 +168,15 @@ Container.PropertySetChangeNotifier {
 	    for (Object itemId : getItemIds()) {
 		values.add((ItemId) itemId);
 	    }
+	    if (getValue() != null) {
+		for (ItemId itemId : getValue()) {
+		    if (!values.contains(itemId)) {
+			if (itemRemover != null) {
+			    itemRemover.remove(itemId);
+			}
+		    }
+		}
+	    }
 	    setValue(values);
 	    disableCommitPropagation = false;
 	}
@@ -185,7 +200,17 @@ Container.PropertySetChangeNotifier {
 
     @Override
     public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	this.writeThrough = writeThrough;
+	if (writeThrough != this.writeThrough) {
+	    this.writeThrough = writeThrough;
+	    for (Object itemId : getItemIds()) {
+		if (getItem(itemId) instanceof Buffered) {
+		    ((Buffered) getItem(itemId)).setWriteThrough(writeThrough);
+		}
+	    }
+	    if (writeThrough && modified) {
+		commit();
+	    }
+	}
     }
 
     @Override
@@ -425,13 +450,12 @@ Container.PropertySetChangeNotifier {
 	    property.addListener(new ValueChangeListener() {
 		@Override
 		public void valueChange(ValueChangeEvent event) {
-		    if (property.getValue() != null) {
-			ItemType item = items.get(property);
-			items.remove(property);
-			items.put(property.getValue(), item);
-			property.removeListener(this);
-			// TODO: check if this is really needed
-			fireItemSetChange();
+		    if (event.getProperty().getValue() != null) {
+			ItemType item = getUnfilteredItem(event.getProperty());
+			int index = indexOfId(event.getProperty());
+			removeItem(event.getProperty());
+			internalAddItemAt(index, event.getProperty().getValue(), item, true);
+			((ValueChangeNotifier) event.getProperty()).removeListener(this);
 		    }
 		}
 	    });

@@ -26,8 +26,7 @@ import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.PropertysetItem;
 
 public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem implements Property, HintedProperty,
-BufferedValidatable,
-Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
+BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
 
@@ -395,7 +394,17 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     @Override
     public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	this.writeThrough = writeThrough;
+	if (writeThrough != this.writeThrough) {
+	    this.writeThrough = writeThrough;
+	    for (PropertyId propertyId : getItemPropertyIds()) {
+		if (getItemProperty(propertyId) instanceof Buffered) {
+		    ((Buffered) getItemProperty(propertyId)).setWriteThrough(writeThrough);
+		}
+	    }
+	    if (writeThrough && modified) {
+		commit();
+	    }
+	}
     }
 
     @Override
@@ -405,7 +414,14 @@ Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
 
     @Override
     public void setReadThrough(boolean readThrough) throws SourceException {
-	this.readThrough = readThrough;
+	if (readThrough != this.readThrough) {
+	    this.readThrough = readThrough;
+	    for (PropertyId propertyId : getItemPropertyIds()) {
+		if (getItemProperty(propertyId) instanceof Buffered) {
+		    ((Buffered) getItemProperty(propertyId)).setReadThrough(readThrough);
+		}
+	    }
+	}
     }
 
     @Override
