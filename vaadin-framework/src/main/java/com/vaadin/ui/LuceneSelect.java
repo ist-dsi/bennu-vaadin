@@ -1,9 +1,11 @@
 package com.vaadin.ui;
 
-import java.util.Map;
+import pt.ist.bennu.ui.TimeoutSelect;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.util.LuceneIndexedContainer;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 
 
 /**
@@ -11,53 +13,43 @@ import com.vaadin.data.util.LuceneIndexedContainer;
  * 
  */
 
-public class LuceneSelect extends Select {
+public class LuceneSelect extends TimeoutSelect implements TextChangeListener {
     	
+    
     	public LuceneSelect() {
     	    super();
-    	    setFilteringMode(FILTERINGMODE_OFF);
-    	    setNullSelectionAllowed(false);
+    	    addListener((TextChangeListener)this);
 	}
     	
     	
     	
 	public LuceneSelect(String caption, Container dataSource) {
 	    super(caption, dataSource);
-	    setFilteringMode(FILTERINGMODE_OFF);
-	    setNullSelectionAllowed(false);
+	    addListener((TextChangeListener)this);
 	}
 
 
 
 	public LuceneSelect(String caption) {
 	    super(caption);
-	    setFilteringMode(FILTERINGMODE_OFF);
-	    setNullSelectionAllowed(false);
+	    addListener((TextChangeListener)this);
 	}
 
-
-	@Override
-	public void changeVariables(Object source, Map<String, Object> variables) {
-	    if (variables.containsKey("filter")) {
-		final String filterText = (String) variables.get("filter");
-		final LuceneIndexedContainer luceneContainer = (LuceneIndexedContainer) getContainerDataSource();
-		luceneContainer.search(filterText);
-	    }
-	    super.changeVariables(source, variables);
-	}
-	
 	@Override
 	public void setContainerDataSource(Container newDataSource) {
-	    if (newDataSource instanceof LuceneIndexedContainer) {
-		super.setContainerDataSource(newDataSource);
-	    }
+//	    if (!(newDataSource instanceof LuceneIndexedContainer)) {
+//		throw new UnsupportedOperationException("The container datasource must inherit from LuceneIndexedContainer.");
+//	    } 
+	    super.setContainerDataSource(newDataSource);
 	}
-	
-//	@Override
-//	public void setFilteringMode(int filteringMode) {
-//	    if (filteringMode != FILTERINGMODE_OFF) {
-//		super.setFilteringMode(FILTERINGMODE_CONTAINS);
-//	    }
-//	}
+
+	@Override
+	public void textChange(TextChangeEvent event) {
+	    final LuceneIndexedContainer luceneContainer = (LuceneIndexedContainer) getContainerDataSource();
+	    if (luceneContainer == null) {
+		throw new UnsupportedOperationException("You must set the container datasource first.");
+	    }
+	    luceneContainer.search(event.getText());
+	}
 	
 }
