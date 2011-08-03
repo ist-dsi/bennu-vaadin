@@ -54,9 +54,8 @@ public class ContainerEditor<PC> extends FieldWrapper<PC> {
 	}
 
 	@Override
-	public boolean isValid() {
-	    // TODO: pois
-	    return true;
+	protected boolean isEmpty() {
+	    return getContainerDataSource().size() == 0;
 	}
 
 	@Override

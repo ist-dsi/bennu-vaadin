@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import jvstm.VBox;
 import pt.ist.fenixWebFramework.services.Service;
 
 import com.vaadin.data.Buffered;
@@ -50,7 +51,7 @@ Container.PropertySetChangeNotifier {
 
     private final Class<? extends ItemId> elementType;
 
-    private boolean disableCommitPropagation = false;
+    private VBox<Boolean> disableCommitPropagation;
 
     private ItemRemover<ItemId> itemRemover;
 
@@ -65,6 +66,12 @@ Container.PropertySetChangeNotifier {
 		addItem(itemId);
 	    }
 	}
+	initVBox();
+    }
+
+    @Service
+    private void initVBox() {
+	this.disableCommitPropagation = new VBox<Boolean>(false);
     }
 
     // Property implementation
@@ -157,8 +164,8 @@ Container.PropertySetChangeNotifier {
     @Override
     @Service
     public void commit() throws SourceException, InvalidValueException {
-	if (!disableCommitPropagation) {
-	    disableCommitPropagation = true;
+	if (!disableCommitPropagation.get()) {
+	    disableCommitPropagation.put(true);
 	    for (Object itemId : getItemIds()) {
 		if (getItem(itemId) instanceof Buffered) {
 		    ((Buffered) getItem(itemId)).commit();
@@ -166,7 +173,11 @@ Container.PropertySetChangeNotifier {
 	    }
 	    Collection<ItemId> values = new ArrayList<ItemId>();
 	    for (Object itemId : getItemIds()) {
-		values.add((ItemId) itemId);
+		if (itemId instanceof Property) {
+		    values.add((ItemId) ((Property) itemId).getValue());
+		} else {
+		    values.add((ItemId) itemId);
+		}
 	    }
 	    if (getValue() != null) {
 		for (ItemId itemId : getValue()) {
@@ -178,7 +189,7 @@ Container.PropertySetChangeNotifier {
 		}
 	    }
 	    setValue(values);
-	    disableCommitPropagation = false;
+	    disableCommitPropagation.put(false);
 	}
     }
 
@@ -447,18 +458,19 @@ Container.PropertySetChangeNotifier {
 	    property = (HintedProperty) itemId;
 	    // react to creation of object, replacing the key from the promise
 	    // of a value to an actual value.
-	    property.addListener(new ValueChangeListener() {
-		@Override
-		public void valueChange(ValueChangeEvent event) {
-		    if (event.getProperty().getValue() != null) {
-			ItemType item = getUnfilteredItem(event.getProperty());
-			int index = indexOfId(event.getProperty());
-			removeItem(event.getProperty());
-			internalAddItemAt(index, event.getProperty().getValue(), item, true);
-			((ValueChangeNotifier) event.getProperty()).removeListener(this);
-		    }
-		}
-	    });
+	    // property.addListener(new ValueChangeListener() {
+	    // @Override
+	    // public void valueChange(ValueChangeEvent event) {
+	    // if (event.getProperty().getValue() != null) {
+	    // ItemType item = getUnfilteredItem(event.getProperty());
+	    // int index = indexOfId(event.getProperty());
+	    // removeItem(event.getProperty());
+	    // internalAddItemAt(index, event.getProperty().getValue(), item,
+	    // true);
+	    // ((ValueChangeNotifier) event.getProperty()).removeListener(this);
+	    // }
+	    // }
+	    // });
 	} else {
 	    property = new VBoxProperty(itemId);
 	}

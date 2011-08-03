@@ -30,15 +30,7 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     }
 
     @Override
-    public Property getItemProperty(Object propertyId) {
-	Property property = super.getItemProperty(propertyId);
-	if (property == null) {
-	    property = attemptPropertyCreation((String) propertyId);
-	}
-	return property;
-    }
-
-    private Property attemptPropertyCreation(String propertyId) {
+    protected Property makeProperty(String propertyId) {
 	int split = propertyId.indexOf('.');
 	Property property;
 	if (split == -1) {
@@ -103,5 +95,4 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
 	}
 	return descriptorCache.get(propertyId);
     }
-
 }

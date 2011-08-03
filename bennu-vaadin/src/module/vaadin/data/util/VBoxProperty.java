@@ -6,6 +6,7 @@ import java.util.Collections;
 
 import jvstm.VBox;
 import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.vaadinframework.VaadinFrameworkLogger;
 
 import com.vaadin.data.util.AbstractProperty;
 
@@ -43,6 +44,7 @@ public class VBoxProperty extends AbstractProperty implements HintedProperty {
 	if (isReadOnly()) {
 	    throw new ReadOnlyException();
 	}
+	VaadinFrameworkLogger.getLogger().debug("writting vbox property with value: " + newValue);
 	instance.put(newValue);
 	fireValueChange();
     }

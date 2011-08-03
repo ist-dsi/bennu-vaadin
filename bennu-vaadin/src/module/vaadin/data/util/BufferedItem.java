@@ -12,12 +12,18 @@ import java.util.Map;
 
 import jvstm.CommitException;
 import jvstm.cps.ConsistencyException;
+
+import org.apache.commons.lang.StringUtils;
+
 import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
 import pt.ist.fenixframework.pstm.IllegalWriteException;
+import pt.ist.vaadinframework.VaadinFrameworkLogger;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
+import com.vaadin.data.Item;
+import com.vaadin.data.Item.PropertySetChangeEvent;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
@@ -94,8 +100,47 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private List<Validator> validators;
 
+    private LinkedList<Item.PropertySetChangeListener> propertySetChangeListeners = null;
+
+    private boolean propertySetChangePropagationEnabled = true;
+
+    private PropertySetChangeEvent lastEvent;
+
     public BufferedItem(HintedProperty value) {
 	this.value = value;
+    }
+
+    {
+	super.addListener(new PropertySetChangeListener() {
+	    @Override
+	    public void itemPropertySetChange(PropertySetChangeEvent event) {
+		if (propertySetChangePropagationEnabled) {
+		    if (propertySetChangeListeners != null) {
+			final Object[] l = propertySetChangeListeners.toArray();
+			for (int i = 0; i < l.length; i++) {
+			    ((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(event);
+			}
+		    }
+		} else {
+		    lastEvent = event;
+		}
+	    }
+	});
+    }
+
+    public void setPropertySetChangePropagationEnabled(boolean propertySetChangePropagationEnabled) {
+	if (this.propertySetChangePropagationEnabled != propertySetChangePropagationEnabled) {
+	    this.propertySetChangePropagationEnabled = propertySetChangePropagationEnabled;
+	    if (propertySetChangePropagationEnabled && lastEvent != null) {
+		if (propertySetChangeListeners != null) {
+		    final Object[] l = propertySetChangeListeners.toArray();
+		    for (int i = 0; i < l.length; i++) {
+			((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(lastEvent);
+		    }
+		}
+		lastEvent = null;
+	    }
+	}
     }
 
     protected Object getPropertyValue(PropertyId propertyId) {
@@ -106,9 +151,20 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	return propertyValues.get(propertyId);
     }
 
+    /**
+     * Access method for the value of the property with the specified id in the
+     * value of the item.
+     * 
+     * @param host
+     *            instance of the object mapped in the {@link Item}
+     * @param propertyId
+     *            id of the property.
+     * @return the value of the property in the host object.
+     */
     protected abstract Object readPropertyValue(Type host, PropertyId propertyId);
 
     protected void setPropertyValue(PropertyId propertyId, Object newValue) throws SourceException, InvalidValueException {
+	VaadinFrameworkLogger.getLogger().debug("writting item property: " + propertyId + " with value: " + newValue);
 	propertyValues.put(propertyId, newValue);
 	modified = true;
 	if (isWriteThrough()) {
@@ -116,6 +172,17 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	}
     }
 
+    /**
+     * Write method for the value of the property with the specified id in the
+     * value of the item.
+     * 
+     * @param host
+     *            instance of the object mapped in the {@link Item}
+     * @param propertyId
+     *            id of the property.
+     * @param newValue
+     *            the new value of the property in the host object.
+     */
     protected abstract void writePropertyValue(Type host, PropertyId propertyId, Object newValue);
 
     @Override
@@ -185,6 +252,21 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     }
 
     @Override
+    public void addListener(PropertySetChangeListener listener) {
+	if (propertySetChangeListeners == null) {
+	    propertySetChangeListeners = new LinkedList<PropertySetChangeListener>();
+	}
+	propertySetChangeListeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(PropertySetChangeListener listener) {
+	if (propertySetChangeListeners != null) {
+	    propertySetChangeListeners.remove(listener);
+	}
+    }
+
+    @Override
     public boolean addItemProperty(Object propertyId, Property property) {
 	if (super.addItemProperty(propertyId, property)) {
 	    Type value = getValue();
@@ -221,6 +303,29 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     }
 
     @Override
+    public Property getItemProperty(Object propertyId) {
+	Property property = super.getItemProperty(propertyId);
+	if (property == null) {
+	    property = makeProperty((PropertyId) propertyId);
+	}
+	return property;
+    }
+
+    /**
+     * Lazy creation of properties, this method is invoked for every propertyId
+     * that is requested of the Item. The created properties are not
+     * automatically registered in the item, you have to invoke
+     * {@link #addItemProperty(Object, Property)} yourself. You also need to
+     * ensure that the returned properties are of {@link BufferedProperty}s or
+     * {@link Item}s or {@link Collection}s over {@link BufferedProperty}s.
+     * 
+     * @param propertyId
+     *            The key of the property.
+     * @return A {@link Property} instance.
+     */
+    protected abstract Property makeProperty(PropertyId propertyId);
+
+    @Override
     public void commit() throws SourceException, InvalidValueException {
 	commit(getItemPropertyIds());
     }
@@ -244,7 +349,12 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	    if (constructor != null) {
 		try {
 		    Method method = findMethod(constructor.getClass(), getArgumentTypes(constructor.getOrderedArguments()));
-		    setValue(method.invoke(constructor, readArguments(constructor.getOrderedArguments())));
+		    Object[] argumentValues = readArguments(constructor.getOrderedArguments());
+		    VaadinFrameworkLogger.getLogger().debug(
+			    "persisting item with constructor with properties: ["
+				    + StringUtils.join(constructor.getOrderedArguments(), ", ") + "] with values: ["
+				    + StringUtils.join(argumentValues, ", ") + "]");
+		    setValue(method.invoke(constructor, argumentValues));
 		    savingIds.removeAll(Arrays.asList(constructor.getOrderedArguments()));
 		} catch (SecurityException e) {
 		    handleException(e);
@@ -276,14 +386,20 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	} else {
 	    if (writer != null) {
 		try {
-		    LinkedList<Class<?>> argumentTypes = new LinkedList<Class<?>>();
-		    argumentTypes.add(getType());
-		    argumentTypes.addAll(Arrays.asList(getArgumentTypes(writer.getOrderedArguments())));
-		    Method method = findMethod(writer.getClass(), argumentTypes.toArray(new Class<?>[0]));
-		    LinkedList<Object> argumentValues = new LinkedList<Object>();
-		    argumentValues.add(getValue());
-		    argumentValues.addAll(Arrays.asList(readArguments(writer.getOrderedArguments())));
-		    method.invoke(writer, argumentValues.toArray(new Object[0]));
+		    if (fieldDiffer(writer.getOrderedArguments())) {
+			LinkedList<Class<?>> argumentTypes = new LinkedList<Class<?>>();
+			argumentTypes.add(getType());
+			argumentTypes.addAll(Arrays.asList(getArgumentTypes(writer.getOrderedArguments())));
+			Method method = findMethod(writer.getClass(), argumentTypes.toArray(new Class<?>[0]));
+			LinkedList<Object> argumentValues = new LinkedList<Object>();
+			argumentValues.add(getValue());
+			argumentValues.addAll(Arrays.asList(readArguments(writer.getOrderedArguments())));
+			VaadinFrameworkLogger.getLogger().debug(
+				"persisting item with writer with properties: ["
+					+ StringUtils.join(writer.getOrderedArguments(), ", ") + "] with values: ["
+					+ StringUtils.join(argumentValues.subList(1, argumentValues.size()), ", ") + "]");
+			method.invoke(writer, argumentValues.toArray(new Object[0]));
+		    }
 		    savingIds.removeAll(Arrays.asList(writer.getOrderedArguments()));
 		} catch (IllegalArgumentException e) {
 		    handleException(e);
@@ -305,7 +421,13 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	}
 	for (PropertyId propertyId : savingIds) {
 	    try {
-		writePropertyValue(getValue(), propertyId, propertyValues.get(propertyId));
+		if ((propertyValues.get(propertyId) == null && readPropertyValue(getValue(), propertyId) != null)
+			|| (propertyValues.get(propertyId) != null && !propertyValues.get(propertyId).equals(
+				readPropertyValue(getValue(), propertyId)))) {
+		    VaadinFrameworkLogger.getLogger().debug(
+			    "persisting item property: " + propertyId + " with value: " + propertyValues.get(propertyId));
+		    writePropertyValue(getValue(), propertyId, propertyValues.get(propertyId));
+		}
 	    } catch (Throwable e) {
 		handleException(e);
 		problems.add(e);
@@ -315,6 +437,17 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	    throw new SourceException(this, problems.toArray(new Throwable[0]));
 	}
 	modified = false;
+    }
+
+    private boolean fieldDiffer(PropertyId[] arguments) {
+	for (PropertyId propertyId : arguments) {
+	    if ((propertyValues.get(propertyId) == null && readPropertyValue(getValue(), propertyId) != null)
+		    || (propertyValues.get(propertyId) != null && !propertyValues.get(propertyId).equals(
+			    readPropertyValue(getValue(), propertyId)))) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     private Method findMethod(Class<?> type, Class<?>[] types) throws NoSuchMethodException {
@@ -330,6 +463,9 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 		    match = false;
 		    break;
 		}
+	    }
+	    if (!getType().isAssignableFrom(method.getReturnType())) {
+		match = false;
 	    }
 	    if (match) {
 		return method;
