@@ -55,6 +55,8 @@ Container.PropertySetChangeNotifier {
 
     private ItemRemover<ItemId> itemRemover;
 
+    private Object indexPropertyId;
+
     public BufferedContainer(HintedProperty value, Class<? extends ItemId> elementType) {
 	this.value = value;
 	this.elementType = elementType;
@@ -167,6 +169,9 @@ Container.PropertySetChangeNotifier {
 	if (!disableCommitPropagation.get()) {
 	    disableCommitPropagation.put(true);
 	    for (Object itemId : getItemIds()) {
+		if (indexPropertyId != null) {
+		    getContainerProperty(itemId, indexPropertyId).setValue(indexOfId(itemId));
+		}
 		if (getItem(itemId) instanceof Buffered) {
 		    ((Buffered) getItem(itemId)).commit();
 		}
@@ -315,6 +320,10 @@ Container.PropertySetChangeNotifier {
     }
 
     // end of BufferedValidatable implementation
+
+    public void setIndexProperty(Object propertyId) {
+	indexPropertyId = propertyId;
+    }
 
     // container implementation
 
