@@ -44,7 +44,7 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
 	field.setDescription(makeDescription(item, propertyId, uiContext));
 	boolean required = isRequired(item.getItemProperty(propertyId));
 	field.setRequired(required);
-	field.setRequiredError(VaadinResources.getString(REQUIRED_ERROR, caption));
+	field.setRequiredError(VaadinResources.getString(REQUIRED_ERROR, caption != null ? caption : propertyId.toString()));
 	if (field instanceof AbstractSelect) {
 	    ((AbstractSelect) field).setNullSelectionAllowed(!required);
 	}
