@@ -69,6 +69,12 @@ Container.PropertySetChangeNotifier {
 	    }
 	}
 	initVBox();
+	value.addListener(new ValueChangeListener() {
+	    @Override
+	    public void valueChange(ValueChangeEvent event) {
+		discard();
+	    }
+	});
     }
 
     @Service
