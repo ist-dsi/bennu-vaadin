@@ -35,7 +35,7 @@ Container.PropertySetChangeNotifier {
 
     private boolean readThrough = true;
 
-    private boolean writeThrough = true;
+    private boolean writeThrough = false;
 
     private boolean invalidAllowed = true;
 
@@ -499,6 +499,9 @@ Container.PropertySetChangeNotifier {
 		}
 	    }
 	});
+	if (property instanceof Item) {
+	    return (ItemType) property;
+	}
 	return makeItem(property);
     }
 

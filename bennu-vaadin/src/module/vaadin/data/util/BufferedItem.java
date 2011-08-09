@@ -94,7 +94,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private boolean readThrough = true;
 
-    private boolean writeThrough = true;
+    private boolean writeThrough = false;
 
     private boolean invalidAllowed = true;
 
