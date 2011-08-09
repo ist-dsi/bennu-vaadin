@@ -5,7 +5,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,15 +25,13 @@ import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
 import com.vaadin.data.Item;
-import com.vaadin.data.Item.PropertySetChangeEvent;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.AbstractProperty;
-import com.vaadin.data.util.PropertysetItem;
 
-public abstract class BufferedItem<PropertyId, Type> extends PropertysetItem implements Property, HintedProperty,
+public abstract class BufferedItem<PropertyId, Type> implements Item, Item.PropertySetChangeNotifier, Property, HintedProperty,
 BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
@@ -82,6 +82,10 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private final HintedProperty value;
 
+    private final LinkedList<PropertyId> list = new LinkedList<PropertyId>();
+
+    private final HashMap<Object, Property> map = new HashMap<Object, Property>();
+
     private final Map<Object, Object> propertyValues = new HashMap<Object, Object>();
 
     private ItemConstructor<PropertyId> constructor;
@@ -104,43 +108,10 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private boolean propertySetChangePropagationEnabled = true;
 
-    private PropertySetChangeEvent lastEvent;
+    private Item.PropertySetChangeEvent lastEvent;
 
     public BufferedItem(HintedProperty value) {
 	this.value = value;
-    }
-
-    {
-	super.addListener(new PropertySetChangeListener() {
-	    @Override
-	    public void itemPropertySetChange(PropertySetChangeEvent event) {
-		if (propertySetChangePropagationEnabled) {
-		    if (propertySetChangeListeners != null) {
-			final Object[] l = propertySetChangeListeners.toArray();
-			for (int i = 0; i < l.length; i++) {
-			    ((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(event);
-			}
-		    }
-		} else {
-		    lastEvent = event;
-		}
-	    }
-	});
-    }
-
-    public void setPropertySetChangePropagationEnabled(boolean propertySetChangePropagationEnabled) {
-	if (this.propertySetChangePropagationEnabled != propertySetChangePropagationEnabled) {
-	    this.propertySetChangePropagationEnabled = propertySetChangePropagationEnabled;
-	    if (propertySetChangePropagationEnabled && lastEvent != null) {
-		if (propertySetChangeListeners != null) {
-		    final Object[] l = propertySetChangeListeners.toArray();
-		    for (int i = 0; i < l.length; i++) {
-			((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(lastEvent);
-		    }
-		}
-		lastEvent = null;
-	    }
-	}
     }
 
     protected Object getPropertyValue(PropertyId propertyId) {
@@ -252,46 +223,54 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     }
 
     @Override
-    public void addListener(PropertySetChangeListener listener) {
-	if (propertySetChangeListeners == null) {
-	    propertySetChangeListeners = new LinkedList<PropertySetChangeListener>();
-	}
-	propertySetChangeListeners.add(listener);
-    }
-
-    @Override
-    public void removeListener(PropertySetChangeListener listener) {
-	if (propertySetChangeListeners != null) {
-	    propertySetChangeListeners.remove(listener);
-	}
-    }
-
-    @Override
     public boolean addItemProperty(Object propertyId, Property property) {
-	if (super.addItemProperty(propertyId, property)) {
-	    Type value = getValue();
-	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, (PropertyId) propertyId));
-	    if (property instanceof Buffered) {
-		((Buffered) property).setWriteThrough(isWriteThrough());
-		((Buffered) property).setReadThrough(isReadThrough());
-	    }
-	    if (property instanceof Validatable) {
-		((Validatable) property).setInvalidAllowed(isInvalidAllowed());
-	    }
-	    return true;
+	// Null ids are not accepted
+	if (propertyId == null) {
+	    throw new NullPointerException("Item property id can not be null");
 	}
-	return false;
+
+	// Cant add a property twice
+	if (map.containsKey(propertyId)) {
+	    return false;
+	}
+
+	// Put the property to map
+	map.put(propertyId, property);
+	list.add((PropertyId) propertyId);
+
+	Type value = getValue();
+	propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, (PropertyId) propertyId));
+	if (property instanceof Buffered) {
+	    ((Buffered) property).setWriteThrough(isWriteThrough());
+	    ((Buffered) property).setReadThrough(isReadThrough());
+	}
+	if (property instanceof Validatable) {
+	    ((Validatable) property).setInvalidAllowed(isInvalidAllowed());
+	}
+
+	// Send event
+	fireItemPropertySetChange();
+	return true;
     }
 
     @Override
     public boolean removeItemProperty(Object propertyId) {
+	// Cant remove missing properties
+	if (map.remove(propertyId) == null) {
+	    return false;
+	}
+	list.remove(propertyId);
 	propertyValues.remove(propertyId);
-	return super.removeItemProperty(propertyId);
+
+	// Send change events
+	fireItemPropertySetChange();
+
+	return true;
     }
 
     @Override
     public Collection<PropertyId> getItemPropertyIds() {
-	return (Collection<PropertyId>) super.getItemPropertyIds();
+	return Collections.unmodifiableCollection(list);
     }
 
     public void setConstructor(ItemConstructor<PropertyId> constructor) {
@@ -304,7 +283,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     @Override
     public Property getItemProperty(Object propertyId) {
-	Property property = super.getItemProperty(propertyId);
+	Property property = map.get(propertyId);
 	if (property == null) {
 	    property = makeProperty((PropertyId) propertyId);
 	}
@@ -421,12 +400,18 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	}
 	for (PropertyId propertyId : savingIds) {
 	    try {
-		if ((propertyValues.get(propertyId) == null && readPropertyValue(getValue(), propertyId) != null)
-			|| (propertyValues.get(propertyId) != null && !propertyValues.get(propertyId).equals(
-				readPropertyValue(getValue(), propertyId)))) {
-		    VaadinFrameworkLogger.getLogger().debug(
-			    "persisting item property: " + propertyId + " with value: " + propertyValues.get(propertyId));
-		    writePropertyValue(getValue(), propertyId, propertyValues.get(propertyId));
+		Object old = readPropertyValue(getValue(), propertyId);
+		Object current = propertyValues.get(propertyId);
+		if (current != null && current instanceof Property) {
+		    // could be wrapped inside a property when coming from
+		    // selections of containers that accept new items.
+		    current = ((Property) current).getValue();
+		}
+
+		if ((current == null && old != null) || (current != null && !current.equals(old))) {
+		    VaadinFrameworkLogger.getLogger()
+		    .debug("persisting item property: " + propertyId + " with value: " + current);
+		    writePropertyValue(getValue(), propertyId, current);
 		}
 	    } catch (Throwable e) {
 		handleException(e);
@@ -638,5 +623,118 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     @Override
     public void setInvalidCommitted(boolean isCommitted) {
 	this.invalidCommited = isCommitted;
+    }
+
+    /* Notifiers */
+
+    private class PropertySetChangeEvent extends EventObject implements Item.PropertySetChangeEvent {
+
+	private PropertySetChangeEvent(Item source) {
+	    super(source);
+	}
+
+	/**
+	 * Gets the Item whose Property set has changed.
+	 * 
+	 * @return source object of the event as an <code>Item</code>
+	 */
+	@Override
+	public Item getItem() {
+	    return (Item) getSource();
+	}
+    }
+
+    /**
+     * Registers a new property set change listener for this Item.
+     * 
+     * @param listener
+     *            the new Listener to be registered.
+     */
+    @Override
+    public void addListener(Item.PropertySetChangeListener listener) {
+	if (propertySetChangeListeners == null) {
+	    propertySetChangeListeners = new LinkedList<PropertySetChangeListener>();
+	}
+	propertySetChangeListeners.add(listener);
+    }
+
+    /**
+     * Removes a previously registered property set change listener.
+     * 
+     * @param listener
+     *            the Listener to be removed.
+     */
+    @Override
+    public void removeListener(Item.PropertySetChangeListener listener) {
+	if (propertySetChangeListeners != null) {
+	    propertySetChangeListeners.remove(listener);
+	}
+    }
+
+    /**
+     * Sends a Property set change event to all interested listeners.
+     */
+    protected void fireItemPropertySetChange() {
+	if (propertySetChangeListeners != null) {
+	    final Item.PropertySetChangeEvent event = new BufferedItem.PropertySetChangeEvent(this);
+	    if (propertySetChangePropagationEnabled) {
+		final Object[] l = propertySetChangeListeners.toArray();
+		for (int i = 0; i < l.length; i++) {
+		    ((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(event);
+		}
+	    } else {
+		lastEvent = event;
+	    }
+	}
+    }
+
+    public void setPropertySetChangePropagationEnabled(boolean propertySetChangePropagationEnabled) {
+	if (this.propertySetChangePropagationEnabled != propertySetChangePropagationEnabled) {
+	    this.propertySetChangePropagationEnabled = propertySetChangePropagationEnabled;
+	    if (propertySetChangePropagationEnabled && lastEvent != null) {
+		if (propertySetChangeListeners != null) {
+		    final Object[] l = propertySetChangeListeners.toArray();
+		    for (int i = 0; i < l.length; i++) {
+			((Item.PropertySetChangeListener) l[i]).itemPropertySetChange(lastEvent);
+		    }
+		}
+		lastEvent = null;
+	    }
+	}
+    }
+
+    public Collection<?> getListeners(Class<?> eventType) {
+	if (Item.PropertySetChangeEvent.class.isAssignableFrom(eventType)) {
+	    if (propertySetChangeListeners == null) {
+		return Collections.EMPTY_LIST;
+	    } else {
+		return Collections.unmodifiableCollection(propertySetChangeListeners);
+	    }
+	}
+
+	return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Gets the <code>String</code> representation of the contents of the Item.
+     * The format of the string is a space separated catenation of the
+     * <code>String</code> representations of the Properties contained by the
+     * Item.
+     * 
+     * @return <code>String</code> representation of the Item contents
+     */
+    @Override
+    public String toString() {
+	String retValue = "";
+
+	for (final Iterator<?> i = getItemPropertyIds().iterator(); i.hasNext();) {
+	    final Object propertyId = i.next();
+	    retValue += getItemProperty(propertyId).toString();
+	    if (i.hasNext()) {
+		retValue += " ";
+	    }
+	}
+
+	return retValue;
     }
 }
