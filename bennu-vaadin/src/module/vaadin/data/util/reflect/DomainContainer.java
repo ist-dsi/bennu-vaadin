@@ -14,7 +14,7 @@ BufferedContainer<Type, String, DomainItem<Type>> {
     }
 
     public DomainContainer(Class<? extends Type> elementType) {
-	super(new VBoxProperty(null), elementType);
+	super(new VBoxProperty(Collection.class), elementType);
     }
 
     public DomainContainer(Collection<? extends Type> elements, Class<? extends Type> elementType) {
