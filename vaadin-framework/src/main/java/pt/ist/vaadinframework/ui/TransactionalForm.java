@@ -170,7 +170,16 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Service
     public void commit() {
 	try {
-	    super.commit();
+	    if (!isWriteThrough()) {
+		super.commit();
+	    } else {
+		if (!isInvalidCommitted() && !isValid()) {
+		    if (isValidationVisibleOnCommit()) {
+			setValidationVisible(true);
+		    }
+		    validate();
+		}
+	    }
 	    if (isValid() && getItemDataSource() instanceof Buffered) {
 		Buffered buffer = (Buffered) getItemDataSource();
 		if (!buffer.isWriteThrough()) {
