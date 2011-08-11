@@ -45,6 +45,10 @@ public class TransactionalTable extends Table {
 	return v;
     }
 
+    public void refresh() {
+	refreshRenderedCells();
+    }
+
     @Override
     public void setContainerDataSource(Container newDataSource) {
 	if (getContainerDataSource() != null && getContainerDataSource() instanceof PropertySetChangeNotifier) {

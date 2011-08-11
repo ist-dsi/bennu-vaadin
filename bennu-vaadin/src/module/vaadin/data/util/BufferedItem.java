@@ -117,7 +117,9 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     protected Object getPropertyValue(PropertyId propertyId) {
 	if (isReadThrough() && !isModified()) {
 	    Type value = getValue();
-	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, propertyId));
+	    propertyValues.put(propertyId,
+		    value == null ? (getItemProperty(propertyId).getType().equals(Boolean.class) ? Boolean.FALSE : null)
+			    : readPropertyValue(value, propertyId));
 	}
 	return propertyValues.get(propertyId);
     }
@@ -239,7 +241,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	list.add((PropertyId) propertyId);
 
 	Type value = getValue();
-	propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, (PropertyId) propertyId));
+	propertyValues.put(propertyId, value == null ? (property.getType().equals(Boolean.class) ? Boolean.FALSE : null)
+		: readPropertyValue(value, (PropertyId) propertyId));
 	if (property instanceof Buffered) {
 	    ((Buffered) property).setWriteThrough(isWriteThrough());
 	    ((Buffered) property).setReadThrough(isReadThrough());
@@ -503,7 +506,9 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	    if (getItemProperty(propertyId) instanceof Buffered) {
 		((Buffered) getItemProperty(propertyId)).discard();
 	    }
-	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, propertyId));
+	    propertyValues.put(propertyId,
+		    value == null ? (getItemProperty(propertyId).getType().equals(Boolean.class) ? Boolean.FALSE : null)
+			    : readPropertyValue(value, propertyId));
 	}
 	modified = false;
     }

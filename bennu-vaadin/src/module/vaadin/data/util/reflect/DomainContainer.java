@@ -7,6 +7,9 @@ import module.vaadin.data.util.HintedProperty;
 import module.vaadin.data.util.VBoxProperty;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
+import com.vaadin.data.util.metamodel.MetaModel;
+import com.vaadin.data.util.metamodel.PropertyDescriptor;
+
 public class DomainContainer<Type extends AbstractDomainObject> extends
 BufferedContainer<Type, String, DomainItem<Type>> {
     public DomainContainer(HintedProperty value, Class<? extends Type> elementType) {
@@ -24,5 +27,13 @@ BufferedContainer<Type, String, DomainItem<Type>> {
     @Override
     public DomainItem<Type> makeItem(HintedProperty itemId) {
 	return new DomainItem<Type>(itemId);
+    }
+
+    public void setContainerProperties(String... propertyIds) {
+	for (String propertyId : propertyIds) {
+	    PropertyDescriptor propertyDescriptor = MetaModel.findMetaModelForType(getElementType()).getPropertyDescriptor(
+		    propertyId);
+	    addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
+	}
     }
 }
