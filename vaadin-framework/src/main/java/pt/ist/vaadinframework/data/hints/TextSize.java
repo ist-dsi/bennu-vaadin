@@ -19,15 +19,32 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.annotation;
+package pt.ist.vaadinframework.data.hints;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import pt.ist.vaadinframework.data.HintedProperty.Hint;
 
-@Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface EmbeddedComponent {
-    String[] path();
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.TextArea;
+
+public class TextSize implements Hint {
+    private final int rows;
+
+    public TextSize(int rows) {
+	this.rows = rows;
+    }
+
+    @Override
+    public Field applyHint(Field field) {
+	if (field instanceof TextArea) {
+	    ((TextArea) field).setRows(rows);
+	}
+	return field;
+    }
+
+    @Override
+    public boolean appliesTo(Field field) {
+	return field instanceof AbstractTextField;
+    }
+
 }

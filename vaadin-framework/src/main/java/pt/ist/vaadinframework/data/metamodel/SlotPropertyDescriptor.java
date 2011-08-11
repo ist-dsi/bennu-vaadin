@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -19,27 +19,31 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util.metamodel;
+package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import dml.Slot;
+import dml.Slot.Option;
 
 /**
+ * Meta information over a DML slot. Read and write operations are supported
+ * using reflection.
+ * 
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
-public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implements PropertyDescriptor {
+public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implements PropertyDescriptor {
     private final boolean required;
 
-    public BeanPropertyDescriptor(java.beans.PropertyDescriptor descriptor, boolean required) throws IntrospectionException {
-	super(descriptor.getName(), descriptor.getReadMethod(), descriptor.getWriteMethod());
-	this.required = required;
+    public SlotPropertyDescriptor(Slot slot, Class<? extends AbstractDomainObject> type) throws IntrospectionException {
+	super(slot.getName(), type);
+	this.required = slot.getOptions().contains(Option.REQUIRED);
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getPropertyId()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getPropertyId()
      */
     @Override
     public String getPropertyId() {
@@ -47,7 +51,7 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getDefaultValue()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getDefaultValue()
      */
     @Override
     public Object getDefaultValue() {
@@ -67,7 +71,7 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getCollectionElementType()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getCollectionElementType()
      */
     @Override
     public Class<? extends AbstractDomainObject> getCollectionElementType() {
@@ -75,7 +79,7 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#isCollection()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#isCollection()
      */
     @Override
     public boolean isCollection() {
@@ -83,7 +87,7 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#isRequired()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#isRequired()
      */
     @Override
     public boolean isRequired() {
@@ -91,7 +95,7 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#read(java.lang.Object)
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#read(java.lang.Object)
      */
     @Override
     public Object read(Object host) throws ModelIntroscpectionException {
@@ -108,16 +112,13 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
 
     /**
      * @throws ModelIntroscpectionException
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#write(java.lang.Object,
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#write(java.lang.Object,
      *      java.lang.Object)
      */
     @Override
     public void write(Object host, Object newValue) throws ModelIntroscpectionException {
 	try {
-	    final Method writeMethod = getWriteMethod();
-	    if (writeMethod != null) {
-		writeMethod.invoke(host, newValue);
-	    }
+	    getWriteMethod().invoke(host, newValue);
 	} catch (IllegalArgumentException e) {
 	    throw new ModelIntroscpectionException(e);
 	} catch (IllegalAccessException e) {

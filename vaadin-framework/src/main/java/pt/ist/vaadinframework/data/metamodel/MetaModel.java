@@ -19,7 +19,7 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util.metamodel;
+package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
@@ -87,7 +87,7 @@ public class MetaModel {
 		}
 	    }
 	}
-	
+
 	for (Method method : type.getDeclaredMethods()) {
 	    final String methodName = method.getName();
 	    String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
@@ -102,7 +102,7 @@ public class MetaModel {
 	    if (!methodName.contains("$") && methodName.startsWith("get")) {
 		readMethod = method;
 		Class<?> returnType = readMethod.getReturnType();
-		writeMethod = getSetMethod(type,fieldName, returnType);
+		writeMethod = getSetMethod(type, fieldName, returnType);
 	    }
 
 	    if (readMethod != null) {

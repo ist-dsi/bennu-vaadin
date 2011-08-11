@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -19,12 +19,8 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util;
+package pt.ist.vaadinframework.data;
 
-import java.io.Serializable;
-
-public interface InstanceCreationNotifier extends Serializable {
-    public void addListener(InstanceCreationListener listener);
-
-    public void removeListener(InstanceCreationListener listener);
+public interface ItemWriter<PropertyId> {
+    public PropertyId[] getOrderedArguments();
 }

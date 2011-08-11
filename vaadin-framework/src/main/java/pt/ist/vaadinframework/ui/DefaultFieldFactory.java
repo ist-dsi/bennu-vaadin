@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework-ant.
  *
- *   The vaadin-framework-ant Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework-ant Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework-ant is distributed in the hope that it will be useful,
@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.ResourceBundle;
 
@@ -31,6 +32,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.vaadinframework.data.BufferedContainer;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
 import pt.ist.vaadinframework.data.validator.CharacterValidator;
@@ -40,6 +42,7 @@ import pt.ist.vaadinframework.data.validator.IntegerValidator;
 import pt.ist.vaadinframework.data.validator.LongValidator;
 import pt.ist.vaadinframework.data.validator.ShortValidator;
 import pt.ist.vaadinframework.data.validator.URLValidator;
+import pt.ist.vaadinframework.ui.fields.ContainerEditor;
 import pt.ist.vaadinframework.ui.fields.EnumField;
 import pt.ist.vaadinframework.ui.fields.MultiLanguageStringField;
 import pt.ist.vaadinframework.ui.fields.PopupDateTimeField;
@@ -84,6 +87,10 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    field.setNullSettingAllowed(true);
 	    field.setNullRepresentation(StringUtils.EMPTY);
 	    return field;
+	}
+	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof BufferedContainer) {
+	    return new ContainerEditor<Object>(this, bundle,
+		    ((BufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
 	}
 	if (AbstractDomainObject.class.isAssignableFrom(type)) {
 	    Select select = new Select();

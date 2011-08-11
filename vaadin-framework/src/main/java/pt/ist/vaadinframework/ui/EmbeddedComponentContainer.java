@@ -38,8 +38,9 @@ public interface EmbeddedComponentContainer extends ComponentContainer {
      * You can assume that this configuration method will be called before the
      * component is attached to the window.
      * 
-     * @param arguments the parsed arguments passed to the container including
-     *            the full parameter text.
+     * @param arguments
+     *            the parsed arguments passed to the container including the
+     *            full parameter text.
      */
     public void setArguments(String... arguments);
 }

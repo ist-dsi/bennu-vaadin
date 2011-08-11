@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util.metamodel;
+package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +51,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     private Class<? extends AbstractDomainObject> elementType;
 
     public RolePropertyDescriptor(Role role, Class<? extends AbstractDomainObject> type) throws IntrospectionException,
-	    SecurityException, NoSuchMethodException, ClassNotFoundException {
+    SecurityException, NoSuchMethodException, ClassNotFoundException {
 	this.propertyId = role.getName();
 	if (role.getMultiplicityUpper() == 1) {
 	    java.beans.PropertyDescriptor property = new java.beans.PropertyDescriptor(role.getName(), type);
@@ -65,7 +65,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getPropertyId()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getPropertyId()
      */
     @Override
     public String getPropertyId() {
@@ -73,7 +73,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getPropertyType()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getPropertyType()
      */
     @Override
     public Class<? extends AbstractDomainObject> getPropertyType() {
@@ -86,7 +86,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#getDefaultValue()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getDefaultValue()
      */
     @Override
     public Object getDefaultValue() {
@@ -100,7 +100,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#isCollection()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#isCollection()
      */
     @Override
     public boolean isCollection() {
@@ -108,7 +108,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#isRequired()
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#isRequired()
      */
     @Override
     public boolean isRequired() {
@@ -116,7 +116,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#read(java.lang.Object)
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#read(java.lang.Object)
      */
     @Override
     public Object read(Object host) throws ModelIntroscpectionException {
@@ -132,7 +132,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     }
 
     /**
-     * @see com.vaadin.data.util.metamodel.PropertyDescriptor#write(java.lang.Object,
+     * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#write(java.lang.Object,
      *      java.lang.Object)
      */
     @Override

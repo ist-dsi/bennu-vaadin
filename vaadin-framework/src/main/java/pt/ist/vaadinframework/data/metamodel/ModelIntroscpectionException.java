@@ -1,13 +1,13 @@
 /*
- * Copyright 2011 Instituto Superior Tecnico
+ * Copyright 2010 Instituto Superior Tecnico
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -19,10 +19,14 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package com.vaadin.data.util;
+package pt.ist.vaadinframework.data.metamodel;
 
-import java.io.Serializable;
-
-public interface InstanceCreationListener extends Serializable {
-    public void itemCreation(InstanceCreationEvent event);
+/**
+ * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * 
+ */
+public class ModelIntroscpectionException extends RuntimeException {
+    public ModelIntroscpectionException(Throwable cause) {
+	super(cause);
+    }
 }

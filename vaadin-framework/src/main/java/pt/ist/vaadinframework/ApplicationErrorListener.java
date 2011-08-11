@@ -24,7 +24,6 @@ package pt.ist.vaadinframework;
 import com.vaadin.Application;
 import com.vaadin.terminal.Terminal.ErrorEvent;
 
-
 public interface ApplicationErrorListener {
 
     public void terminalError(final ErrorEvent event, final Application application);

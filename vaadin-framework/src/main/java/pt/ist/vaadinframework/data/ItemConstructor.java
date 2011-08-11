@@ -19,15 +19,18 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.annotation;
+package pt.ist.vaadinframework.data;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface EmbeddedComponent {
-    String[] path();
+/**
+ * Custom constructor strategy. Implementors must provide a method with a
+ * signature that has the types of the properties corresponding to the ids
+ * returned by {@link #getOrderedArguments()}.
+ * 
+ * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * 
+ * @param <PropertyId>
+ *            Type of the Ids of the properties
+ */
+public interface ItemConstructor<PropertyId> {
+    public PropertyId[] getOrderedArguments();
 }

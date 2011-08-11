@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework-ant.
  *
- *   The vaadin-framework-ant Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework-ant Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework-ant is distributed in the hope that it will be useful,
@@ -62,4 +62,12 @@ public interface VaadinResourceConstants {
     public static final String COMMONS_MESSAGE_SUBMIT = "pt.ist.vaadinframework.commons.message.submit";
     public static final String COMMONS_MESSAGE_DISCARD = "pt.ist.vaadinframework.commons.message.discard";
     public static final String COMMONS_MESSAGE_CANCEL = "pt.ist.vaadinframework.commons.message.cancel";
+    public static final String COMMONS_ACTION_DELETE = "pt.ist.vaadinframework.commons.action.delete";
+    public static final String COMMONS_ACTION_ADD = "pt.ist.vaadinframework.commons.action.add";
+
+    public static final String COMMONS_GROUPBY_LABEL = "pt.ist.vaadinframework.commons.label.groupBy";
+    public static final String COMMONS_SORTBY_LABEL = "pt.ist.vaadinframework.commons.label.sortBy";
+    public static final String COMMONS_FILTERBY_LABEL = "pt.ist.vaadinframework.commons.label.filterBy";
+    public static final String COMMONS_ITEMS_PER_PAGE_LABEL = "pt.ist.vaadinframework.commons.label.itemsPerPage";
+    public static final String COMMONS_PAGE_LABEL = "pt.ist.vaadinframework.commons.label.page";
 }

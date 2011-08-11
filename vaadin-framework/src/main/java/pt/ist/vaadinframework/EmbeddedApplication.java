@@ -50,12 +50,16 @@ import com.vaadin.ui.Window.CloseListener;
  * For example: Lets say we have a component that displays information about a
  * Product given its ID. First add the pattern to the resolver by doing:
  * 
- * <pre>{@code EmbeddedApplication.addResolutionPattern(Pattern.compile("product-(.*)"), ProductContainer.class);}</pre>
+ * <pre>
+ * {@code EmbeddedApplication.addResolutionPattern(Pattern.compile("product-(.*)"), ProductContainer.class);}
+ * </pre>
  * 
  * In the hostItem application set the {@link EmbeddedApplication#VAADIN_PARAM }
  * like:
  * 
- * <pre>{@code request.getSession().setAttribute(EmbeddedApplication.VAADIN_PARAM, "product-10042786");}</pre>
+ * <pre>
+ * {@code request.getSession().setAttribute(EmbeddedApplication.VAADIN_PARAM, "product-10042786");}
+ * </pre>
  * 
  * As you defined a group in the pattern the group will be sent as an argument
  * to {@link EmbeddedComponentContainer#setArguments(String...)}.
@@ -85,6 +89,7 @@ import com.vaadin.ui.Window.CloseListener;
  * </servlet-mapping>
  * }
  * </pre>
+ * 
  * </ul>
  * <ul>
  * 
@@ -99,6 +104,7 @@ import com.vaadin.ui.Window.CloseListener;
  * <div id="vaadin"/>
  * }
  * </pre>
+ * 
  * </ul>
  * </li>
  * 
@@ -154,9 +160,11 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      * {@link EmbeddedComponentContainer} using
      * {@link EmbeddedComponentContainer#setArguments(String...)}.
      * 
-     * @param pattern The compiled {@link Pattern} instance.
-     * @param type The container that will be instantiated if the pattern
-     *            matches the {@link EmbeddedApplication#VAADIN_PARAM}.
+     * @param pattern
+     *            The compiled {@link Pattern} instance.
+     * @param type
+     *            The container that will be instantiated if the pattern matches
+     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);
