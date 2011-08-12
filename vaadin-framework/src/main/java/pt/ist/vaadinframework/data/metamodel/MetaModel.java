@@ -88,7 +88,7 @@ public class MetaModel {
 	    }
 	}
 
-	for (Method method : type.getDeclaredMethods()) {
+	for (Method method : type.getMethods()) {
 	    final String methodName = method.getName();
 	    String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
 
