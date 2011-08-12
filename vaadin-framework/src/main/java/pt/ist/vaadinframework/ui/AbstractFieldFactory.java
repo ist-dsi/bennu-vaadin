@@ -21,22 +21,15 @@
  */
 package pt.ist.vaadinframework.ui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
-import org.apache.commons.lang.StringUtils;
-
-import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.data.HintedProperty;
 import pt.ist.vaadinframework.data.HintedProperty.Hint;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.TableFieldFactory;
@@ -78,40 +71,10 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
     protected abstract Field makeField(Item item, Object propertyId, Component uiContext);
 
     protected String makeCaption(Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property) {
-	    String key = getBundleKey(((Property) item).getType(), propertyId, StringUtils.EMPTY);
-	    if (bundle.containsKey(key)) {
-		return bundle.getString(key);
-	    }
-	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
-	}
-	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
+	return CaptionUtils.makeCaption(bundle, item, propertyId, uiContext);
     }
 
     protected String makeDescription(Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property) {
-	    String key = getBundleKey(((Property) item).getType(), propertyId, ".description");
-	    if (bundle.containsKey(key)) {
-		return bundle.getString(key);
-	    }
-	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
-	}
-	return makeCaption(item, propertyId, uiContext);
-    }
-
-    private String getBundleKey(Class<?> clazz, Object propertyId, String suffix) {
-	return getBundleKey(new ArrayList<String>(), clazz, propertyId, suffix);
-    }
-
-    private String getBundleKey(List<String> missed, Class<?> clazz, Object propertyId, String suffix) {
-	String key = clazz.getName() + "." + propertyId + suffix;
-	if (bundle.containsKey(key)) {
-	    return key;
-	}
-	missed.add(clazz.getName() + "." + propertyId + suffix);
-	if (clazz.getSuperclass() == null) {
-	    return StringUtils.join(missed, " or ");
-	}
-	return getBundleKey(missed, clazz.getSuperclass(), propertyId, suffix);
+	return CaptionUtils.makeDescription(bundle, item, propertyId, uiContext);
     }
 }

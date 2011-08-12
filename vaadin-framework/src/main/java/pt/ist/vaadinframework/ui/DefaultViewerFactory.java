@@ -29,7 +29,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.Viewer;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Label;
 
 public class DefaultViewerFactory implements ViewerFactory {
@@ -50,32 +49,11 @@ public class DefaultViewerFactory implements ViewerFactory {
 
     @Override
     public final String makeCaption(Item item, Object propertyId, Component uiContext) {
-	// if (item instanceof AbstractDomainItem) {
-	// AbstractDomainItem domainItem = (AbstractDomainItem) item;
-	// String key = domainItem.getLabelKey(bundle, propertyId);
-	// if (key != null) {
-	// return key;
-	// }
-	// key = domainItem.getType().getName() + "." + propertyId;
-	// VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " +
-	// key);
-	// }
-	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
+	return CaptionUtils.makeCaption(bundle, item, propertyId, uiContext);
     }
 
     protected String makeDescription(Item item, Object propertyId, Component uiContext) {
-	// if (item instanceof AbstractDomainItem) {
-	// AbstractDomainItem domainItem = (AbstractDomainItem) item;
-	// String key = domainItem.getDescriptionKey(bundle,propertyId);
-	// if (key != null) {
-	// return key;
-	// }
-	// key = domainItem.getType().getName() + "." + propertyId +
-	// ".description";
-	// VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " +
-	// key);
-	// }
-	return makeCaption(item, propertyId, uiContext);
+	return CaptionUtils.makeDescription(bundle, item, propertyId, uiContext);
     }
 
     protected Viewer makeViewer(Item item, Object propertyId, Component uiContext) {
