@@ -117,7 +117,7 @@ public class ContainerEditor<PC> extends FieldWrapper<PC> {
 		    return delete;
 		}
 	    });
-	    setVisible(size() > 0);
+	    // setVisible(size() > 0);
 	    addListener(new ItemSetChangeListener() {
 		@Override
 		public void containerItemSetChange(ItemSetChangeEvent event) {
