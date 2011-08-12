@@ -35,7 +35,7 @@ import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 
-public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<String, Type> {
+public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<Object, Type> {
     private final Map<String, PropertyDescriptor> descriptorCache = new HashMap<String, PropertyDescriptor>();
 
     public DomainItem(HintedProperty value) {
@@ -51,17 +51,17 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     }
 
     @Override
-    protected Property makeProperty(String propertyId) {
-	int split = propertyId.indexOf('.');
+    protected Property makeProperty(Object propertyId) {
+	int split = ((String) propertyId).indexOf('.');
 	Property property;
 	if (split == -1) {
-	    property = fromDescriptor(propertyId);
+	    property = fromDescriptor((String) propertyId);
 	    if (property != null) {
 		addItemProperty(propertyId, property);
 	    }
 	} else {
-	    String first = propertyId.substring(0, split);
-	    String rest = propertyId.substring(split + 1);
+	    String first = ((String) propertyId).substring(0, split);
+	    String rest = ((String) propertyId).substring(split + 1);
 	    property = getItemProperty(first);
 	    if (property != null && property instanceof Item) {
 		addItemProperty(first, property);
@@ -93,8 +93,8 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     }
 
     @Override
-    protected Object readPropertyValue(AbstractDomainObject host, String propertyId) {
-	PropertyDescriptor descriptor = getDescriptor(propertyId);
+    protected Object readPropertyValue(AbstractDomainObject host, Object propertyId) {
+	PropertyDescriptor descriptor = getDescriptor((String) propertyId);
 	if (descriptor != null) {
 	    return descriptor.read(host);
 	}
@@ -102,8 +102,8 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     }
 
     @Override
-    protected void writePropertyValue(AbstractDomainObject host, String propertyId, Object newValue) {
-	PropertyDescriptor descriptor = getDescriptor(propertyId);
+    protected void writePropertyValue(AbstractDomainObject host, Object propertyId, Object newValue) {
+	PropertyDescriptor descriptor = getDescriptor((String) propertyId);
 	if (descriptor != null) {
 	    descriptor.write(host, newValue);
 	}
