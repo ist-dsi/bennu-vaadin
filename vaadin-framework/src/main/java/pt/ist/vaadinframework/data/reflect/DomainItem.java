@@ -105,6 +105,9 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     protected void writePropertyValue(AbstractDomainObject host, Object propertyId, Object newValue) {
 	PropertyDescriptor descriptor = getDescriptor((String) propertyId);
 	if (descriptor != null) {
+	    if (newValue == null) {
+		newValue = descriptor.getDefaultValue();
+	    }
 	    descriptor.write(host, newValue);
 	}
     }
