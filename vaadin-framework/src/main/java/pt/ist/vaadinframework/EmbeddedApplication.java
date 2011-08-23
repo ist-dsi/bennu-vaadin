@@ -155,16 +155,21 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
     }
 
     /**
+     * Reloads current page with current arguments.
+     */
+    public void refresh() {
+	((EmbeddedWindow) getMainWindow()).refreshContent();
+    }
+
+    /**
      * Adds a new pattern to the resolver, the pattern can have groups that when
      * captured will be supplied to the corresponding
      * {@link EmbeddedComponentContainer} using
      * {@link EmbeddedComponentContainer#setArguments(String...)}.
      * 
-     * @param pattern
-     *            The compiled {@link Pattern} instance.
-     * @param type
-     *            The container that will be instantiated if the pattern matches
-     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
+     * @param pattern The compiled {@link Pattern} instance.
+     * @param type The container that will be instantiated if the pattern
+     *            matches the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);

@@ -46,6 +46,10 @@ public class EmbeddedWindow extends Window {
 
     private Component current;
 
+    private Class<? extends EmbeddedComponentContainer> currentType;
+
+    private String[] currentArguments;
+
     public EmbeddedWindow(final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver) {
 	final VerticalLayout layout = new VerticalLayout();
 	layout.addComponent(fragmentUtility);
@@ -56,34 +60,41 @@ public class EmbeddedWindow extends Window {
 		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
 		    Matcher matcher = entry.getKey().matcher(fragment);
 		    if (matcher.matches()) {
-			try {
-			    EmbeddedComponentContainer container = entry.getValue().newInstance();
-			    Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
-			    for (int i = 0; i <= matcher.groupCount(); i++) {
-				arguments.add(matcher.group(i));
-			    }
-			    container.setArguments(arguments.toArray(new String[0]));
-			    layout.removeAllComponents();
-			    layout.addComponent(fragmentUtility);
-			    layout.addComponent(container);
-			    return;
-			} catch (InstantiationException e) {
-			    VaadinFrameworkLogger.getLogger().error(
-				    "Embedded component resolver could not instantiate matched pattern: <"
-					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
-			} catch (IllegalAccessException e) {
-			    VaadinFrameworkLogger.getLogger().error(
-				    "Embedded component resolver could not instantiate matched pattern: <"
-					    + entry.getKey().pattern() + ", " + entry.getValue().getName() + ">", e);
+			currentType = entry.getValue();
+			Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
+			for (int i = 0; i <= matcher.groupCount(); i++) {
+			    arguments.add(matcher.group(i));
 			}
+			currentArguments = arguments.toArray(new String[0]);
+			refreshContent();
+			return;
 		    }
 		}
-		layout.removeAllComponents();
-		layout.addComponent(fragmentUtility);
-		layout.addComponent(new NoMatchingPatternFoundComponent());
+		VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
+		currentType = null;
+		currentArguments = null;
+		refreshContent();
 	    }
 	});
 	setContent(layout);
+    }
+
+    public void refreshContent() {
+	try {
+	    getContent().removeAllComponents();
+	    getContent().addComponent(fragmentUtility);
+	    if (currentType != null && currentArguments != null) {
+		EmbeddedComponentContainer container = currentType.newInstance();
+		container.setArguments(currentArguments);
+		getContent().addComponent(container);
+	    } else {
+		getContent().addComponent(new NoMatchingPatternFoundComponent());
+	    }
+	} catch (InstantiationException e) {
+	    VaadinFrameworkLogger.getLogger().error("Failed to load page: " + currentType.getName());
+	} catch (IllegalAccessException e) {
+	    VaadinFrameworkLogger.getLogger().error("Failed to load page: " + currentType.getName());
+	}
     }
 
     @Override
