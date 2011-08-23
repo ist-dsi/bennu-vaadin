@@ -36,20 +36,84 @@ import pt.ist.vaadinframework.ui.layout.ControlsLayout;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.terminal.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Window.Notification;
 
 public class TransactionalForm extends Form implements VaadinResourceConstants {
+    public static interface Redirector {
+	public Resource redirectTo();
+    }
+
     private final ControlsLayout controls = new ControlsLayout();
+
+    private Redirector successRedirectFactory;
+
+    private Redirector cancelRedirectFactory;
+
+    private Resource successRedirect;
+
+    private Resource cancelRedirect;
 
     public TransactionalForm(ResourceBundle bundle) {
 	setFormFieldFactory(new DefaultFieldFactory(bundle));
 	setFooter(controls);
+    }
+
+    /**
+     * Factory of the page to redirect to after successful commit of the form
+     * 
+     * @param successRedirectFactory redirector instance
+     */
+    public void setSuccessRedirectFactory(Redirector successRedirectFactory) {
+	this.successRedirectFactory = successRedirectFactory;
+    }
+
+    public Redirector getSuccessRedirectFactory() {
+	return successRedirectFactory;
+    }
+
+    /**
+     * Factory of the page to redirect to after form cancel
+     * 
+     * @param cancelRedirectFactory redirector instance
+     */
+    public void setCancelRedirectFactory(Redirector cancelRedirectFactory) {
+	this.cancelRedirectFactory = cancelRedirectFactory;
+    }
+
+    public Redirector getCancelRedirectFactory() {
+	return cancelRedirectFactory;
+    }
+
+    /**
+     * Page to redirect to after successful commit of the form
+     * 
+     * @param successRedirect resource to redirect to
+     */
+    public void setSuccessRedirect(Resource successRedirect) {
+	this.successRedirect = successRedirect;
+    }
+
+    public Resource getSuccessRedirect() {
+	return successRedirect;
+    }
+
+    /**
+     * Page to redirect to after form cancel
+     * 
+     * @param cancelRedirect resource to redirect to
+     */
+    public void setCancelRedirect(Resource cancelRedirect) {
+	this.cancelRedirect = cancelRedirect;
+    }
+
+    public Resource getCancelRedirect() {
+	return cancelRedirect;
     }
 
     public void addSubmitButton() {
@@ -57,11 +121,6 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
 		commit();
-		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_SUBMIT),
-			Notification.TYPE_TRAY_NOTIFICATION);
-		if (getWindow().isClosable() && getWindow().getParent() != null) {
-		    getWindow().getParent().removeWindow(getWindow());
-		}
 	    }
 	});
     }
@@ -71,8 +130,6 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
 		discard();
-		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_DISCARD),
-			Notification.TYPE_TRAY_NOTIFICATION);
 	    }
 	});
     }
@@ -81,12 +138,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	addButton(VaadinResources.getString(COMMONS_ACTION_CANCEL), new ClickListener() {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
-		discard();
-		getWindow().showNotification(VaadinResources.getString(COMMONS_MESSAGE_CANCEL),
-			Notification.TYPE_TRAY_NOTIFICATION);
-		if (getWindow().isClosable() && getWindow().getParent() != null) {
-		    getWindow().getParent().removeWindow(getWindow());
-		}
+		cancel();
 	    }
 	});
     }
@@ -207,6 +259,14 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 		    buffer.commit();
 		}
 	    }
+	    if (getWindow().isClosable() && getWindow().getParent() != null) {
+		getWindow().getParent().removeWindow(getWindow());
+	    }
+	    if (successRedirect != null) {
+		getWindow().open(successRedirect);
+	    } else if (successRedirectFactory != null) {
+		getWindow().open(successRedirectFactory.redirectTo());
+	    }
 	} catch (Buffered.SourceException e) {
 	    findIllegalWritesInside(e);
 	    focus();
@@ -227,6 +287,18 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    findIllegalWritesInside(e);
 	    focus();
 	    throw e;
+	}
+    }
+
+    public void cancel() {
+	discard();
+	if (getWindow().isClosable() && getWindow().getParent() != null) {
+	    getWindow().getParent().removeWindow(getWindow());
+	}
+	if (cancelRedirect != null) {
+	    getWindow().open(cancelRedirect);
+	} else if (cancelRedirectFactory != null) {
+	    getWindow().open(cancelRedirectFactory.redirectTo());
 	}
     }
 
