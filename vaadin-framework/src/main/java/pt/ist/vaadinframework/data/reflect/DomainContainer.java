@@ -30,7 +30,9 @@ import pt.ist.vaadinframework.data.VBoxProperty;
 import pt.ist.vaadinframework.data.metamodel.MetaModel;
 import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 
-public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, Object, DomainItem<Type>> {
+import com.vaadin.data.util.ItemSorter;
+
+public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, String, DomainItem<Type>> {
     public DomainContainer(HintedProperty value, Class<? extends Type> elementType) {
 	super(value, elementType);
     }
@@ -54,5 +56,10 @@ public class DomainContainer<Type extends AbstractDomainObject> extends Buffered
 		    propertyId);
 	    addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
 	}
+    }
+    
+    @Override
+    public void setItemSorter(ItemSorter itemSorter) {
+        super.setItemSorter(itemSorter);
     }
 }

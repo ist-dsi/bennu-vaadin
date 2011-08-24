@@ -278,10 +278,10 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Service
     public void discard() throws SourceException {
 	try {
-	    if (getItemDataSource() instanceof Buffered) {
-		Buffered buffer = (Buffered) getItemDataSource();
-		buffer.discard();
-	    }
+//	    if (getItemDataSource() instanceof Buffered) {
+//		Buffered buffer = (Buffered) getItemDataSource();
+//		buffer.discard();
+//	    }
 	    super.discard();
 	} catch (Buffered.SourceException e) {
 	    findIllegalWritesInside(e);

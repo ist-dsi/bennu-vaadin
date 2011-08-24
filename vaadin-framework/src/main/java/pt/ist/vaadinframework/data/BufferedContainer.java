@@ -535,7 +535,7 @@ Container.PropertySetChangeNotifier {
 	    BufferedItem<PropertyId, ItemId> buffered = (BufferedItem<PropertyId, ItemId>) item;
 	    buffered.setConstructor(constructor);
 	    buffered.setWriter(writer);
-	    buffered.setWriteThrough(writeThrough);
+//	    buffered.setWriteThrough(writeThrough);
 	    buffered.setReadThrough(readThrough);
 	    buffered.setInvalidAllowed(invalidAllowed);
 	    buffered.setInvalidCommitted(invalidCommited);
