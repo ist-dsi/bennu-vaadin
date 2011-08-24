@@ -44,7 +44,7 @@ public class LuceneSelect extends TimeoutSelect implements TextChangeListener {
 
     @Override
     public void textChange(TextChangeEvent event) {
-	final LuceneContainer<?> luceneContainer = (LuceneContainer<?>) getContainerDataSource();
+	final LuceneContainer luceneContainer = (LuceneContainer) getContainerDataSource();
 	if (luceneContainer == null) {
 	    throw new UnsupportedOperationException("You must set the container datasource first.");
 	}
