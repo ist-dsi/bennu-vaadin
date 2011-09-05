@@ -94,10 +94,22 @@ Container.PropertySetChangeNotifier {
 	    @Override
 	    public void valueChange(ValueChangeEvent event) {
 		discard();
+//		discard((Collection<ItemId>)event.getProperty().getValue());
 	    }
 	});
     }
 
+//    private void discard(Collection<ItemId> newPropertyValues) {
+//	final Collection<ItemId> oldItems = (Collection<ItemId>) getItemIds();
+//	
+//	//remove items that are no longer present
+//	for(ItemId oldItem : oldItems) {
+//	    if (!newPropertyValues.contains(oldItem)) {
+//		removeItem(oldItem);
+//	    }
+//	}
+//    }
+    
     @Service
     private void initVBox() {
 	this.disableCommitPropagation = new VBox<Boolean>(false);
@@ -225,12 +237,28 @@ Container.PropertySetChangeNotifier {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void discard() throws SourceException {
-	removeAllItems();
-	if (getValue() != null) {
-	    for (ItemId itemId : getValue()) {
-		addItem(itemId);
+	final Collection<ItemId> oldItemIds = new ArrayList<ItemId>((Collection<ItemId>) getItemIds());
+	final Collection<ItemId> newItemIds = new ArrayList<ItemId>(getValue());
+
+	if (oldItemIds != null && newItemIds != null) {
+	    
+	    for (ItemId itemId : oldItemIds) {
+		if (!newItemIds.contains(itemId)) {
+		    internalRemoveItem(itemId);
+		} else {
+		    final ItemType item = getItem(itemId);
+		    if (item instanceof Buffered) {
+			((Buffered) item).discard();
+		    }
+		    newItemIds.remove(itemId);
+		}
+	    }
+
+	    for (ItemId itemId : newItemIds) {
+		    addItem(itemId);
 	    }
 	}
 	modified = false;

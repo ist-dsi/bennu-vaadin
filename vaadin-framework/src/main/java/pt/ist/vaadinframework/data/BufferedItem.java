@@ -51,6 +51,7 @@ import com.vaadin.data.Validatable;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.AbstractProperty;
+import com.vaadin.data.util.ObjectProperty;
 
 public abstract class BufferedItem<PropertyId, Type> implements Item, Item.PropertySetChangeNotifier, Property, HintedProperty,
 BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
@@ -133,6 +134,13 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     public BufferedItem(HintedProperty value) {
 	this.value = value;
+	this.value.addListener(new ValueChangeListener() {
+
+	    @Override
+	    public void valueChange(ValueChangeEvent event) {
+		discard();
+	    }
+	});
     }
 
     protected Object getPropertyValue(PropertyId propertyId) {
@@ -260,8 +268,13 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	list.add((PropertyId) propertyId);
 
 	Type value = getValue();
-	propertyValues.put(propertyId, value == null ? (property.getType().equals(Boolean.class) ? Boolean.FALSE : null)
-		: readPropertyValue(value, (PropertyId) propertyId));
+	if (property instanceof ObjectProperty<?>) {
+	    propertyValues.put(propertyId,property.getValue());
+	} else {
+	    propertyValues.put(propertyId, value == null ? (property.getType().equals(Boolean.class) ? Boolean.FALSE : null)
+			: readPropertyValue(value, (PropertyId) propertyId));
+	}
+	
 	if (property instanceof Buffered) {
 	    ((Buffered) property).setWriteThrough(isWriteThrough());
 	    ((Buffered) property).setReadThrough(isReadThrough());
@@ -522,11 +535,12 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     public void discard() throws SourceException {
 	Type value = getValue();
 	for (PropertyId propertyId : getItemPropertyIds()) {
-	    if (getItemProperty(propertyId) instanceof Buffered) {
-		((Buffered) getItemProperty(propertyId)).discard();
+	    final Property itemProperty = getItemProperty(propertyId);
+	    if (itemProperty instanceof Buffered) {
+		((Buffered) itemProperty).discard();
 	    }
 	    propertyValues.put(propertyId,
-		    value == null ? (getItemProperty(propertyId).getType().equals(Boolean.class) ? Boolean.FALSE : null)
+		    value == null ? (itemProperty.getType().equals(Boolean.class) ? Boolean.FALSE : null)
 			    : readPropertyValue(value, propertyId));
 	}
 	modified = false;
