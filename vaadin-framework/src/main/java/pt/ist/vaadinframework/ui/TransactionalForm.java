@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 import jvstm.cps.ConsistencyException;
@@ -67,7 +68,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after successful commit of the form
      * 
-     * @param successRedirectFactory redirector instance
+     * @param successRedirectFactory
+     *            redirector instance
      */
     public void setSuccessRedirectFactory(Redirector successRedirectFactory) {
 	this.successRedirectFactory = successRedirectFactory;
@@ -80,7 +82,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after form cancel
      * 
-     * @param cancelRedirectFactory redirector instance
+     * @param cancelRedirectFactory
+     *            redirector instance
      */
     public void setCancelRedirectFactory(Redirector cancelRedirectFactory) {
 	this.cancelRedirectFactory = cancelRedirectFactory;
@@ -93,7 +96,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after successful commit of the form
      * 
-     * @param successRedirect resource to redirect to
+     * @param successRedirect
+     *            resource to redirect to
      */
     public void setSuccessRedirect(Resource successRedirect) {
 	this.successRedirect = successRedirect;
@@ -106,7 +110,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after form cancel
      * 
-     * @param cancelRedirect resource to redirect to
+     * @param cancelRedirect
+     *            resource to redirect to
      */
     public void setCancelRedirect(Resource cancelRedirect) {
 	this.cancelRedirect = cancelRedirect;
@@ -242,9 +247,32 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Override
     @Service
     public void commit() {
+	LinkedList<SourceException> problems = null;
+
 	try {
 	    if (!isWriteThrough()) {
-		super.commit();
+		try {
+		    super.commit();
+		} catch (Buffered.SourceException se) {
+		    findIllegalWritesInside(se);
+		    focus();
+		    if (problems == null) {
+			problems = new LinkedList<SourceException>();
+		    }
+		    problems.add(se);
+		}
+		if (problems != null && !problems.isEmpty()) {
+		    // Commit problems
+		    final Throwable[] causes = new Throwable[problems.size()];
+		    int index = 0;
+		    for (final Iterator<SourceException> i = problems.iterator(); i.hasNext();) {
+			causes[index++] = i.next();
+		    }
+		    final Buffered.SourceException e = new Buffered.SourceException(this, causes);
+		    // currentBufferedSourceException = e;
+		    throw e;
+		}
+
 	    } else {
 		if (!isInvalidCommitted() && !isValid()) {
 		    if (isValidationVisibleOnCommit()) {
@@ -253,20 +281,48 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 		    validate();
 		}
 	    }
+
 	    if (isValid() && getItemDataSource() instanceof Buffered) {
 		Buffered buffer = (Buffered) getItemDataSource();
 		if (!buffer.isWriteThrough()) {
-		    buffer.commit();
+		    try {
+			buffer.commit();
+		    } catch (final Buffered.SourceException e) {
+			findIllegalWritesInside(e);
+			focus();
+			if (problems == null) {
+			    problems = new LinkedList<SourceException>();
+			}
+			problems.add(e);
+		    }
+
 		}
 	    }
-	    if (getWindow().isClosable() && getWindow().getParent() != null) {
-		getWindow().getParent().removeWindow(getWindow());
+
+	    // No problems occurred
+	    if (problems == null) {
+		if (getWindow().isClosable() && getWindow().getParent() != null) {
+		    getWindow().getParent().removeWindow(getWindow());
+		}
+		if (successRedirect != null) {
+		    getWindow().open(successRedirect);
+		} else if (successRedirectFactory != null) {
+		    getWindow().open(successRedirectFactory.redirectTo());
+		}
+		// currentBufferedSourceException = null;
+		setComponentError(null);
+		return;
 	    }
-	    if (successRedirect != null) {
-		getWindow().open(successRedirect);
-	    } else if (successRedirectFactory != null) {
-		getWindow().open(successRedirectFactory.redirectTo());
+
+	    // Commit problems
+	    final Throwable[] causes = new Throwable[problems.size()];
+	    int index = 0;
+	    for (final Iterator<SourceException> i = problems.iterator(); i.hasNext();) {
+		causes[index++] = i.next();
 	    }
+	    final Buffered.SourceException e = new Buffered.SourceException(this, causes);
+	    // currentBufferedSourceException = e;
+	    throw e;
 	} catch (Buffered.SourceException e) {
 	    findIllegalWritesInside(e);
 	    focus();
@@ -278,10 +334,10 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     @Service
     public void discard() throws SourceException {
 	try {
-//	    if (getItemDataSource() instanceof Buffered) {
-//		Buffered buffer = (Buffered) getItemDataSource();
-//		buffer.discard();
-//	    }
+	    // if (getItemDataSource() instanceof Buffered) {
+	    // Buffered buffer = (Buffered) getItemDataSource();
+	    // buffer.discard();
+	    // }
 	    super.discard();
 	} catch (Buffered.SourceException e) {
 	    findIllegalWritesInside(e);

@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.data;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,9 +40,11 @@ import jvstm.cps.ConsistencyException;
 import org.apache.commons.lang.StringUtils;
 
 import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.FFDomainException;
 import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
 import pt.ist.fenixframework.pstm.IllegalWriteException;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
+import pt.ist.vaadinframework.terminal.DomainExceptionErrorMessage;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.BufferedValidatable;
@@ -346,8 +349,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     @Service
     private void commit(Collection<PropertyId> savingPropertyIds) throws SourceException, InvalidValueException {
-	LinkedList<Throwable> problems = new LinkedList<Throwable>();
-	LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
+	final LinkedList<Throwable> problems = new LinkedList<Throwable>();
+	final LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
 	for (PropertyId propertyId : savingIds) {
 	    try {
 		if (getItemProperty(propertyId) instanceof Buffered) {
@@ -454,11 +457,39 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	    }
 	}
 	if (!problems.isEmpty()) {
-	    throw new SourceException(this, problems.toArray(new Throwable[0]));
+	    SourceException se = handleDomainException(new SourceException(this, problems.toArray(new Throwable[0])));
+	    throw se;
 	}
 	modified = false;
     }
-
+    
+    private ArrayList<Throwable> getAllCauses(Throwable t) {
+	final ArrayList<Throwable> causes = new ArrayList<Throwable>();
+	causes.add(t);
+	if (t instanceof Buffered.SourceException) {
+	    for(Throwable sec : ((Buffered.SourceException) t).getCauses()) {
+		causes.addAll(getAllCauses(sec));
+	    }
+	} else {
+	    if (t.getCause() != null) {
+		    causes.addAll(getAllCauses(t.getCause()));
+	    }
+	}
+	return causes;
+    }
+    
+    private Buffered.SourceException handleDomainException(Buffered.SourceException se) {
+	final ArrayList<Throwable> causes = new ArrayList<Throwable>();
+	for(Throwable throwable : getAllCauses(se)) {
+	    if (throwable instanceof FFDomainException) {
+		return new Buffered.SourceException(se.getSource(), new Throwable[] { new DomainExceptionErrorMessage(throwable) });
+	    } else {
+		causes.add(throwable);
+	    }
+	}
+	return new Buffered.SourceException(se.getSource(), causes.toArray(new Throwable[0]));
+    }
+    
     private boolean fieldDiffer(PropertyId[] arguments) {
 	for (PropertyId propertyId : arguments) {
 	    if ((propertyValues.get(propertyId) == null && readPropertyValue(getValue(), propertyId) != null)
