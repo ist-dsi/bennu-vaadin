@@ -57,7 +57,7 @@ import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.ObjectProperty;
 
 public abstract class BufferedItem<PropertyId, Type> implements Item, Item.PropertySetChangeNotifier, Property, HintedProperty,
-BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
+	BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
 
@@ -135,15 +135,16 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private Item.PropertySetChangeEvent lastEvent;
 
+    private final ValueChangeListener innerPropertyChangeListener = new ValueChangeListener() {
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+	    discard();
+	}
+    };
+
     public BufferedItem(HintedProperty value) {
 	this.value = value;
-	this.value.addListener(new ValueChangeListener() {
-
-	    @Override
-	    public void valueChange(ValueChangeEvent event) {
-		discard();
-	    }
-	});
+	this.value.addListener(innerPropertyChangeListener);
     }
 
     protected Object getPropertyValue(PropertyId propertyId) {
@@ -158,10 +159,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * Access method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host
-     *            instance of the object mapped in the {@link Item}
-     * @param propertyId
-     *            id of the property.
+     * @param host instance of the object mapped in the {@link Item}
+     * @param propertyId id of the property.
      * @return the value of the property in the host object.
      */
     protected abstract Object readPropertyValue(Type host, PropertyId propertyId);
@@ -179,12 +178,9 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * Write method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host
-     *            instance of the object mapped in the {@link Item}
-     * @param propertyId
-     *            id of the property.
-     * @param newValue
-     *            the new value of the property in the host object.
+     * @param host instance of the object mapped in the {@link Item}
+     * @param propertyId id of the property.
+     * @param newValue the new value of the property in the host object.
      */
     protected abstract void writePropertyValue(Type host, PropertyId propertyId, Object newValue);
 
@@ -272,12 +268,12 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
 	Type value = getValue();
 	if (property instanceof ObjectProperty<?>) {
-	    propertyValues.put(propertyId,property.getValue());
+	    propertyValues.put(propertyId, property.getValue());
 	} else {
 	    propertyValues.put(propertyId, value == null ? (property.getType().equals(Boolean.class) ? Boolean.FALSE : null)
-			: readPropertyValue(value, (PropertyId) propertyId));
+		    : readPropertyValue(value, (PropertyId) propertyId));
 	}
-	
+
 	if (property instanceof Buffered) {
 	    ((Buffered) property).setWriteThrough(isWriteThrough());
 	    ((Buffered) property).setReadThrough(isReadThrough());
@@ -336,8 +332,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * ensure that the returned properties are of {@link BufferedProperty}s or
      * {@link Item}s or {@link Collection}s over {@link BufferedProperty}s.
      * 
-     * @param propertyId
-     *            The key of the property.
+     * @param propertyId The key of the property.
      * @return A {@link Property} instance.
      */
     protected abstract Property makeProperty(PropertyId propertyId);
@@ -349,6 +344,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     @Service
     private void commit(Collection<PropertyId> savingPropertyIds) throws SourceException, InvalidValueException {
+	this.value.removeListener(innerPropertyChangeListener);
 	final LinkedList<Throwable> problems = new LinkedList<Throwable>();
 	final LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
 	for (PropertyId propertyId : savingIds) {
@@ -448,7 +444,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
 		if ((current == null && old != null) || (current != null && !current.equals(old))) {
 		    VaadinFrameworkLogger.getLogger()
-		    .debug("persisting item property: " + propertyId + " with value: " + current);
+			    .debug("persisting item property: " + propertyId + " with value: " + current);
 		    writePropertyValue(getValue(), propertyId, current);
 		}
 	    } catch (Throwable e) {
@@ -456,40 +452,42 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 		problems.add(e);
 	    }
 	}
+	this.value.addListener(innerPropertyChangeListener);
 	if (!problems.isEmpty()) {
 	    SourceException se = handleDomainException(new SourceException(this, problems.toArray(new Throwable[0])));
 	    throw se;
 	}
 	modified = false;
     }
-    
+
     private ArrayList<Throwable> getAllCauses(Throwable t) {
 	final ArrayList<Throwable> causes = new ArrayList<Throwable>();
 	causes.add(t);
 	if (t instanceof Buffered.SourceException) {
-	    for(Throwable sec : ((Buffered.SourceException) t).getCauses()) {
+	    for (Throwable sec : ((Buffered.SourceException) t).getCauses()) {
 		causes.addAll(getAllCauses(sec));
 	    }
 	} else {
 	    if (t.getCause() != null) {
-		    causes.addAll(getAllCauses(t.getCause()));
+		causes.addAll(getAllCauses(t.getCause()));
 	    }
 	}
 	return causes;
     }
-    
+
     private Buffered.SourceException handleDomainException(Buffered.SourceException se) {
 	final ArrayList<Throwable> causes = new ArrayList<Throwable>();
-	for(Throwable throwable : getAllCauses(se)) {
+	for (Throwable throwable : getAllCauses(se)) {
 	    if (throwable instanceof FFDomainException) {
-		return new Buffered.SourceException(se.getSource(), new Throwable[] { new DomainExceptionErrorMessage(throwable) });
+		return new Buffered.SourceException(se.getSource(),
+			new Throwable[] { new DomainExceptionErrorMessage(throwable) });
 	    } else {
 		causes.add(throwable);
 	    }
 	}
 	return new Buffered.SourceException(se.getSource(), causes.toArray(new Throwable[0]));
     }
-    
+
     private boolean fieldDiffer(PropertyId[] arguments) {
 	for (PropertyId propertyId : arguments) {
 	    if ((propertyValues.get(propertyId) == null && readPropertyValue(getValue(), propertyId) != null)
@@ -570,9 +568,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	    if (itemProperty instanceof Buffered) {
 		((Buffered) itemProperty).discard();
 	    }
-	    propertyValues.put(propertyId,
-		    value == null ? (itemProperty.getType().equals(Boolean.class) ? Boolean.FALSE : null)
-			    : readPropertyValue(value, propertyId));
+	    propertyValues.put(propertyId, value == null ? (itemProperty.getType().equals(Boolean.class) ? Boolean.FALSE : null)
+		    : readPropertyValue(value, propertyId));
 	}
 	modified = false;
     }
@@ -716,8 +713,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     /**
      * Registers a new property set change listener for this Item.
      * 
-     * @param listener
-     *            the new Listener to be registered.
+     * @param listener the new Listener to be registered.
      */
     @Override
     public void addListener(Item.PropertySetChangeListener listener) {
@@ -730,8 +726,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     /**
      * Removes a previously registered property set change listener.
      * 
-     * @param listener
-     *            the Listener to be removed.
+     * @param listener the Listener to be removed.
      */
     @Override
     public void removeListener(Item.PropertySetChangeListener listener) {

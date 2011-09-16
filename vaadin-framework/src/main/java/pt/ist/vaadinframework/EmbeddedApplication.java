@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.CloseEvent;
@@ -149,7 +150,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    addWindow(window);
 
 	    // Move to the url to remember the name in the future
-	    // window.open(new ExternalResource(window.getURL()));
+	    window.open(new ExternalResource(window.getURL()));
 	}
 	return window;
     }
