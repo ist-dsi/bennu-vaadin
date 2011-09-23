@@ -241,6 +241,10 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	// newField.addListener(fieldValueChangeListener);
 	// oldField.removeListener(fieldValueChangeListener);
 
+	// Replaces the old field with new one
+	getLayout().replaceComponent(oldField, newField);
+	addField(propertyId, newField);
+
 	return newField;
     }
 

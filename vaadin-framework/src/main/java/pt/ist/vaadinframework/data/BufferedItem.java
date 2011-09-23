@@ -57,11 +57,11 @@ import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.ObjectProperty;
 
 public abstract class BufferedItem<PropertyId, Type> implements Item, Item.PropertySetChangeNotifier, Property, HintedProperty,
-	BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
+BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
 
-	private final Class<?> type;
+	protected Class<?> type;
 
 	private final Collection<Hint> hints;
 
@@ -444,7 +444,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
 
 		if ((current == null && old != null) || (current != null && !current.equals(old))) {
 		    VaadinFrameworkLogger.getLogger()
-			    .debug("persisting item property: " + propertyId + " with value: " + current);
+		    .debug("persisting item property: " + propertyId + " with value: " + current);
 		    writePropertyValue(getValue(), propertyId, current);
 		}
 	    } catch (Throwable e) {
