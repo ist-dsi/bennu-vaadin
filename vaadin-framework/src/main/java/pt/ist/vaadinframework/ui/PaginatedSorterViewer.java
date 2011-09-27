@@ -533,6 +533,11 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
 
     @Override
     public void setContainerDataSource(Container newDataSource) {
+	if (newDataSource == null) {
+	    setVisible(false);
+	    return;
+	}
+	setVisible(true);
 	if (!(newDataSource instanceof Container.Indexed)) {
 	    throw new IllegalArgumentException("Can only use containers that implement Container.Indexed");
 	}

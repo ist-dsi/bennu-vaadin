@@ -68,8 +68,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after successful commit of the form
      * 
-     * @param successRedirectFactory
-     *            redirector instance
+     * @param successRedirectFactory redirector instance
      */
     public void setSuccessRedirectFactory(Redirector successRedirectFactory) {
 	this.successRedirectFactory = successRedirectFactory;
@@ -82,8 +81,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after form cancel
      * 
-     * @param cancelRedirectFactory
-     *            redirector instance
+     * @param cancelRedirectFactory redirector instance
      */
     public void setCancelRedirectFactory(Redirector cancelRedirectFactory) {
 	this.cancelRedirectFactory = cancelRedirectFactory;
@@ -96,8 +94,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after successful commit of the form
      * 
-     * @param successRedirect
-     *            resource to redirect to
+     * @param successRedirect resource to redirect to
      */
     public void setSuccessRedirect(Resource successRedirect) {
 	this.successRedirect = successRedirect;
@@ -110,8 +107,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after form cancel
      * 
-     * @param cancelRedirect
-     *            resource to redirect to
+     * @param cancelRedirect resource to redirect to
      */
     public void setCancelRedirect(Resource cancelRedirect) {
 	this.cancelRedirect = cancelRedirect;
