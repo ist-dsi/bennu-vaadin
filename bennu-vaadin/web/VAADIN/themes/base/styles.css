@@ -74,3 +74,28 @@
     text-align: left;
     vertical-align: top;
 }
+
+.v-gridlayout-complexFormField {
+    background: whiteSmoke;
+}
+
+.v-gridlayout-complexFormField .v-gridlayout-margin-top {
+	padding-top: 10px;
+}
+
+.v-gridlayout-complexFormField .v-gridlayout-margin-bottom {
+	padding-bottom: 10px;
+}
+
+.v-gridlayout-complexFormField .v-gridlayout-margin-left {
+	padding-left: 10px;
+} 
+
+.v-gridlayout-complexFormField .v-gridlayout-margin-right {
+	padding-right: 10px;
+}
+
+.v-gridlayout-complexFormField .v-gridlayout-spacing-on {
+	padding-left: 6px;
+	padding-top: 6px;
+}
