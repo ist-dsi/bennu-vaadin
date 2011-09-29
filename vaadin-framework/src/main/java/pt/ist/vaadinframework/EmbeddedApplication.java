@@ -116,7 +116,7 @@ import com.vaadin.ui.Window;
 public class EmbeddedApplication extends Application implements VaadinResourceConstants {
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
     private static final Set<Class<? extends EmbeddedComponentContainer>> pages = new HashSet<Class<? extends EmbeddedComponentContainer>>();
-    
+
     private static ApplicationErrorListener errorListener = null;
 
     @Override
@@ -124,14 +124,17 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	setTheme("reindeer");
 	setMainWindow(new EmbeddedWindow(pages));
     }
-    
-    
-    public void open(Class<? extends EmbeddedComponentContainer> clazz, String... args) {
-	 final FragmentQuery fragmentQuery = new FragmentQuery(clazz, args);
-	 ((EmbeddedWindow)getMainWindow()).open(fragmentQuery.getQueryString());
+
+    public static void open(Application application, Class<? extends EmbeddedComponentContainer> clazz, String... args) {
+	((EmbeddedApplication) application).open(clazz, args);
     }
-    
-    /** 
+
+    public void open(Class<? extends EmbeddedComponentContainer> clazz, String... args) {
+	final FragmentQuery fragmentQuery = new FragmentQuery(clazz, args);
+	((EmbeddedWindow) getMainWindow()).open(fragmentQuery.getQueryString());
+    }
+
+    /**
      * @see com.vaadin.Application#getWindow(java.lang.String)
      */
     @Override
@@ -142,13 +145,13 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	// If not, we must create a new window for this new browser window/tab
 	if (window == null) {
 	    window = new EmbeddedWindow(pages);
-	     // Use the random name given by the framework to identify this
+	    // Use the random name given by the framework to identify this
 	    // window in future
 	    window.setName(name);
-	    //addWindow(window);
+	    // addWindow(window);
 
 	    // Move to the url to remember the name in the future
-	    //window.open(new ExternalResource(window.getURL()));
+	    // window.open(new ExternalResource(window.getURL()));
 	}
 	return window;
     }
@@ -173,11 +176,10 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);
     }
-    
+
     public static void addPage(Class<? extends EmbeddedComponentContainer> type) {
 	pages.add(type);
     }
-    
 
     public static SystemMessages getSystemMessages() {
 	return new CustomizedSystemMessages() {
