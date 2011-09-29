@@ -115,23 +115,22 @@ import com.vaadin.terminal.Terminal.ErrorEvent;
 import com.vaadin.ui.Window.Notification;
 
 public class VirtualHostAwareErrorHandler implements ApplicationErrorListener {
-    
-  private ArrayList<Throwable> getAllCauses(Throwable t) {
-	System.out.println("getAllCauses");
+
+    private ArrayList<Throwable> getAllCauses(Throwable t) {
 	final ArrayList<Throwable> causes = new ArrayList<Throwable>();
 	causes.add(t);
 	if (t instanceof Buffered.SourceException) {
-	    for(Throwable sec : ((Buffered.SourceException) t).getCauses()) {
+	    for (Throwable sec : ((Buffered.SourceException) t).getCauses()) {
 		causes.addAll(getAllCauses(sec));
 	    }
 	} else {
 	    if (t.getCause() != null) {
-		    causes.addAll(getAllCauses(t.getCause()));
+		causes.addAll(getAllCauses(t.getCause()));
 	    }
 	}
 	return causes;
-  }
-    
+    }
+
     @Override
     public void terminalError(final ErrorEvent event, final Application application) {
 	final Logger logger = VaadinFrameworkLogger.getLogger();
@@ -149,16 +148,19 @@ public class VirtualHostAwareErrorHandler implements ApplicationErrorListener {
 	} else if (throwable instanceof UserErrorException) {
 	    application.getMainWindow().showNotification(throwable.getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
 	} else if (throwable.getCause() != null && throwable.getCause() instanceof UserErrorException) {
-	    application.getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(), Notification.TYPE_ERROR_MESSAGE);
+	    application.getMainWindow().showNotification(throwable.getCause().getLocalizedMessage(),
+		    Notification.TYPE_ERROR_MESSAGE);
 	} else if (throwable.getCause() != null && throwable.getCause() instanceof Buffered.SourceException) {
-	    logger.error("Source error: " + getSourceExceptionDescription((SourceException) throwable.getCause()));
+	    final SourceException cause = (SourceException) throwable.getCause();
+	    logger.error("Source error: " + getSourceExceptionDescription(cause));
+	    getAllCauses(cause).iterator().next().printStackTrace();
 	} else {
 	    final TerminalErrorWindow terminalErrorWindow = createTerminalErrorWindow(event);
 	    application.getMainWindow().addWindow(terminalErrorWindow);
 	    logger.error("Terminal error:", throwable);
 	}
     }
-    
+
     public String getSourceExceptionDescription(Buffered.SourceException se) {
 	ArrayList<String> messages = new ArrayList<String>();
 	for (Throwable t : getAllCauses(se)) {
@@ -167,10 +169,9 @@ public class VirtualHostAwareErrorHandler implements ApplicationErrorListener {
 	final String join = StringUtils.join(messages, ",");
 	return String.format("[%s]", join);
     }
-    
+
     protected TerminalErrorWindow createTerminalErrorWindow(final ErrorEvent event) {
 	return new TerminalErrorWindow(event);
     }
 
 }
-
