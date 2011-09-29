@@ -21,6 +21,8 @@
  */
 package pt.ist.vaadinframework.ui;
 
+import java.util.Map;
+
 import pt.ist.vaadinframework.EmbeddedApplication;
 
 import com.vaadin.ui.ComponentContainer;
@@ -42,5 +44,5 @@ public interface EmbeddedComponentContainer extends ComponentContainer {
      *            the parsed arguments passed to the container including the
      *            full parameter text.
      */
-    public void setArguments(String... arguments);
+    public void setArguments(java.util.Map<String,String> arguments);
 }

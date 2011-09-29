@@ -21,12 +21,14 @@
  */
 package pt.ist.vaadinframework;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotation;
+import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotationPath;
 
+import java.util.Map;
+import java.util.Set;
+
+import pt.ist.vaadinframework.annotation.EmbeddedComponent;
+import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 
@@ -47,45 +49,75 @@ public class EmbeddedWindow extends Window {
     private Component current;
 
     private Class<? extends EmbeddedComponentContainer> currentType;
+    
+    private FragmentQuery currentQuery;
+    
+    private Set<Class<? extends EmbeddedComponentContainer>> pages;
+    
 
-    private String[] currentArguments;
+    public void setTypeForQuery() {
+	for(Class<? extends EmbeddedComponentContainer> page : pages) {
+	    final EmbeddedComponent annotation = getAnnotation(page);
+	    final String annotationPath = getAnnotationPath(annotation);
+	    if (currentQuery.getPath().startsWith(annotationPath)) {
+		currentType = page;
+		return;
+	    }
+	}
+	currentType = null;
+    }
+    
+    public void open (String fragment) {
+	fragmentUtility.setFragment(fragment);
+    }
+     
+   private void setFragment(String fragment) {
+	
+	try {
+	    currentQuery = new FragmentQuery(fragment);
+	    setTypeForQuery();
+	}
+	catch(Exception ife) {
+	    VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
+	    currentQuery = null;
+	}
+	
+    }
+    
+    
 
-    public EmbeddedWindow(final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver) {
+    public EmbeddedWindow(Set<Class<? extends EmbeddedComponentContainer>> pages) {
+	setImmediate(true);
+	this.pages = pages;
 	final VerticalLayout layout = new VerticalLayout();
 	layout.addComponent(fragmentUtility);
 	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
 	    @Override
 	    public void fragmentChanged(FragmentChangedEvent source) {
 		String fragment = source.getUriFragmentUtility().getFragment();
-		for (Entry<Pattern, Class<? extends EmbeddedComponentContainer>> entry : resolver.entrySet()) {
-		    Matcher matcher = entry.getKey().matcher(fragment);
-		    if (matcher.matches()) {
-			currentType = entry.getValue();
-			Vector<String> arguments = new Vector<String>(matcher.groupCount() + 1);
-			for (int i = 0; i <= matcher.groupCount(); i++) {
-			    arguments.add(matcher.group(i));
-			}
-			currentArguments = arguments.toArray(new String[0]);
-			refreshContent();
-			return;
-		    }
-		}
-		VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
-		currentType = null;
-		currentArguments = null;
+		setFragment("#" + fragment);
 		refreshContent();
 	    }
 	});
 	setContent(layout);
+	addListener(new CloseListener() {
+	    @Override
+	    public void windowClose(CloseEvent e) {
+		System.out.println("Closing embedded window!:" + e.getWindow().getName());
+	    }
+	});
     }
 
     public void refreshContent() {
 	try {
 	    getContent().removeAllComponents();
 	    getContent().addComponent(fragmentUtility);
-	    if (currentType != null && currentArguments != null) {
+	    if (currentType != null && currentQuery != null) {
 		EmbeddedComponentContainer container = currentType.newInstance();
-		container.setArguments(currentArguments);
+		final Map<String, String> params = currentQuery.getParams();
+		if (params != null) {
+		    container.setArguments(params);
+		}
 		getContent().addComponent(container);
 	    } else {
 		getContent().addComponent(new NoMatchingPatternFoundComponent());
@@ -111,7 +143,7 @@ public class EmbeddedWindow extends Window {
 	}
 
 	@Override
-	public void setArguments(String... arguments) {
+	public void setArguments(Map<String,String> arguments) {
 	    // Not expecting any arguments
 	}
     }
