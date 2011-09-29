@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletConfig;
@@ -15,10 +14,10 @@ import myorg._development.PropertiesManager;
 import pt.ist.bennu.vaadin.errorHandling.VirtualHostAwareErrorHandler;
 import pt.ist.vaadinframework.ApplicationErrorListener;
 import pt.ist.vaadinframework.EmbeddedApplication;
-import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
-import pt.utl.ist.fenix.tools.util.FileUtils;
 import pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor;
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
+import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
+import pt.utl.ist.fenix.tools.util.FileUtils;
 
 @SuppressWarnings("serial")
 public class EmbeddedApplicationInitializer extends HttpServlet {
@@ -39,7 +38,8 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 
 	    for (String path : paths) {
 		try {
-		    EmbeddedApplication.addResolutionPattern(Pattern.compile(path), embeddedComponentClass);
+//		    EmbeddedApplication.addResolutionPattern(Pattern.compile(path), embeddedComponentClass);
+		    EmbeddedApplication.addPage(embeddedComponentClass);
 		} catch (PatternSyntaxException e) {
 		    throw new Error("Error interpreting pattern: " + path, e);
 		}
