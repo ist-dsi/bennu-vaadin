@@ -520,8 +520,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 		return method;
 	    }
 	}
-	throw new NoSuchMethodException(
-		"Must specify a method with a signature compatible with the arguments in getOrderedArguments()");
+	final String message = "Must specify a method in class %s with a signature compatible with the arguments in getOrderedArguments() [%s]";
+	throw new NoSuchMethodException(String.format(message, type.getName(), StringUtils.join(types, ",")));
     }
 
     private void handleException(Throwable throwable) {
