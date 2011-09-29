@@ -73,7 +73,7 @@ public class TransactionalTable extends Table {
     @Override
     public void setContainerDataSource(Container newDataSource) {
 	if (getContainerDataSource() != null && getContainerDataSource() instanceof PropertySetChangeNotifier) {
-	    ((PropertySetChangeNotifier) newDataSource).removeListener(headerUpdater);
+	    ((PropertySetChangeNotifier) getContainerDataSource()).removeListener(headerUpdater);
 	}
 	if (newDataSource instanceof BufferedContainer) {
 	    for (Object propertyId : newDataSource.getContainerPropertyIds()) {
