@@ -21,11 +21,14 @@
  */
 package pt.ist.vaadinframework.fragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
 import pt.ist.vaadinframework.annotation.EmbeddedComponentUtils;
@@ -68,7 +71,7 @@ public class FragmentQuery {
 	params.put(key, value);
     }
 
-    public FragmentQuery(Class<? extends EmbeddedComponentContainer> clazz, String[] values) {
+    public FragmentQuery(Class<? extends EmbeddedComponentContainer> clazz, String... values) {
 	this();
 	final EmbeddedComponent annotation = EmbeddedComponentUtils.getAnnotation(clazz);
 	final String[] path = annotation.path();
@@ -117,12 +120,12 @@ public class FragmentQuery {
 
     public String getQueryString() {
 	String queryString = String.format("%s", path);
+	final ArrayList<String> args = new ArrayList<String>();
 	if (params != null) {
-	    queryString += "?";
 	    for (Entry<String, String> entry : params.entrySet()) {
-		queryString += String.format("%s=%s&", entry.getKey(), entry.getValue());
+		args.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
 	    }
 	}
-	return queryString.substring(0, queryString.length() - 1);
+	return args.isEmpty() ? queryString : queryString + "?" + StringUtils.join(args, "&");
     }
 }
