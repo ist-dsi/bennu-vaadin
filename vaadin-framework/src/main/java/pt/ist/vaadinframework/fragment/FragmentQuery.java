@@ -56,30 +56,30 @@ public class FragmentQuery {
     private void setPath(final String path) {
 	this.path = path;
     }
-    
+
     public FragmentQuery() {
-//	params = new HashMap<String, String>();
+	// params = new HashMap<String, String>();
     }
-    
-    private void put(String key , String value) {
+
+    private void put(String key, String value) {
 	if (params == null) {
 	    params = new HashMap<String, String>();
 	}
 	params.put(key, value);
     }
-    
+
     public FragmentQuery(Class<? extends EmbeddedComponentContainer> clazz, String[] values) {
 	this();
 	final EmbeddedComponent annotation = EmbeddedComponentUtils.getAnnotation(clazz);
 	final String[] path = annotation.path();
 	final String[] args = annotation.args();
-	
+
 	if ((args.length != values.length) || path.length != 1) {
 	    throw new InvalidFragmentException("args don't match");
 	}
-	
+
 	this.path = path[0];
-	
+
 	for (int i = 0; i < args.length; i++) {
 	    put(args[i], values[i]);
 	}
@@ -116,7 +116,7 @@ public class FragmentQuery {
     }
 
     public String getQueryString() {
-	String queryString = String.format("#%s", path);
+	String queryString = String.format("%s", path);
 	if (params != null) {
 	    queryString += "?";
 	    for (Entry<String, String> entry : params.entrySet()) {
