@@ -41,7 +41,6 @@ import com.vaadin.ui.Window;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
- * 
  */
 public class EmbeddedWindow extends Window {
     private final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
@@ -49,42 +48,38 @@ public class EmbeddedWindow extends Window {
     private Component current;
 
     private Class<? extends EmbeddedComponentContainer> currentType;
-    
+
     private FragmentQuery currentQuery;
-    
-    private Set<Class<? extends EmbeddedComponentContainer>> pages;
-    
+
+    private final Set<Class<? extends EmbeddedComponentContainer>> pages;
 
     public void setTypeForQuery() {
-	for(Class<? extends EmbeddedComponentContainer> page : pages) {
+	for (Class<? extends EmbeddedComponentContainer> page : pages) {
 	    final EmbeddedComponent annotation = getAnnotation(page);
 	    final String annotationPath = getAnnotationPath(annotation);
-	    if (currentQuery.getPath().startsWith(annotationPath)) {
+	    if (currentQuery.getPath().equals(annotationPath)) {
 		currentType = page;
 		return;
 	    }
 	}
 	currentType = null;
     }
-    
-    public void open (String fragment) {
+
+    public void open(String fragment) {
 	fragmentUtility.setFragment(fragment);
     }
-     
-   private void setFragment(String fragment) {
-	
+
+    private void setFragment(String fragment) {
+
 	try {
 	    currentQuery = new FragmentQuery(fragment);
 	    setTypeForQuery();
-	}
-	catch(Exception ife) {
+	} catch (Exception ife) {
 	    VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
 	    currentQuery = null;
 	}
-	
+
     }
-    
-    
 
     public EmbeddedWindow(Set<Class<? extends EmbeddedComponentContainer>> pages) {
 	setImmediate(true);
@@ -115,9 +110,7 @@ public class EmbeddedWindow extends Window {
 	    if (currentType != null && currentQuery != null) {
 		EmbeddedComponentContainer container = currentType.newInstance();
 		final Map<String, String> params = currentQuery.getParams();
-		if (params != null) {
-		    container.setArguments(params);
-		}
+		container.setArguments(params);
 		getContent().addComponent(container);
 	    } else {
 		getContent().addComponent(new NoMatchingPatternFoundComponent());
@@ -143,7 +136,7 @@ public class EmbeddedWindow extends Window {
 	}
 
 	@Override
-	public void setArguments(Map<String,String> arguments) {
+	public void setArguments(Map<String, String> arguments) {
 	    // Not expecting any arguments
 	}
     }

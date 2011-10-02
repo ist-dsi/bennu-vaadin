@@ -129,9 +129,17 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	((EmbeddedApplication) application).open(clazz, args);
     }
 
+    public static void open(Application application, String fragment) {
+	((EmbeddedApplication) application).open(fragment);
+    }
+
     public void open(Class<? extends EmbeddedComponentContainer> clazz, String... args) {
 	final FragmentQuery fragmentQuery = new FragmentQuery(clazz, args);
-	((EmbeddedWindow) getMainWindow()).open(fragmentQuery.getQueryString());
+	open(fragmentQuery.getQueryString());
+    }
+
+    public void open(String fragment) {
+	((EmbeddedWindow) getMainWindow()).open(fragment);
     }
 
     /**

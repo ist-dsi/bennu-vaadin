@@ -30,6 +30,7 @@ import jvstm.cps.ConsistencyException;
 import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
 import pt.ist.fenixframework.pstm.IllegalWriteException;
+import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 import pt.ist.vaadinframework.ui.layout.ControlsLayout;
@@ -37,7 +38,6 @@ import pt.ist.vaadinframework.ui.layout.ControlsLayout;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.terminal.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -47,7 +47,7 @@ import com.vaadin.ui.OptionGroup;
 
 public class TransactionalForm extends Form implements VaadinResourceConstants {
     public static interface Redirector {
-	public Resource redirectTo();
+	public String redirectTo();
     }
 
     private final ControlsLayout controls = new ControlsLayout();
@@ -56,9 +56,9 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 
     private Redirector cancelRedirectFactory;
 
-    private Resource successRedirect;
+    private String successRedirect;
 
-    private Resource cancelRedirect;
+    private String cancelRedirect;
 
     public TransactionalForm(ResourceBundle bundle) {
 	setFormFieldFactory(new DefaultFieldFactory(bundle));
@@ -96,11 +96,11 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
      * 
      * @param successRedirect resource to redirect to
      */
-    public void setSuccessRedirect(Resource successRedirect) {
+    public void setSuccessRedirect(String successRedirect) {
 	this.successRedirect = successRedirect;
     }
 
-    public Resource getSuccessRedirect() {
+    public String getSuccessRedirect() {
 	return successRedirect;
     }
 
@@ -109,11 +109,11 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
      * 
      * @param cancelRedirect resource to redirect to
      */
-    public void setCancelRedirect(Resource cancelRedirect) {
+    public void setCancelRedirect(String cancelRedirect) {
 	this.cancelRedirect = cancelRedirect;
     }
 
-    public Resource getCancelRedirect() {
+    public String getCancelRedirect() {
 	return cancelRedirect;
     }
 
@@ -301,13 +301,13 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 
 	    // No problems occurred
 	    if (problems == null) {
+		if (successRedirect != null) {
+		    EmbeddedApplication.open(getApplication(), successRedirect);
+		} else if (successRedirectFactory != null) {
+		    EmbeddedApplication.open(getApplication(), successRedirectFactory.redirectTo());
+		}
 		if (getWindow().isClosable() && getWindow().getParent() != null) {
 		    getWindow().getParent().removeWindow(getWindow());
-		}
-		if (successRedirect != null) {
-		    getWindow().open(successRedirect);
-		} else if (successRedirectFactory != null) {
-		    getWindow().open(successRedirectFactory.redirectTo());
 		}
 		// currentBufferedSourceException = null;
 		setComponentError(null);
@@ -352,9 +352,9 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    getWindow().getParent().removeWindow(getWindow());
 	}
 	if (cancelRedirect != null) {
-	    getWindow().open(cancelRedirect);
+	    EmbeddedApplication.open(getApplication(), cancelRedirect);
 	} else if (cancelRedirectFactory != null) {
-	    getWindow().open(cancelRedirectFactory.redirectTo());
+	    EmbeddedApplication.open(getApplication(), cancelRedirectFactory.redirectTo());
 	}
     }
 
