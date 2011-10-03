@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.fragment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +39,9 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
  * 
  */
-public class FragmentQuery {
+public class FragmentQuery implements Serializable {
     String path;
+
     Map<String, String> params;
 
     private void setParams(String query) {
@@ -77,13 +79,13 @@ public class FragmentQuery {
 	final String[] path = annotation.path();
 	final String[] args = annotation.args();
 
-	if ((args.length != values.length) || path.length != 1) {
+	if ((args.length < values.length) || path.length != 1) {
 	    throw new InvalidFragmentException("args don't match");
 	}
 
 	this.path = path[0];
 
-	for (int i = 0; i < args.length; i++) {
+	for (int i = 0; i < values.length; i++) {
 	    put(args[i], values[i]);
 	}
     }
