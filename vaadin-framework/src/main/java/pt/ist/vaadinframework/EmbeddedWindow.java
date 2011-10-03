@@ -49,9 +49,11 @@ public class EmbeddedWindow extends Window {
 
     private Class<? extends EmbeddedComponentContainer> currentType;
 
+    private String lastQuery = null;
+
     private FragmentQuery currentQuery;
 
-    private final Set<Class<? extends EmbeddedComponentContainer>> pages;
+    private Set<Class<? extends EmbeddedComponentContainer>> pages;
 
     public void setTypeForQuery() {
 	for (Class<? extends EmbeddedComponentContainer> page : pages) {
@@ -67,6 +69,13 @@ public class EmbeddedWindow extends Window {
 
     public void open(String fragment) {
 	fragmentUtility.setFragment(fragment);
+	lastQuery = fragment;
+    }
+
+    public void back() {
+	if (lastQuery != null) {
+	    open(lastQuery);
+	}
     }
 
     private void setFragment(String fragment) {
@@ -110,6 +119,7 @@ public class EmbeddedWindow extends Window {
 	    if (currentType != null && currentQuery != null) {
 		EmbeddedComponentContainer container = currentType.newInstance();
 		final Map<String, String> params = currentQuery.getParams();
+		container.setArguments(params);
 		container.setArguments(params);
 		getContent().addComponent(container);
 	    } else {

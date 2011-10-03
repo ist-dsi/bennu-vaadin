@@ -142,6 +142,14 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	((EmbeddedWindow) getMainWindow()).open(fragment);
     }
 
+    public void back() {
+	((EmbeddedWindow) getMainWindow()).back();
+    }
+
+    public static void back(Application application) {
+	((EmbeddedApplication) application).back();
+    }
+
     /**
      * @see com.vaadin.Application#getWindow(java.lang.String)
      */
@@ -177,9 +185,11 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      * {@link EmbeddedComponentContainer} using
      * {@link EmbeddedComponentContainer#setArguments(String...)}.
      * 
-     * @param pattern The compiled {@link Pattern} instance.
-     * @param type The container that will be instantiated if the pattern
-     *            matches the {@link EmbeddedApplication#VAADIN_PARAM}.
+     * @param pattern
+     *            The compiled {@link Pattern} instance.
+     * @param type
+     *            The container that will be instantiated if the pattern matches
+     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);
