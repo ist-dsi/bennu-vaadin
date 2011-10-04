@@ -86,7 +86,9 @@ public class FragmentQuery implements Serializable {
 	this.path = path[0];
 
 	for (int i = 0; i < values.length; i++) {
-	    put(args[i], values[i]);
+	    if (values[i] != null) {
+		put(args[i], values[i]);
+	    }
 	}
     }
 
