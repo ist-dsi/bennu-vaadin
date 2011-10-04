@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -24,8 +24,10 @@ package pt.ist.vaadinframework;
 import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotation;
 import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotationPath;
 
+import java.util.EmptyStackException;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
@@ -40,7 +42,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 /**
- * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt), Sérgio Silva
+ *         (sergio.silva@ist.utl.pt)
  */
 public class EmbeddedWindow extends Window {
     private final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
@@ -49,11 +52,11 @@ public class EmbeddedWindow extends Window {
 
     private Class<? extends EmbeddedComponentContainer> currentType;
 
-    private String lastQuery = null;
+    private final Stack<String> history = new Stack<String>();
 
     private FragmentQuery currentQuery;
 
-    private Set<Class<? extends EmbeddedComponentContainer>> pages;
+    private final Set<Class<? extends EmbeddedComponentContainer>> pages;
 
     public void setTypeForQuery() {
 	for (Class<? extends EmbeddedComponentContainer> page : pages) {
@@ -69,17 +72,18 @@ public class EmbeddedWindow extends Window {
 
     public void open(String fragment) {
 	fragmentUtility.setFragment(fragment);
-	lastQuery = fragment;
     }
 
     public void back() {
-	if (lastQuery != null) {
-	    open(lastQuery);
+	try {
+	    history.pop(); // consume current
+	    fragmentUtility.setFragment(history.pop());
+	} catch (EmptyStackException e) {
+	    // back fails quietly if no history is available
 	}
     }
 
     private void setFragment(String fragment) {
-
 	try {
 	    currentQuery = new FragmentQuery(fragment);
 	    setTypeForQuery();
@@ -87,7 +91,6 @@ public class EmbeddedWindow extends Window {
 	    VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
 	    currentQuery = null;
 	}
-
     }
 
     public EmbeddedWindow(Set<Class<? extends EmbeddedComponentContainer>> pages) {
@@ -99,6 +102,7 @@ public class EmbeddedWindow extends Window {
 	    @Override
 	    public void fragmentChanged(FragmentChangedEvent source) {
 		String fragment = source.getUriFragmentUtility().getFragment();
+		history.push(fragment);
 		setFragment("#" + fragment);
 		refreshContent();
 	    }
@@ -119,7 +123,6 @@ public class EmbeddedWindow extends Window {
 	    if (currentType != null && currentQuery != null) {
 		EmbeddedComponentContainer container = currentType.newInstance();
 		final Map<String, String> params = currentQuery.getParams();
-		container.setArguments(params);
 		container.setArguments(params);
 		getContent().addComponent(container);
 	    } else {
