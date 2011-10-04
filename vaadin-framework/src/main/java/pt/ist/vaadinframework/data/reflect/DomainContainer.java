@@ -22,17 +22,29 @@
 package pt.ist.vaadinframework.data.reflect;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
+import pt.ist.fenixframework.plugins.luceneIndexing.DomainIndexer;
+import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.BuildingState;
+import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.DSLState;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.BufferedContainer;
 import pt.ist.vaadinframework.data.HintedProperty;
+import pt.ist.vaadinframework.data.LuceneContainer;
 import pt.ist.vaadinframework.data.VBoxProperty;
 import pt.ist.vaadinframework.data.metamodel.MetaModel;
 import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 
 import com.vaadin.data.util.ItemSorter;
 
-public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, Object, DomainItem<Type>> {
+public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, Object, DomainItem<Type>>
+implements LuceneContainer {
+    private final int maxHits = 1000000;
+
     public DomainContainer(HintedProperty value, Class<? extends Type> elementType) {
 	super(value, elementType);
     }
@@ -57,9 +69,28 @@ public class DomainContainer<Type extends AbstractDomainObject> extends Buffered
 	    addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
 	}
     }
-    
+
     @Override
     public void setItemSorter(ItemSorter itemSorter) {
-        super.setItemSorter(itemSorter);
+	super.setItemSorter(itemSorter);
+    }
+
+    @Override
+    public void search(String filterText) {
+	removeAllItems();
+	final DSLState expr = createFilterExpression(filterText);
+	DateTime start = new DateTime();
+	final List<? extends AbstractDomainObject> searchResult = DomainIndexer.getInstance().search(getElementType(), expr,
+		maxHits);
+	DateTime check1 = new DateTime();
+	addItemBatch(searchResult);
+	DateTime check2 = new DateTime();
+	VaadinFrameworkLogger.getLogger().debug(
+		"container search: " + expr.toString() + " took: " + new Interval(start, check1).toDuration() + " "
+			+ new Interval(check1, check2).toDuration() + "(" + new Interval(start, check2).toDuration() + ")");
+    }
+
+    protected DSLState createFilterExpression(String filterText) {
+	return new BuildingState().matches(filterText);
     }
 }
