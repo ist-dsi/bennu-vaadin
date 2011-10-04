@@ -148,7 +148,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     }
 
     protected Object getPropertyValue(PropertyId propertyId) {
-	if (isReadThrough() && !isModified()) {
+	if (isReadThrough() && !propertyValues.containsKey(propertyId)) {
 	    Type value = getValue();
 	    propertyValues.put(propertyId, value == null ? null : readPropertyValue(value, propertyId));
 	}
