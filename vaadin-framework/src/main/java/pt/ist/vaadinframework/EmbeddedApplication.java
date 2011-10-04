@@ -5,9 +5,9 @@
  * 
  *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework Infrastructure is free software: you can 
- *   redistribute it and/or modify it under the terms of the GNU Lesser General 
- *   Public License as published by the Free Software Foundation, either version 
+ *   The vaadin-framework Infrastructure is free software: you can
+ *   redistribute it and/or modify it under the terms of the GNU Lesser General
+ *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
  *   vaadin-framework is distributed in the hope that it will be useful,
@@ -164,7 +164,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    // Use the random name given by the framework to identify this
 	    // window in future
 	    window.setName(name);
-	    // addWindow(window);
+	    addWindow(window);
 
 	    // Move to the url to remember the name in the future
 	    // window.open(new ExternalResource(window.getURL()));
