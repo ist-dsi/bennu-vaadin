@@ -99,3 +99,7 @@
 	padding-left: 6px;
 	padding-top: 6px;
 }
+
+.v-table-cell-wrapper {
+    white-space: normal;
+}
