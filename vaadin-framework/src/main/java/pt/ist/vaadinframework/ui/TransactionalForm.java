@@ -33,6 +33,7 @@ import pt.ist.fenixframework.pstm.IllegalWriteException;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
+import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.ui.layout.ControlsLayout;
 
 import com.vaadin.data.Buffered;
@@ -46,19 +47,15 @@ import com.vaadin.ui.Form;
 import com.vaadin.ui.OptionGroup;
 
 public class TransactionalForm extends Form implements VaadinResourceConstants {
-    public static interface Redirector {
-	public String redirectTo();
-    }
-
     private final ControlsLayout controls = new ControlsLayout();
 
     private Redirector successRedirectFactory;
 
     private Redirector cancelRedirectFactory;
 
-    private String successRedirect;
+    private FragmentQuery successRedirect;
 
-    private String cancelRedirect;
+    private FragmentQuery cancelRedirect;
 
     public TransactionalForm(ResourceBundle bundle) {
 	setFormFieldFactory(new DefaultFieldFactory(bundle));
@@ -68,7 +65,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after successful commit of the form
      * 
-     * @param successRedirectFactory redirector instance
+     * @param successRedirectFactory
+     *            redirector instance
      */
     public void setSuccessRedirectFactory(Redirector successRedirectFactory) {
 	this.successRedirectFactory = successRedirectFactory;
@@ -81,7 +79,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after form cancel
      * 
-     * @param cancelRedirectFactory redirector instance
+     * @param cancelRedirectFactory
+     *            redirector instance
      */
     public void setCancelRedirectFactory(Redirector cancelRedirectFactory) {
 	this.cancelRedirectFactory = cancelRedirectFactory;
@@ -94,26 +93,28 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after successful commit of the form
      * 
-     * @param successRedirect resource to redirect to
+     * @param successRedirect
+     *            resource to redirect to
      */
-    public void setSuccessRedirect(String successRedirect) {
+    public void setSuccessRedirect(FragmentQuery successRedirect) {
 	this.successRedirect = successRedirect;
     }
 
-    public String getSuccessRedirect() {
+    public FragmentQuery getSuccessRedirect() {
 	return successRedirect;
     }
 
     /**
      * Page to redirect to after form cancel
      * 
-     * @param cancelRedirect resource to redirect to
+     * @param cancelRedirect
+     *            resource to redirect to
      */
-    public void setCancelRedirect(String cancelRedirect) {
+    public void setCancelRedirect(FragmentQuery cancelRedirect) {
 	this.cancelRedirect = cancelRedirect;
     }
 
-    public String getCancelRedirect() {
+    public FragmentQuery getCancelRedirect() {
 	return cancelRedirect;
     }
 
@@ -302,11 +303,10 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    // No problems occurred
 	    if (problems == null) {
 		if (successRedirect != null) {
-		    EmbeddedApplication.open(getApplication(), successRedirect);
+		    EmbeddedApplication.open(getApplication(), successRedirect.getQueryString());
 		} else if (successRedirectFactory != null) {
-		    EmbeddedApplication.open(getApplication(), successRedirectFactory.redirectTo());
-		}
-		if (getWindow().isClosable() && getWindow().getParent() != null) {
+		    successRedirectFactory.redirect();
+		} else if (getWindow().isClosable() && getWindow().getParent() != null) {
 		    getWindow().getParent().removeWindow(getWindow());
 		}
 		// currentBufferedSourceException = null;
@@ -352,9 +352,9 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    getWindow().getParent().removeWindow(getWindow());
 	}
 	if (cancelRedirect != null) {
-	    EmbeddedApplication.open(getApplication(), cancelRedirect);
+	    EmbeddedApplication.open(getApplication(), cancelRedirect.getQueryString());
 	} else if (cancelRedirectFactory != null) {
-	    EmbeddedApplication.open(getApplication(), cancelRedirectFactory.redirectTo());
+	    cancelRedirectFactory.redirect();
 	}
     }
 
