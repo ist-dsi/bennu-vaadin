@@ -94,22 +94,22 @@ Container.PropertySetChangeNotifier {
 	    @Override
 	    public void valueChange(ValueChangeEvent event) {
 		discard();
-//		discard((Collection<ItemId>)event.getProperty().getValue());
+		// discard((Collection<ItemId>)event.getProperty().getValue());
 	    }
 	});
     }
 
-//    private void discard(Collection<ItemId> newPropertyValues) {
-//	final Collection<ItemId> oldItems = (Collection<ItemId>) getItemIds();
-//	
-//	//remove items that are no longer present
-//	for(ItemId oldItem : oldItems) {
-//	    if (!newPropertyValues.contains(oldItem)) {
-//		removeItem(oldItem);
-//	    }
-//	}
-//    }
-    
+    // private void discard(Collection<ItemId> newPropertyValues) {
+    // final Collection<ItemId> oldItems = (Collection<ItemId>) getItemIds();
+    //
+    // //remove items that are no longer present
+    // for(ItemId oldItem : oldItems) {
+    // if (!newPropertyValues.contains(oldItem)) {
+    // removeItem(oldItem);
+    // }
+    // }
+    // }
+
     @Service
     private void initVBox() {
 	this.disableCommitPropagation = new VBox<Boolean>(false);
@@ -244,7 +244,7 @@ Container.PropertySetChangeNotifier {
 	final Collection<ItemId> newItemIds = new ArrayList<ItemId>(getValue());
 
 	if (oldItemIds != null && newItemIds != null) {
-	    
+
 	    for (ItemId itemId : oldItemIds) {
 		if (!newItemIds.contains(itemId)) {
 		    internalRemoveItem(itemId);
@@ -258,7 +258,7 @@ Container.PropertySetChangeNotifier {
 	    }
 
 	    for (ItemId itemId : newItemIds) {
-		    addItem(itemId);
+		addItem(itemId);
 	    }
 	}
 	modified = false;
@@ -563,7 +563,7 @@ Container.PropertySetChangeNotifier {
 	    BufferedItem<PropertyId, ItemId> buffered = (BufferedItem<PropertyId, ItemId>) item;
 	    buffered.setConstructor(constructor);
 	    buffered.setWriter(writer);
-//	    buffered.setWriteThrough(writeThrough);
+	    // buffered.setWriteThrough(writeThrough);
 	    buffered.setReadThrough(readThrough);
 	    buffered.setInvalidAllowed(invalidAllowed);
 	    buffered.setInvalidCommitted(invalidCommited);
@@ -597,6 +597,13 @@ Container.PropertySetChangeNotifier {
 
     public Item addItem(Class<? extends ItemId> type) {
 	return addItem(new VBoxProperty(type));
+    }
+
+    @Service
+    public void addItemBatch(Collection<?> itemIds) {
+	for (Object itemId : itemIds) {
+	    addItem(itemId);
+	}
     }
 
     @Override
