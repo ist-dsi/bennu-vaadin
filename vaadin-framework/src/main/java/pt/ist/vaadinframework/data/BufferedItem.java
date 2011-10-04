@@ -125,7 +125,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
     private boolean invalidCommited = false;
 
-    private boolean modified = false;
+    protected boolean modified = false;
 
     private List<Validator> validators;
 
