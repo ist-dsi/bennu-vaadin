@@ -23,6 +23,7 @@ package pt.ist.vaadinframework.fragment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -119,7 +120,7 @@ public class FragmentQuery implements Serializable {
     }
 
     public Map<String, String> getParams() {
-	return params;
+	return params != null ? params : Collections.EMPTY_MAP;
     }
 
     public String getQueryString() {
