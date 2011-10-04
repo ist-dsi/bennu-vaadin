@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 
@@ -350,6 +351,7 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
 	    refreshComponents(event.getContainer());
 	}
 
+	@Service
 	private void refreshComponents(Container container) {
 	    removeAllComponents();
 	    if (groupPropertyId != null) {
