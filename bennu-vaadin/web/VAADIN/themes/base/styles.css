@@ -1,19 +1,19 @@
 @import url(../reindeer/styles.css);
 
-.float-right {
-	float: right;
-}
-
-.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell,
-.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
-.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
-	padding-top: 0px;
+.v-panel-caption {
+    white-space: normal;
 }
 
 .v-generated-body, .v-app {
 	background: none repeat scroll 0 0 #FFFFFF;
 }
 
+
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell,
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
+	padding-top: 0px;
+}
 
 .flow .v-csslayout-margin,.v-csslayout-margin-top,.v-csslayout-margin-right,.v-csslayout-margin-bottom,.v-csslayout-margin-left {
 	padding: 4px;
@@ -29,10 +29,6 @@
 .flow-part *, .flow-separator * {
 	display: inline !important;
 	white-space: normal;
-}
-
-.v-panel-caption {
-    white-space: normal;
 }
 
 .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell, 
@@ -68,38 +64,27 @@
     padding-right: 12px;
 }
 
-.v-form-wide table tr {
+/* BennuTheme.WIDE_FORM */
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr {
     border-bottom: 1px solid #DDDDDD;
     border-top: 1px solid #DDDDDD;
-    text-align: left;
     vertical-align: top;
 }
 
-.v-gridlayout-complexFormField {
-    background: whiteSmoke;
+/* BennuTheme.TABLE_CLEAR */
+.v-table-clear .v-table-row-odd {
+	background: none;
 }
 
-.v-gridlayout-complexFormField .v-gridlayout-margin-top {
-	padding-top: 10px;
-}
-
-.v-gridlayout-complexFormField .v-gridlayout-margin-bottom {
-	padding-bottom: 10px;
-}
-
-.v-gridlayout-complexFormField .v-gridlayout-margin-left {
-	padding-left: 10px;
-} 
-
-.v-gridlayout-complexFormField .v-gridlayout-margin-right {
-	padding-right: 10px;
-}
-
-.v-gridlayout-complexFormField .v-gridlayout-spacing-on {
-	padding-left: 6px;
-	padding-top: 6px;
-}
-
-.v-table-cell-wrapper {
+.v-table-clear .v-table-cell-wrapper {
     white-space: normal;
+}
+
+.v-table-clear .v-table-body-noselection {
+	height: auto !important;
+}
+
+/* Reindeer.TABLE_BORDERLESS */
+.v-table-borderless .v-table-cell-content {
+	border-right: none;
 }
