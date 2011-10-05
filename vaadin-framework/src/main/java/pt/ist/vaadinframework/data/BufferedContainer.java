@@ -127,6 +127,11 @@ Container.PropertySetChangeNotifier {
     }
 
     @Override
+    public void addHint(Hint hint) {
+	value.addHint(hint);
+    }
+
+    @Override
     public Collection<Hint> getHints() {
 	return value.getHints();
     }

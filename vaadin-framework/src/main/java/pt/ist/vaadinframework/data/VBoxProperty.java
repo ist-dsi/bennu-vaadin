@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,18 +37,18 @@ public class VBoxProperty extends AbstractProperty implements HintedProperty {
 
     private final Class<?> type;
 
-    private final Collection<Hint> hints;
+    private Collection<Hint> hints;
 
     public VBoxProperty(Object instance, Hint... hints) {
 	writeVBox(instance);
 	this.type = instance.getClass();
-	this.hints = Arrays.asList(hints);
+	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
     }
 
     public VBoxProperty(Class<?> type, Hint... hints) {
 	writeVBox(null);
 	this.type = type;
-	this.hints = Arrays.asList(hints);
+	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
     }
 
     @Service
@@ -71,8 +72,19 @@ public class VBoxProperty extends AbstractProperty implements HintedProperty {
     }
 
     @Override
+    public void addHint(Hint hint) {
+	if (hints == null) {
+	    hints = new ArrayList<Hint>();
+	}
+	hints.add(hint);
+    }
+
+    @Override
     public Collection<Hint> getHints() {
-	return Collections.unmodifiableCollection(hints);
+	if (hints != null) {
+	    return Collections.unmodifiableCollection(hints);
+	}
+	return Collections.emptyList();
     }
 
     @Override

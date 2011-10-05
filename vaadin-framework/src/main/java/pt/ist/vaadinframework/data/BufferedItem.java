@@ -63,10 +63,10 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
 	protected Class<?> type;
 
-	private final Collection<Hint> hints;
+	private Collection<Hint> hints;
 
 	public BufferedProperty(PropertyId propertyId, Class<?> type, Hint... hints) {
-	    this(propertyId, type, Arrays.asList(hints));
+	    this(propertyId, type, new ArrayList<Hint>(Arrays.asList(hints)));
 	}
 
 	public BufferedProperty(PropertyId propertyId, Class<?> type, Collection<Hint> hints) {
@@ -90,8 +90,19 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	}
 
 	@Override
+	public void addHint(Hint hint) {
+	    if (hints == null) {
+		hints = new ArrayList<Hint>();
+	    }
+	    hints.add(hint);
+	}
+
+	@Override
 	public Collection<Hint> getHints() {
-	    return Collections.unmodifiableCollection(hints);
+	    if (hints != null) {
+		return Collections.unmodifiableCollection(hints);
+	    }
+	    return Collections.emptyList();
 	}
 
 	@Override
@@ -207,6 +218,11 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     @Override
     public void setReadOnly(boolean newStatus) {
 	value.setReadOnly(newStatus);
+    }
+
+    @Override
+    public void addHint(Hint hint) {
+	value.addHint(hint);
     }
 
     @Override

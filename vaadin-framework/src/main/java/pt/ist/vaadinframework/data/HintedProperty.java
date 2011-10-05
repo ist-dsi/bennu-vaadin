@@ -35,5 +35,7 @@ public interface HintedProperty extends Property, ValueChangeNotifier, ReadOnlyS
 	public boolean appliesTo(Field field);
     }
 
+    public void addHint(Hint hint);
+
     public Collection<Hint> getHints();
 }
