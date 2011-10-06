@@ -57,7 +57,7 @@ import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.data.util.ObjectProperty;
 
 public abstract class BufferedItem<PropertyId, Type> implements Item, Item.PropertySetChangeNotifier, Property, HintedProperty,
-BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
+	BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier {
     public class BufferedProperty extends AbstractProperty implements HintedProperty {
 	private final PropertyId propertyId;
 
@@ -170,8 +170,10 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * Access method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host instance of the object mapped in the {@link Item}
-     * @param propertyId id of the property.
+     * @param host
+     *            instance of the object mapped in the {@link Item}
+     * @param propertyId
+     *            id of the property.
      * @return the value of the property in the host object.
      */
     protected abstract Object readPropertyValue(Type host, PropertyId propertyId);
@@ -189,9 +191,12 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * Write method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host instance of the object mapped in the {@link Item}
-     * @param propertyId id of the property.
-     * @param newValue the new value of the property in the host object.
+     * @param host
+     *            instance of the object mapped in the {@link Item}
+     * @param propertyId
+     *            id of the property.
+     * @param newValue
+     *            the new value of the property in the host object.
      */
     protected abstract void writePropertyValue(Type host, PropertyId propertyId, Object newValue);
 
@@ -348,7 +353,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
      * ensure that the returned properties are of {@link BufferedProperty}s or
      * {@link Item}s or {@link Collection}s over {@link BufferedProperty}s.
      * 
-     * @param propertyId The key of the property.
+     * @param propertyId
+     *            The key of the property.
      * @return A {@link Property} instance.
      */
     protected abstract Property makeProperty(PropertyId propertyId);
@@ -460,7 +466,7 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 
 		if ((current == null && old != null) || (current != null && !current.equals(old))) {
 		    VaadinFrameworkLogger.getLogger()
-		    .debug("persisting item property: " + propertyId + " with value: " + current);
+			    .debug("persisting item property: " + propertyId + " with value: " + current);
 		    writePropertyValue(getValue(), propertyId, current);
 		}
 	    } catch (Throwable e) {
@@ -581,11 +587,11 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
 	Type value = getValue();
 	for (PropertyId propertyId : getItemPropertyIds()) {
 	    final Property itemProperty = getItemProperty(propertyId);
+	    propertyValues.put(propertyId, value == null ? (itemProperty.getType().equals(Boolean.class) ? Boolean.FALSE : null)
+		    : readPropertyValue(value, propertyId));
 	    if (itemProperty instanceof Buffered) {
 		((Buffered) itemProperty).discard();
 	    }
-	    propertyValues.put(propertyId, value == null ? (itemProperty.getType().equals(Boolean.class) ? Boolean.FALSE : null)
-		    : readPropertyValue(value, propertyId));
 	}
 	modified = false;
     }
@@ -729,7 +735,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     /**
      * Registers a new property set change listener for this Item.
      * 
-     * @param listener the new Listener to be registered.
+     * @param listener
+     *            the new Listener to be registered.
      */
     @Override
     public void addListener(Item.PropertySetChangeListener listener) {
@@ -742,7 +749,8 @@ BufferedValidatable, Property.ReadOnlyStatusChangeNotifier, Property.ValueChange
     /**
      * Removes a previously registered property set change listener.
      * 
-     * @param listener the Listener to be removed.
+     * @param listener
+     *            the Listener to be removed.
      */
     @Override
     public void removeListener(Item.PropertySetChangeListener listener) {
