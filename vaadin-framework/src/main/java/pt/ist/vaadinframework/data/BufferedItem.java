@@ -170,10 +170,8 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
      * Access method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host
-     *            instance of the object mapped in the {@link Item}
-     * @param propertyId
-     *            id of the property.
+     * @param host instance of the object mapped in the {@link Item}
+     * @param propertyId id of the property.
      * @return the value of the property in the host object.
      */
     protected abstract Object readPropertyValue(Type host, PropertyId propertyId);
@@ -191,12 +189,9 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
      * Write method for the value of the property with the specified id in the
      * value of the item.
      * 
-     * @param host
-     *            instance of the object mapped in the {@link Item}
-     * @param propertyId
-     *            id of the property.
-     * @param newValue
-     *            the new value of the property in the host object.
+     * @param host instance of the object mapped in the {@link Item}
+     * @param propertyId id of the property.
+     * @param newValue the new value of the property in the host object.
      */
     protected abstract void writePropertyValue(Type host, PropertyId propertyId, Object newValue);
 
@@ -353,8 +348,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
      * ensure that the returned properties are of {@link BufferedProperty}s or
      * {@link Item}s or {@link Collection}s over {@link BufferedProperty}s.
      * 
-     * @param propertyId
-     *            The key of the property.
+     * @param propertyId The key of the property.
      * @return A {@link Property} instance.
      */
     protected abstract Property makeProperty(PropertyId propertyId);
@@ -365,7 +359,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
     }
 
     @Service
-    private void commit(Collection<PropertyId> savingPropertyIds) throws SourceException, InvalidValueException {
+    protected void commit(Collection<PropertyId> savingPropertyIds) throws SourceException, InvalidValueException {
 	this.value.removeListener(innerPropertyChangeListener);
 	final LinkedList<Throwable> problems = new LinkedList<Throwable>();
 	final LinkedList<PropertyId> savingIds = new LinkedList<PropertyId>(savingPropertyIds);
@@ -530,7 +524,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
 		    match = false;
 		    break;
 		}
-		if (!mTypes[i].isAssignableFrom(types[i])) {
+		if (!mTypes[i].isAssignableFrom(Object.class) && !mTypes[i].isAssignableFrom(types[i])) {
 		    match = false;
 		    break;
 		}
@@ -735,8 +729,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
     /**
      * Registers a new property set change listener for this Item.
      * 
-     * @param listener
-     *            the new Listener to be registered.
+     * @param listener the new Listener to be registered.
      */
     @Override
     public void addListener(Item.PropertySetChangeListener listener) {
@@ -749,8 +742,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
     /**
      * Removes a previously registered property set change listener.
      * 
-     * @param listener
-     *            the Listener to be removed.
+     * @param listener the Listener to be removed.
      */
     @Override
     public void removeListener(Item.PropertySetChangeListener listener) {
