@@ -43,9 +43,9 @@ import com.vaadin.data.util.AbstractInMemoryContainer;
 import com.vaadin.data.util.filter.UnsupportedFilterException;
 
 public abstract class BufferedContainer<ItemId, PropertyId, ItemType extends Item> extends
-AbstractInMemoryContainer<Object, PropertyId, ItemType> implements Property, HintedProperty, BufferedValidatable,
-Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
-Container.PropertySetChangeNotifier {
+	AbstractInMemoryContainer<Object, PropertyId, ItemType> implements Property, HintedProperty, BufferedValidatable,
+	Property.ReadOnlyStatusChangeNotifier, Property.ValueChangeNotifier, Container.Sortable, Container.Filterable,
+	Container.PropertySetChangeNotifier {
     private final HintedProperty value;
 
     private final List<PropertyId> propertyIds = new ArrayList<PropertyId>();
@@ -93,7 +93,9 @@ Container.PropertySetChangeNotifier {
 	value.addListener(new ValueChangeListener() {
 	    @Override
 	    public void valueChange(ValueChangeEvent event) {
-		discard();
+		if (!disableCommitPropagation.get()) {
+		    discard();
+		}
 		// discard((Collection<ItemId>)event.getProperty().getValue());
 	    }
 	});
