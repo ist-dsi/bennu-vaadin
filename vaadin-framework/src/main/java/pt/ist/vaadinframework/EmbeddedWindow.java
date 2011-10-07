@@ -111,6 +111,8 @@ public class EmbeddedWindow extends Window {
 	addListener(new CloseListener() {
 	    @Override
 	    public void windowClose(CloseEvent e) {
+		getContent().removeAllComponents();
+		getContent().addComponent(fragmentUtility);
 		System.out.println("Closing embedded window!:" + e.getWindow().getName());
 	    }
 	});
