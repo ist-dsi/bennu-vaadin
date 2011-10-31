@@ -71,6 +71,10 @@
     vertical-align: top;
 }
 
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr > td > .v-caption {
+    text-align: left;
+}
+
 /* BennuTheme.TABLE_CLEAR */
 .v-table-clear .v-table-row-odd {
 	background: none;
