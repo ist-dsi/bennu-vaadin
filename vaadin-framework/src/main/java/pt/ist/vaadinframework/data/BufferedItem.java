@@ -120,7 +120,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
 
     private final LinkedList<PropertyId> list = new LinkedList<PropertyId>();
 
-    private final HashMap<Object, Property> map = new HashMap<Object, Property>();
+    protected final HashMap<Object, HintedProperty> map = new HashMap<Object, HintedProperty>();
 
     private final Map<Object, Object> propertyValues = new HashMap<Object, Object>();
 
@@ -279,7 +279,7 @@ public abstract class BufferedItem<PropertyId, Type> implements Item, Item.Prope
 	}
 
 	// Put the property to map
-	map.put(propertyId, property);
+	map.put(propertyId, (HintedProperty) property);
 	list.add((PropertyId) propertyId);
 
 	Type value = getValue();
