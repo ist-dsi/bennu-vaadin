@@ -134,7 +134,8 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
 			String filePath = fileset.getDir().getAbsolutePath() + "/" + includedFile;
 			File file = new File(filePath);
 			boolean isModified = file.lastModified() > latestBuildTime;
-			System.out.println(includedFile + " : " + (isModified ? "not up to date" : "up to date"));
+			// System.out.println(includedFile + " : " + (isModified
+			// ? "not up to date" : "up to date"));
 			domainModelURLs.add(new File(filePath).toURI().toURL());
 			shouldCompile = shouldCompile || isModified;
 		    }
@@ -155,6 +156,8 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
 	} catch (ANTLRException e) {
 	    throw new BuildException(e);
 	} catch (JClassAlreadyExistsException e) {
+	    throw new BuildException(e);
+	} catch (ClassNotFoundException e) {
 	    throw new BuildException(e);
 	}
     }
