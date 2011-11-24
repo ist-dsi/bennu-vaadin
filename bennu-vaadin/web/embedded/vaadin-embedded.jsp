@@ -24,4 +24,4 @@ setTimeout('if (typeof pt_ist_bennu_widgetset_BennuWidgetSet == "undefined") {al
 //]]>
 </script>
 
-<div id="vaadin" class="<%= "v-app v-theme-" + theme + " v-app-EmbeddedApplication" %>" />
+<div id="vaadin" class="<%= "v-app v-theme-" + theme + " v-app-EmbeddedApplication" %>" ></div>
