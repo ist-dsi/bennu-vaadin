@@ -1,4 +1,4 @@
-@import url(../reindeer/styles.css);
+@import url(../chameleon/styles.css);
 
 .v-panel-caption {
     white-space: normal;
@@ -63,6 +63,18 @@
 .v-formlayout-margin-right .v-formlayout-contentcell {
     padding-right: 12px;
 }
+
+/* BennuTheme.WRAP */
+.text-wrap {
+	white-space: normal;
+}
+
+/*
+.text-wrap .v-button-wrap,
+.text-wrap .v-button-caption {
+	white-space: normal;
+}
+*/
 
 /* BennuTheme.WIDE_FORM */
 .v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr {

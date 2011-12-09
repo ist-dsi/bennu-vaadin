@@ -6,4 +6,6 @@ public class BennuTheme extends BennuConstants {
     public static final String WIDE_FORM = "wide";
 
     public static final String TABLE_CLEAR = TABLE_BORDERLESS + " clear";
+
+    public static final String WRAP = "text-wrap";
 }
