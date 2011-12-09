@@ -15,7 +15,7 @@ if(!vaadin || !vaadin.vaadinConfigurations) {
 	document.write('<iframe tabIndex="-1" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0;overflow:hidden;" src="javascript:false"></iframe>');
 	document.write("<script language='javascript' src='<%= request.getContextPath()%>/VAADIN/widgetsets/pt.ist.bennu.widgetset.BennuWidgetSet/pt.ist.bennu.widgetset.BennuWidgetSet.nocache.js'><\/script>");
 }
-vaadin.vaadinConfigurations["vaadin"] = {appUri:'<%= request.getContextPath() + "/vaadin"%>', themeUri:"<%= request.getContextPath() + "/VAADIN/themes/" + theme %>", versionInfo : {vaadinVersion:"6.5.2",applicationVersion:"NONVERSIONED"}};
+vaadin.vaadinConfigurations["vaadin"] = {appUri:'<%= request.getContextPath() + "/vaadin"%>', themeUri:"<%= request.getContextPath() + "/VAADIN/themes/" + theme %>", versionInfo : {vaadinVersion:"6.7.2",applicationVersion:"NONVERSIONED"}};
 //]]>
 </script>
 <script type="text/javascript">
