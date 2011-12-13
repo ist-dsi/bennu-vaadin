@@ -30,8 +30,6 @@ import com.vaadin.ui.Label;
  * 
  */
 public class FlowLayout extends CssLayout {
-    private static final long serialVersionUID = 3515741439654516552L;
-
     private String separator;
 
     public FlowLayout() {

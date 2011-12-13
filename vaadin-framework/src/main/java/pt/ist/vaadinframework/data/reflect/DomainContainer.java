@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.data.reflect;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,34 +33,38 @@ import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.BuildingSta
 import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.DSLState;
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
-import pt.ist.vaadinframework.data.BufferedContainer;
-import pt.ist.vaadinframework.data.HintedProperty;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.data.LuceneContainer;
-import pt.ist.vaadinframework.data.VBoxProperty;
 import pt.ist.vaadinframework.data.metamodel.MetaModel;
 import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.ItemSorter;
 
-public class DomainContainer<Type extends AbstractDomainObject> extends BufferedContainer<Type, Object, DomainItem<Type>>
-implements LuceneContainer {
+public class DomainContainer<Type extends AbstractDomainObject> extends AbstractBufferedContainer<Type, Object, DomainItem<Type>>
+	implements LuceneContainer {
     private final int maxHits = 1000000;
 
-    public DomainContainer(HintedProperty value, Class<? extends Type> elementType) {
-	super(value, elementType);
+    public DomainContainer(Property wrapped, Class<? extends Type> elementType, Hint... hints) {
+	super(wrapped, elementType, hints);
     }
 
-    public DomainContainer(Class<? extends Type> elementType) {
-	super(new VBoxProperty(Collection.class), elementType);
+    public DomainContainer(Class<? extends Type> elementType, Hint... hints) {
+	super(elementType, hints);
     }
 
-    public DomainContainer(Collection<? extends Type> elements, Class<? extends Type> elementType) {
-	super(new VBoxProperty(elements), elementType);
+    public DomainContainer(Collection<Type> elements, Class<? extends Type> elementType, Hint... hints) {
+	super(new ArrayList<Type>(elements), elementType, hints);
     }
 
     @Override
-    public DomainItem<Type> makeItem(HintedProperty itemId) {
+    protected DomainItem<Type> makeItem(Type itemId) {
 	return new DomainItem<Type>(itemId);
+    }
+
+    @Override
+    protected DomainItem<Type> makeItem(Class<? extends Type> type) {
+	return new DomainItem<Type>(type);
     }
 
     public void setContainerProperties(String... propertyIds) {
@@ -80,8 +85,7 @@ implements LuceneContainer {
 	removeAllItems();
 	final DSLState expr = createFilterExpression(filterText);
 	DateTime start = new DateTime();
-	final List<? extends AbstractDomainObject> searchResult = DomainIndexer.getInstance().search(getElementType(), expr,
-		maxHits);
+	final List<Type> searchResult = (List<Type>) DomainIndexer.getInstance().search(getElementType(), expr, maxHits);
 	DateTime check1 = new DateTime();
 	addItemBatch(searchResult);
 	DateTime check2 = new DateTime();

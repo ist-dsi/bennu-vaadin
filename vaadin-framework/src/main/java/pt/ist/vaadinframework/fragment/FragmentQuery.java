@@ -80,7 +80,7 @@ public class FragmentQuery implements Serializable {
 	final String[] path = annotation.path();
 	final String[] args = annotation.args();
 
-	if ((args.length < values.length) || path.length != 1) {
+	if (args.length < values.length || path.length != 1) {
 	    throw new InvalidFragmentException("args don't match");
 	}
 

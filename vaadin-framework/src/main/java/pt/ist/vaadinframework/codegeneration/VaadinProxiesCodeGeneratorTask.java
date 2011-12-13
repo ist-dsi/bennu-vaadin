@@ -3,20 +3,20 @@
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
- *   This file is part of the vaadin-framework-ant.
+ *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework-ant Infrastructure is free software: you can 
+ *   The vaadin-framework Infrastructure is free software: you can 
  *   redistribute it and/or modify it under the terms of the GNU Lesser General 
  *   Public License as published by the Free Software Foundation, either version 
  *   3 of the License, or (at your option) any later version.*
  *
- *   vaadin-framework-ant is distributed in the hope that it will be useful,
+ *   vaadin-framework is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *   GNU Lesser General Public License for more details.
  *
  *   You should have received a copy of the GNU Lesser General Public License
- *   along with vaadin-framework-ant. If not, see <http://www.gnu.org/licenses/>.
+ *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 package pt.ist.vaadinframework.codegeneration;
@@ -34,6 +34,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import pt.ist.fenixframework.FenixFrameworkPlugin;
 import pt.ist.fenixframework.pstm.DML;
@@ -51,6 +55,8 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
     private File srcBaseDir;
 
     private File buildDir;
+
+    private File packageSourceLocations;
 
     private String vaadinSrcDir;
 
@@ -72,6 +78,14 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
 	this.buildDir = buildDir;
     }
 
+    public File getPackageSourceLocations() {
+	return packageSourceLocations;
+    }
+
+    public void setPackageSourceLocations(File packageSourceLocations) {
+	this.packageSourceLocations = packageSourceLocations;
+    }
+
     public String getVaadinSrcDir() {
 	return vaadinSrcDir;
     }
@@ -88,6 +102,7 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
     public void execute() throws BuildException {
 	super.execute();
 
+	DateTime start = new DateTime();
 	final Properties properties = new MultiProperty();
 	try {
 	    properties.load(new FileInputStream(buildDir.getAbsolutePath() + "/WEB-INF/classes/configuration.properties"));
@@ -144,7 +159,8 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
 
 	    // first, get the domain model
 	    FenixDomainModel model = DML.getDomainModelForURLs(FenixDomainModel.class, domainModelURLs, false);
-	    VaadinProxiesCodeGenerator generator = new VaadinProxiesCodeGenerator(model, srcBaseDir, vaadinSrcDir);
+	    VaadinProxiesCodeGenerator generator = new VaadinProxiesCodeGenerator(model, srcBaseDir, vaadinSrcDir,
+		    packageSourceLocations);
 	    generator.generate();
 	    timestampFile.delete();
 	    timestampFile.createNewFile();
@@ -157,9 +173,11 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
 	    throw new BuildException(e);
 	} catch (JClassAlreadyExistsException e) {
 	    throw new BuildException(e);
-	} catch (ClassNotFoundException e) {
-	    throw new BuildException(e);
 	}
+	Duration processingTime = new Duration(start, new DateTime());
+	PeriodFormatter formatter = new PeriodFormatterBuilder().appendMinutes().appendSuffix("m").appendSeconds()
+		.appendSuffix("s").toFormatter();
+	System.out.println("Vaadin Generation Took: " + formatter.print(processingTime.toPeriod()));
     }
 
     private FenixFrameworkPlugin[] getPluginArray(Properties properties) {

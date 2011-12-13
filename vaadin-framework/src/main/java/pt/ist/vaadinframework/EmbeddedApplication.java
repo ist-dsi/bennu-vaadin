@@ -185,11 +185,9 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      * {@link EmbeddedComponentContainer} using
      * {@link EmbeddedComponentContainer#setArguments(String...)}.
      * 
-     * @param pattern
-     *            The compiled {@link Pattern} instance.
-     * @param type
-     *            The container that will be instantiated if the pattern matches
-     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
+     * @param pattern The compiled {@link Pattern} instance.
+     * @param type The container that will be instantiated if the pattern
+     *            matches the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);

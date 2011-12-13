@@ -3,20 +3,20 @@
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
- *   This file is part of the vaadin-framework-ant.
+ *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework-ant Infrastructure is free software: you can 
+ *   The vaadin-framework Infrastructure is free software: you can 
  *   redistribute it and/or modify it under the terms of the GNU Lesser General 
  *   Public License as published by the Free Software Foundation, either version 
  *   3 of the License, or (at your option) any later version.*
  *
- *   vaadin-framework-ant is distributed in the hope that it will be useful,
+ *   vaadin-framework is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *   GNU Lesser General Public License for more details.
  *
  *   You should have received a copy of the GNU Lesser General Public License
- *   along with vaadin-framework-ant. If not, see <http://www.gnu.org/licenses/>.
+ *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 
@@ -24,41 +24,42 @@ package pt.ist.vaadinframework.codegeneration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
-import pt.ist.vaadinframework.data.BufferedItem.BufferedProperty;
-import pt.ist.vaadinframework.data.HintedProperty;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
+import pt.ist.vaadinframework.data.AbstractBufferedItem;
+import pt.ist.vaadinframework.data.BufferedProperty;
+import pt.ist.vaadinframework.data.HintedProperty.Hint;
 import pt.ist.vaadinframework.data.PropertyId;
-import pt.ist.vaadinframework.data.VBoxProperty;
 import pt.ist.vaadinframework.data.hints.Required;
-import pt.ist.vaadinframework.data.reflect.DomainContainer;
-import pt.ist.vaadinframework.data.reflect.DomainItem;
 
-import com.sun.codemodel.JBlock;
+import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JPackage;
+import com.sun.codemodel.JType;
+import com.sun.codemodel.JTypeVar;
 import com.sun.codemodel.JVar;
+import com.sun.codemodel.writer.FileCodeWriter;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ConversionException;
+import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.util.AbstractProperty;
 
 import dml.DomainClass;
 import dml.DomainEntity;
@@ -74,29 +75,31 @@ import dml.ValueType;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
  */
-
 public class VaadinProxiesCodeGenerator {
     private final DomainModel model;
 
     private final File srcBaseDir;
 
-    private final Map<DomainClass, Map<String, JFieldVar>> propertyMap = new HashMap<DomainClass, Map<String, JFieldVar>>();
+    private final Map<DomainEntity, JDefinedClass> itemBaseMap = new HashMap<DomainEntity, JDefinedClass>();
 
-    private final Map<DomainClass, Set<DomainClass>> subTypeMap = new HashMap<DomainClass, Set<DomainClass>>();
+    private final Map<DomainEntity, JDefinedClass> itemMap = new HashMap<DomainEntity, JDefinedClass>();
+
+    private final Map<JDefinedClass, JDefinedClass> propertyIdMap = new HashMap<JDefinedClass, JDefinedClass>();
+
+    private final Map<JCodeModel, Map<String, JClass>> refMap = new HashMap<JCodeModel, Map<String, JClass>>();
+
+    private final Map<DomainEntity, JDefinedClass> containerBaseMap = new HashMap<DomainEntity, JDefinedClass>();
+
+    private final Map<DomainEntity, JDefinedClass> containerMap = new HashMap<DomainEntity, JDefinedClass>();
 
     private static final Map<String, File> packageMapper = new HashMap<String, File>();
 
-    private static PrintStream devNullStream = new PrintStream(new NullOutputStream());
-
-    public VaadinProxiesCodeGenerator(DomainModel model, File srcBaseDir, String vaadinSrcDir) {
+    public VaadinProxiesCodeGenerator(DomainModel model, File srcBaseDir, String vaadinSrcDir, File packageSourceLocations) {
 	this.model = model;
 	this.srcBaseDir = srcBaseDir;
-	InputStream inputStream;
+
 	try {
-	    inputStream = getClass().getResourceAsStream("/.dmlProjectPackageMapper");
-	    StringWriter writer = new StringWriter();
-	    IOUtils.copy(inputStream, writer);
-	    final String contents = writer.toString();
+	    final String contents = FileUtils.readFileToString(packageSourceLocations);
 	    for (final String line : contents.split("\n")) {
 		final int sindex = line.indexOf(' ');
 		final String packageName = line.substring(0, sindex);
@@ -109,422 +112,654 @@ public class VaadinProxiesCodeGenerator {
 	}
     }
 
-    public void generate() throws IOException, JClassAlreadyExistsException, ClassNotFoundException {
+    public void generate() throws IOException, JClassAlreadyExistsException {
 	JCodeModel srcgen = new JCodeModel();
 	Map<File, JCodeModel> localsrcs = new HashMap<File, JCodeModel>();
 	for (DomainClass clazz : model.getDomainClasses()) {
-	    if (clazz.hasSuperclass()) {
-		if (!subTypeMap.containsKey(clazz.getSuperclass())) {
-		    subTypeMap.put((DomainClass) clazz.getSuperclass(), new HashSet<DomainClass>());
-		}
-		subTypeMap.get(clazz.getSuperclass()).add(clazz);
-	    }
-	}
-	for (DomainClass clazz : model.getDomainClasses()) {
-	    // generateProperty(srcgen, clazz);
-	    generateBaseItem(srcgen, clazz);
-	    generateBaseContainer(srcgen, clazz);
-	    File packageDir = getPackageDir(clazz.getPackageName());
-	    if (packageDir != null) {
-		if (!localsrcs.containsKey(packageDir)) {
-		    localsrcs.put(packageDir, new JCodeModel());
-		}
-		generateNotBaseItem(localsrcs.get(packageDir), clazz);
-		generateNotBaseContainer(localsrcs.get(packageDir), clazz);
-	    }
+	    registerClass(clazz, srcgen, localsrcs);
 	}
 	for (DomainClass clazz : model.getDomainClasses()) {
 	    if (clazz.hasSuperclass()) {
-		generateContainerSuperMethods(srcgen, clazz);
-		// generatePropertyImplements(srcgen, clazz);
+		registerHierarchy(clazz, clazz.getSuperclass());
 	    }
 	}
-	srcgen.build(srcBaseDir, devNullStream);
+	for (Entry<DomainEntity, JDefinedClass> entry : itemBaseMap.entrySet()) {
+	    DomainEntity clazz = entry.getKey();
+	    JDefinedClass proxy = entry.getValue();
+	    fillBaseItem(proxy, getHostType(proxy, clazz), clazz);
+	}
+	for (Entry<DomainEntity, JDefinedClass> entry : itemMap.entrySet()) {
+	    JDefinedClass proxy = entry.getValue();
+	    fillItem(proxy, getHostType(proxy, entry.getKey()));
+	}
+	iterateThroughContainers(new HashSet<DomainEntity>(containerBaseMap.keySet()), (DomainClass) containerBaseMap.keySet()
+		.iterator().next());
+	for (Entry<DomainEntity, JDefinedClass> entry : containerMap.entrySet()) {
+	    DomainEntity clazz = entry.getKey();
+	    JDefinedClass proxy = entry.getValue();
+	    fillContainer(proxy, (DomainClass) clazz);
+	}
+	CodeWriter src = new FileCodeWriter(srcBaseDir, true);
+	CodeWriter res = new FileCodeWriter(srcBaseDir, true);
+	srcgen.build(src, res);
+
 	for (File packageDir : localsrcs.keySet()) {
 	    packageDir.mkdirs();
-	    localsrcs.get(packageDir).build(packageDir, devNullStream);
+	    src = new NonOverridingCodeWriter(new FileCodeWriter(packageDir), packageDir);
+	    res = new NonOverridingCodeWriter(new FileCodeWriter(packageDir), packageDir);
+	    localsrcs.get(packageDir).build(src, res);
 	}
     }
 
-    private void generateProperty(JCodeModel model, DomainClass clazz) throws JClassAlreadyExistsException {
-	JPackage pckg = model._package(clazz.getPackageName() + ".data");
-	JDefinedClass properties = pckg._interface(clazz.getName() + "Properties");
-	final HashMap<String, JFieldVar> fieldVars = new HashMap<String, JFieldVar>();
-
-	for (Slot slot : clazz.getSlotsList()) {
-	    JFieldVar field = properties.field(JMod.PUBLIC | JMod.STATIC | JMod.FINAL, String.class,
-		    getTableName(slot.getName()), JExpr.lit(slot.getName()));
-	    // System.out.printf("slot : add field %s to %s class\n",
-	    // slot.getName(), clazz.getName());
-	    fieldVars.put(slot.getName(), field);
+    private void iterateThroughContainers(Set<DomainEntity> entities, DomainClass clazz) {
+	if (entities.contains(clazz)) {
+	    if (clazz.hasSuperclass() && entities.contains(clazz.getSuperclass())) {
+		iterateThroughContainers(entities, (DomainClass) clazz.getSuperclass());
+	    } else {
+		JDefinedClass proxy = containerBaseMap.get(clazz);
+		fillBaseContainer(proxy, getLowestItemFor(clazz), clazz);
+		entities.remove(clazz);
+	    }
 	}
-	for (Role role : clazz.getRoleSlotsList()) {
+	if (entities.isEmpty()) {
+	    return;
+	}
+	iterateThroughContainers(entities, (DomainClass) entities.iterator().next());
+    }
+
+    /**
+     * Initialization of types
+     * 
+     * @param localsrcs
+     * @param srcgen
+     * @throws JClassAlreadyExistsException
+     */
+    private void registerClass(DomainClass clazz, JCodeModel srcgen, Map<File, JCodeModel> localsrcs)
+	    throws JClassAlreadyExistsException {
+	JClass propertyIdType = srcgen.ref(PropertyId.class);
+	JClass classref = ref(srcgen, clazz);
+
+	JDefinedClass baseItem = srcgen._class(getProxyFullName(clazz, getItemSuffix(clazz)));
+	JTypeVar genericItemType = baseItem.generify("Type", classref);
+	baseItem._extends(srcgen.ref(AbstractBufferedItem.class).narrow(propertyIdType, genericItemType));
+	itemBaseMap.put(clazz, baseItem);
+
+	JDefinedClass propertyId = generatePropertyIdClass(baseItem, clazz);
+	propertyIdMap.put(baseItem, propertyId);
+
+	File packageDir = getPackageDir(clazz.getPackageName());
+	if (packageDir != null) {
+	    if (!localsrcs.containsKey(packageDir)) {
+		localsrcs.put(packageDir, new JCodeModel());
+	    }
+	    JDefinedClass item = localsrcs.get(packageDir)._class(getProxyFullName(clazz, "Item"));
+	    item._extends(baseItem.narrow(ref(item.owner(), clazz)));
+	    itemMap.put(clazz, item);
+	}
+
+	JDefinedClass baseContainer = srcgen._class(getProxyFullName(clazz, getContainerSuffix(clazz)));
+	containerBaseMap.put(clazz, baseContainer);
+
+	if (packageDir != null) {
+	    JDefinedClass container = localsrcs.get(packageDir)._class(getProxyFullName(clazz, "Container"));
+	    container._extends(baseContainer);
+	    containerMap.put(clazz, container);
+	}
+    }
+
+    private void registerHierarchy(DomainClass type, DomainEntity supertype) {
+	// override between ChildItem_Base and its super SuperItem or
+	// SuperItem_Base (the latter one in case the super type does not have a
+	// non base item)
+	JDefinedClass item = getBaseItem(type);
+	JDefinedClass superitem = getLowestItemFor(supertype);
+	item._extends(superitem.narrow(item.typeParams()[0]));
+
+	// override between SuperItem and SuperItem_Base for classes that are
+	// not leaves (super of something in this case)
+	if (!getBaseItem(supertype).equals(superitem)) {
+	    if (superitem.typeParams().length == 0) {
+		superitem.generify("Type", ref(superitem.owner(), supertype));
+	    }
+	    superitem._extends(getBaseItem(supertype).narrow(superitem.typeParams()[0]));
+	}
+
+	propertyIdMap.get(item)._extends(propertyIdMap.get(getBaseItem(supertype)));
+    }
+
+    private void fillBaseItem(JDefinedClass item, JClass itemType, DomainEntity clazz) throws JClassAlreadyExistsException {
+	generateConstructorForWrapping(item);
+	generateConstructorForType(item, itemType);
+	generateConstructorForInstance(item, itemType);
+	generateConstructorForInstanceWithForcedType(item, itemType);
+
+	Map<String, JDefinedClass> propertyClasses = new HashMap<String, JDefinedClass>();
+	for (Slot slot : ((DomainClass) clazz).getSlotsList()) {
+	    generateSlotPropertyId(propertyIdMap.get(item), slot.getName());
+	    propertyClasses.put(slot.getName(),
+		    generateSingleValueProperty(itemType, item, slot.getName(), getSlotType(item.owner(), clazz, slot)));
+	    generateDirectPropertyGetter(item, slot);
+	}
+	for (Role role : ((DomainClass) clazz).getRoleSlotsList()) {
 	    if (role.getName() != null && !role.getType().getName().startsWith("Remote")) {
-		JFieldVar field = properties.field(JMod.PUBLIC | JMod.STATIC | JMod.FINAL, String.class,
-			getTableName(role.getName()), JExpr.lit(role.getName()));
-		// System.out.printf("role: add field %s to %s class\n",
-		// role.getName(), clazz.getName());
-		fieldVars.put(role.getName(), field);
-	    }
-	}
-
-	propertyMap.put(clazz, fieldVars);
-    }
-
-    private void generatePropertyImplements(JCodeModel codegen, DomainClass clazz) {
-	JDefinedClass supertype = codegen._getClass(getProxyFullName(clazz.getSuperclass(), "Properties"));
-	JDefinedClass type = codegen._getClass(getProxyFullName(clazz, "Properties"));
-	type._implements(supertype);
-    }
-
-    private String getSuffix(DomainEntity clazz) {
-	Boolean isBaseItem = getPackageDir(clazz.getPackageName()) != null;
-	return isBaseItem ? "Item_Base" : "Item";
-    }
-
-    private void generateBaseItem(JCodeModel codegen, DomainClass clazz) throws JClassAlreadyExistsException,
-	    ClassNotFoundException {
-
-	// Boolean isBaseItem = getPackageDir(clazz.getPackageName()) != null;
-	// String suffix = isBaseItem ? "Item_Base" : "Item";
-	// suffixMapper.put(clazz, suffix);
-	String suffix = getSuffix(clazz);
-
-	// JDefinedClass type = codegen._class(clazz.getFullName() + suffix);
-	JDefinedClass type = codegen._class(getProxyFullName(clazz, suffix));
-	if (clazz.hasSuperclass()) {
-	    type._extends(domainItemRef(codegen, clazz.getSuperclass()));
-	} else {
-	    type._extends(codegen.ref(DomainItem.class).narrow(codegen.ref(clazz.getFullName())));
-	}
-
-	generatePropertyId(codegen, type, clazz, suffix);
-
-	// type._implements(domainPropertiesRef(codegen, clazz));
-
-	JMethod byProperty = type.constructor(JMod.PUBLIC);
-	JVar propertyParam = byProperty.param(HintedProperty.class, "value");
-	byProperty.body().invoke("super").arg(propertyParam);
-
-	JMethod byType = type.constructor(JMod.PUBLIC);
-	JVar typeParam = byType.param(codegen.ref(Class.class).narrow(codegen.ref(clazz.getFullName()).wildcard()), "type");
-	byType.body().invoke("super").arg(typeParam);
-
-	JMethod byInstance = type.constructor(JMod.PUBLIC);
-	JVar instanceParam = byInstance.param(codegen.ref(clazz.getFullName()), "instance");
-	byInstance.body().invoke("super").arg(instanceParam);
-
-	{
-	    JMethod getItemProperty = type.method(JMod.PUBLIC, Property.class, "getItemProperty");
-	    getItemProperty.annotate(Override.class);
-	    JVar propertyIdParam = getItemProperty.param(Object.class, "propertyId");
-	    JBlock getItemPropertyBody = getItemProperty.body();
-	    JVar propertyVar = getItemPropertyBody.decl(codegen.ref(Property.class), "property", JExpr.direct("map")
-		    .invoke("get").arg(propertyIdParam));
-	    JBlock ifbody = getItemPropertyBody._if(propertyVar.eq(JExpr._null()))._then();
-	    for (Slot slot : clazz.getSlotsList()) {
-		JFieldVar slotVar = propertyMap.get(clazz).get(slot.getName());
-		JFieldRef slotProperty = codegen.ref(getPropertyIdFullName(clazz, suffix)).staticRef(slotVar);
-		JBlock slotIfBody = ifbody._if(slotProperty.eq(propertyIdParam))._then();
-		slotIfBody._return(JExpr.invoke("get" + WordUtils.capitalize(slot.getName()) + "Property"));
-	    }
-	    for (Role role : clazz.getRoleSlotsList()) {
-		if (role.getName() != null && !role.getType().getName().startsWith("Remote")) {
-		    JFieldVar slotVar = propertyMap.get(clazz).get(role.getName());
-		    JFieldRef slotProperty = codegen.ref(getPropertyIdFullName(clazz, suffix)).staticRef(slotVar);
-		    JBlock slotIfBody = ifbody._if(slotProperty.eq(propertyIdParam))._then();
-		    slotIfBody._return(JExpr.invoke("get" + WordUtils.capitalize(role.getName()) + "Property"));
+		generateRolePropertyId(propertyIdMap.get(item), role.getName(), propertyIdMap.get(getBaseItem(role.getType())));
+		if (role.getMultiplicityUpper() == 1) {
+		    propertyClasses.put(role.getName(),
+			    generateSingleValueProperty(itemType, item, role.getName(), ref(item.owner(), role.getType())));
+		    generateItemPropertyGetter(item, role);
+		} else {
+		    propertyClasses.put(role.getName(),
+			    generateCollectionValueProperty(itemType, item, role.getName(), ref(item.owner(), role.getType())));
+		    generateContainerPropertyGetter(item, role);
 		}
 	    }
-	    ifbody.assign(propertyVar, JExpr.invoke("makeProperty").arg(propertyIdParam));
-	    getItemPropertyBody._return(propertyVar);
 	}
+	generateMakePropertyMethod(item, (DomainClass) clazz, propertyClasses);
+    }
 
+    /**
+     * <code>
+     * public Property get_property_Property() {
+     *     return getItemProperty(_propertytype_PropertyId._property_);
+     * }
+     * </code>
+     */
+    private void generateDirectPropertyGetter(JDefinedClass item, Slot slot) {
+	JMethod getProperty = item.method(JMod.PUBLIC, Property.class, "get" + StringUtils.capitalize(slot.getName())
+		+ "Property");
+	getProperty.body()._return(JExpr.invoke("getItemProperty").arg(propertyIdMap.get(item).staticRef(slot.getName())));
+    }
+
+    private void generateItemPropertyGetter(JDefinedClass item, Role role) {
+	JType resultType = getLowestItemFor(role.getType());
+	JMethod getProperty = item.method(JMod.PUBLIC, resultType, "get" + StringUtils.capitalize(role.getName()) + "Property");
+	getProperty.body()._return(
+		JExpr.cast(resultType, JExpr.invoke("getItemProperty").arg(propertyIdMap.get(item).staticRef(role.getName()))));
+    }
+
+    private void generateContainerPropertyGetter(JDefinedClass item, Role role) {
+	JType resultType = getLowestContainerFor(role.getType());
+	JMethod getProperty = item.method(JMod.PUBLIC, resultType, "get" + StringUtils.capitalize(role.getName()) + "Property");
+	getProperty.body()._return(
+		JExpr.cast(resultType, JExpr.invoke("getItemProperty").arg(propertyIdMap.get(item).staticRef(role.getName()))));
+    }
+
+    private void fillItem(JDefinedClass item, JClass itemType) {
+	generateConstructorForWrapping(item);
+	generateConstructorForType(item, itemType);
+	generateConstructorForInstance(item, itemType);
+	generateConstructorForInstanceWithForcedType(item, itemType);
+    }
+
+    private void fillBaseContainer(JDefinedClass container, JClass item, DomainClass containerType) {
+	JClass classref = ref(container.owner(), containerType);
+	JClass propertyIdType = container.owner().ref(PropertyId.class);
+
+	container._extends(container.owner().ref(AbstractBufferedContainer.class)
+		.narrow(classref, propertyIdType, narrowToIfNeeded(item, classref, true)));
+
+	generateConstructorForWrappingCollections(container, classref);
+	generateConstructorForType(container, classref);
+	generateConstructorForCollectionInstance(container, classref);
+
+	generateMakeItemMethods(container, item, classref);
+
+	DomainClass current = containerType;
+	while (current.hasSuperclass()) {
+	    current = (DomainClass) current.getSuperclass();
+	    JDefinedClass currentContainer = getBaseContainer(current);
+	    JClass currentRef = ref(currentContainer.owner(), current);
+
+	    insertSpecificMakerIfClauseForInstance(currentContainer, item, currentRef, classref);
+	    insertSpecificMakerIfClauseForType(currentContainer, item, currentRef, classref);
+	    generateItemCreateShortcut(currentContainer, item, classref);
+	}
+    }
+
+    private void fillContainer(JDefinedClass container, DomainClass containerType) {
+	JClass classref = ref(container.owner(), containerType);
+
+	generateConstructorForWrappingCollections(container, classref);
+	generateConstructorForType(container, classref);
+	generateConstructorForCollectionInstance(container, classref);
+    }
+
+    /**
+     * <code>
+     * public static class _clazz_PropertyId {
+     * }
+     * </code>
+     */
+    private JDefinedClass generatePropertyIdClass(JDefinedClass item, DomainClass clazz) throws JClassAlreadyExistsException {
+	JDefinedClass propertyId = item._class(JMod.PUBLIC | JMod.STATIC, clazz.getName() + "PropertyId");
+	propertyId._extends(PropertyId.class);
+
+	// generateConstructor(propertyId);
+	generateConstructorWithPiece(propertyId);
+
+	return propertyId;
+    }
+
+    /**
+     * <code>
+     * public class _property_Property extends AbstractProperty {
+     *     _Override
+     *     public _propertytype_ getValue() {
+     *         _parent_ host = _parent_Item_Base.this.getValue();
+     *         return host != null ? host.get_property_() : null;
+     *     }
+     *     
+     *     _Override
+     *     public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+     *         _parent_Item_Base.this.getValue().set_property_((_propertytype_) newValue);
+     *     }
+     *     
+     *     _Override
+     *     public Class<?> getType() {
+     *         return _propertytype_.class;
+     *     }
+     * }
+     * </code>
+     */
+    private JDefinedClass generateSingleValueProperty(JClass parent, JDefinedClass item, String property, JClass slotType)
+	    throws JClassAlreadyExistsException {
+	JDefinedClass propClass = item._class(JMod.PUBLIC, StringUtils.capitalize(property) + "Property");
+	propClass._extends(AbstractProperty.class);
+
+	// getValue()
+	JMethod getValue = propClass.method(JMod.PUBLIC, slotType, "getValue");
+	getValue.annotate(Override.class);
+	JVar host = getValue.body().decl(parent, "host", item.staticRef("this").invoke("getValue"));
+	JConditional ifHost = getValue.body()._if(host.ne(JExpr._null()));
+	ifHost._then()._return(host.invoke("get" + StringUtils.capitalize(property)));
+	getValue.body()._return(JExpr._null());
+
+	// setValue()
+	JMethod setValue = propClass.method(JMod.PUBLIC, item.owner().VOID, "setValue");
+	setValue.annotate(Override.class);
+	setValue._throws(ReadOnlyException.class);
+	setValue._throws(ConversionException.class);
+	JVar newValue = setValue.param(Object.class, "newValue");
+	setValue.body().add(
+		item.staticRef("this").invoke("getValue").invoke("set" + StringUtils.capitalize(property))
+			.arg(JExpr.cast(slotType, newValue)));
+
+	// getType()
+	JMethod getType = propClass.method(JMod.PUBLIC,
+		item.owner().ref(Class.class).narrow(item.owner().ref(Object.class).wildcard()), "getType");
+	getType.annotate(Override.class);
+	getType.body()._return(JExpr.dotclass(slotType));
+
+	return propClass;
+    }
+
+    /**
+     * <code>
+     * public class _property_Property extends AbstractProperty {
+     *     _Override
+     *     public Set<_propertytype_> getValue() {
+     *         _parent_ host = _parent_Item_Base.this.getValue();
+     *         return host != null ? host.get_property_Set() : null;
+     *     }
+     *     
+     *     _Override
+     *     public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+     *         Set<_propertytype_> set = _parent_Item_Base.this.getValue().get_property_Set();
+     *         set.clear();
+     *         set.addAll((Set<_propertyType>) newValue);
+     *     }
+     *     
+     *     _Override
+     *     public Class<?> getType() {
+     *         return Set.class;
+     *     }
+     * }
+     * </code>
+     */
+    private JDefinedClass generateCollectionValueProperty(JClass parent, JDefinedClass item, String property, JClass propertyType)
+	    throws JClassAlreadyExistsException {
+	JDefinedClass propClass = item._class(JMod.PUBLIC, StringUtils.capitalize(property) + "Property");
+	propClass._extends(AbstractProperty.class);
+
+	JClass setOfType = item.owner().ref(Set.class).narrow(propertyType);
+
+	// getValue()
+	JMethod getValue = propClass.method(JMod.PUBLIC, setOfType, "getValue");
+	getValue.annotate(Override.class);
+	JVar host = getValue.body().decl(parent, "host", item.staticRef("this").invoke("getValue"));
+	JConditional ifHost = getValue.body()._if(host.ne(JExpr._null()));
+	ifHost._then()._return(host.invoke("get" + StringUtils.capitalize(property) + "Set"));
+	getValue.body()._return(JExpr._null());
+
+	// setValue()
+	JMethod setValue = propClass.method(JMod.PUBLIC, item.owner().VOID, "setValue");
+	setValue.annotate(Override.class);
+	setValue._throws(ReadOnlyException.class);
+	setValue._throws(ConversionException.class);
+	JVar newValue = setValue.param(Object.class, "newValue");
+	JVar set = setValue.body().decl(setOfType, "set",
+		item.staticRef("this").invoke("getValue").invoke("get" + StringUtils.capitalize(property) + "Set"));
+	setValue.body().add(set.invoke("clear"));
+	setValue.body().add(set.invoke("addAll").arg(JExpr.cast(setOfType, newValue)));
+
+	// getType()
+	JMethod getType = propClass.method(JMod.PUBLIC,
+		item.owner().ref(Class.class).narrow(item.owner().ref(Object.class).wildcard()), "getType");
+	getType.annotate(Override.class);
+	getType.body()._return(JExpr.dotclass(item.owner().ref(Set.class)));
+
+	return propClass;
+    }
+
+    /**
+     * <code>
+     * public _type_(String piece) {
+     *     super(piece);
+     * }
+     * </code>
+     */
+    private void generateConstructorWithPiece(JDefinedClass type) {
+	JMethod constructor = type.constructor(JMod.PUBLIC);
+	final JVar piece = constructor.param(String.class, "piece");
+	constructor.body().invoke("super").arg(piece);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(Property wrapped, Hint... hints) {
+     *     super(wrapped, hints);
+     * }
+     * </code>
+     */
+    private void generateConstructorForWrapping(JDefinedClass proxy) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar wrapped = constructor.param(Property.class, "wrapped");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(wrapped).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(Property wrapped, Class<? extends _proxyType_> elementType, Hint... hints) {
+     *     super(wrapped, elementType, hints);
+     * }
+     * </code>
+     */
+    private void generateConstructorForWrappingCollections(JDefinedClass proxy, JClass proxyType) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar wrapped = constructor.param(Property.class, "wrapped");
+	JVar elementType = constructor.param(proxy.owner().ref(Class.class).narrow(proxyType.wildcard()), "elementType");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(wrapped).arg(elementType).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(Class<? extends _proxyType_> type, Hint... hints) {
+     *     super(type, hints);
+     * }
+     * </code>
+     */
+    private void generateConstructorForType(JDefinedClass proxy, JClass proxyType) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar type = constructor.param(proxy.owner().ref(Class.class).narrow(proxyType.wildcard()), "type");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(type).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(_proxyType_ value, Hint... hints) {
+     *     super(value, hints);
+     * }
+     * </code>
+     */
+    private void generateConstructorForInstance(JDefinedClass proxy, JClass proxyType) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar value = constructor.param(proxyType, "value");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(value).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(List<_proxyType_> elements, Class<? extends _proxyType_> elementType, Hint... hints) {
+     *     super(elements, elementType, hints);
+     * }
+     * 
+     * </code>
+     */
+    private void generateConstructorForCollectionInstance(JDefinedClass proxy, JClass proxyType) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar elements = constructor.param(proxy.owner().ref(List.class).narrow(proxyType), "elements");
+	JVar elementType = constructor.param(proxy.owner().ref(Class.class).narrow(proxyType.wildcard()), "elementType");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(elements).arg(elementType).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public _proxy_(_proxyType_ value, Class<? extends _proxyType_> type, Hint... hints) {
+     *     super(value, type, hints);
+     * }
+     * </code>
+     */
+    private void generateConstructorForInstanceWithForcedType(JDefinedClass proxy, JClass proxyType) {
+	JMethod constructor = proxy.constructor(JMod.PUBLIC);
+	JVar value = constructor.param(proxyType, "value");
+	JVar type = constructor.param(proxy.owner().ref(Class.class).narrow(proxyType.wildcard()), "type");
+	JVar hints = constructor.varParam(Hint.class, "hints");
+	constructor.body().invoke("super").arg(value).arg(type).arg(hints);
+    }
+
+    /**
+     * <code>
+     * public final static PropertyId type = new PropertyId("_slot_");
+     * </code>
+     */
+    private JFieldVar generateSlotPropertyId(JDefinedClass propertyIdClass, String slot) {
+	JClass propertyId = propertyIdClass.owner().ref(PropertyId.class);
+	return propertyIdClass.field(JMod.PUBLIC | JMod.FINAL | JMod.STATIC, propertyId, slot, JExpr._new(propertyId).arg(slot));
+    }
+
+    /**
+     * <code>
+     * public final static _rolePropertyIdType_ _role_() {
+     *     return new _rolePropertyIdType_("_role_");
+     * }
+     * 
+     * public final static _rolePropertyIdType_ _role_ = _role_();
+     * </code>
+     */
+    private JFieldVar generateRolePropertyId(JDefinedClass propertyIdClass, String role, JType rolePropertyIdType) {
+	JMethod getter = propertyIdClass.method(JMod.PUBLIC | JMod.FINAL | JMod.STATIC, rolePropertyIdType, role);
+	getter.body()._return(JExpr._new(rolePropertyIdType).arg(role));
+
+	return propertyIdClass.field(JMod.PUBLIC | JMod.FINAL | JMod.STATIC, rolePropertyIdType, role, JExpr.invoke(getter));
+    }
+
+    /**
+     * <code>
+     * _Override
+     * protected Property makeProperty(PropertyId propertyId) {
+     *     return null;
+     * } </code>
+     */
+    private void generateMakePropertyMethod(JDefinedClass item, DomainClass clazz, Map<String, JDefinedClass> propertyClasses) {
+	JCodeModel codegen = item.owner();
+
+	JMethod makeProperty = item.method(JMod.PROTECTED, Property.class, "makeProperty");
+	makeProperty.annotate(Override.class);
+	JVar propertyId = makeProperty.param(PropertyId.class, "propertyId");
 	for (Slot slot : clazz.getSlotsList()) {
-	    JMethod propertyAccess = type.method(JMod.PUBLIC, codegen.ref(Property.class),
-		    "get" + WordUtils.capitalize(slot.getName()) + "Property");
-	    // propertyAccess.body()._return(JExpr.invoke("getItemProperty").arg(propertyMap.get(clazz).get(slot.getName())));
-	    JBlock body = propertyAccess.body();
-	    JFieldVar slotVar = propertyMap.get(clazz).get(slot.getName());
-	    JFieldRef slotProperty = codegen.ref(getPropertyIdFullName(clazz, suffix)).staticRef(slotVar);
-
-	    JVar propertyVar = body.decl(codegen.ref(HintedProperty.class), "property",
-		    JExpr.direct("map").invoke("get").arg(slotProperty));
-	    JBlock ifbody = body._if(propertyVar.eq(JExpr._null()))._then();
-	    JInvocation newBP = JExpr._new(codegen.ref(BufferedProperty.class));
-
-	    newBP.arg(slotProperty);
-	    final JClass ref = codegen.ref(getSlotType(clazz, slot));
-	    // System.out.printf("The package for %s is %s\n", ref.name(),
-	    // ref._package().name());
-	    newBP.arg(JExpr.dotclass(ref));
+	    JConditional iff = makeProperty.body()._if(
+		    propertyIdMap.get(item).staticRef(slot.getName()).invoke("equals").arg(propertyId));
+	    JInvocation invoke = JExpr._new(codegen.ref(BufferedProperty.class).narrow(getSlotType(codegen, clazz, slot)));
+	    invoke.arg(JExpr._new(propertyClasses.get(slot.getName())));
 	    if (slot.getOptions().contains(Option.REQUIRED)) {
-		newBP.arg(JExpr._new(codegen.ref(Required.class)));
+		invoke.arg(JExpr._new(codegen.ref(Required.class)));
 	    }
-	    ifbody.assign(propertyVar, newBP);
-	    body._return(propertyVar);
+	    iff._then()._return(invoke);
 	}
 	for (Role role : clazz.getRoleSlotsList()) {
 	    if (role.getName() != null && !role.getType().getName().startsWith("Remote")) {
-		JClass returnType = role.getMultiplicityUpper() == 1 ? domainItemRef(codegen, role.getType())
-			: domainContainerRef(codegen, role.getType());
-		JMethod propertyAccess = type.method(JMod.PUBLIC, returnType, "get" + WordUtils.capitalize(role.getName())
-			+ "Property");
-		JBlock body = propertyAccess.body();
-		JFieldVar roleVar = propertyMap.get(clazz).get(role.getName());
-		JFieldRef roleProperty = codegen.ref(getPropertyIdFullName(clazz, suffix)).staticRef(roleVar);
-		JVar propertyVar = body.decl(codegen.ref(HintedProperty.class), "property", JExpr.direct("map").invoke("get")
-			.arg(roleProperty));
-		JBlock ifbody = body._if(propertyVar.eq(JExpr._null()))._then();
-		JInvocation newBP = JExpr._new(codegen.ref(BufferedProperty.class));
-		newBP.arg(roleProperty);
+		JConditional iff = makeProperty.body()._if(
+			propertyIdMap.get(item).staticRef(role.getName()).invoke("equals").arg(propertyId));
+		JInvocation invoke;
 		if (role.getMultiplicityUpper() == 1) {
-		    newBP.arg(JExpr.dotclass(codegen.ref(role.getType().getFullName())));
+		    if (itemMap.containsKey(role.getType())) {
+			invoke = JExpr._new(itemMap.get(role.getType()));
+		    } else {
+			invoke = JExpr._new(itemBaseMap.get(role.getType()));
+		    }
+		    invoke.arg(JExpr._new(propertyClasses.get(role.getName())));
 		} else {
-		    newBP.arg(JExpr.dotclass(codegen.ref(Set.class)));
+		    if (containerMap.containsKey(role.getType())) {
+			invoke = JExpr._new(containerMap.get(role.getType()));
+		    } else {
+			invoke = JExpr._new(containerBaseMap.get(role.getType()));
+		    }
+		    invoke.arg(JExpr._new(propertyClasses.get(role.getName()))).arg(ref(codegen, role.getType()).dotclass());
 		}
 		if (role.getMultiplicityLower() == 1) {
-		    newBP.arg(JExpr._new(codegen.ref(Required.class)));
+		    invoke.arg(JExpr._new(codegen.ref(Required.class)));
 		}
-		ifbody.assign(propertyVar, newBP);
-		if (role.getMultiplicityUpper() == 1) {
-		    body._return(JExpr._new(domainItemRef(codegen, role.getType())).arg(propertyVar));
-		} else {
-		    body._return(JExpr._new(domainContainerRef(codegen, role.getType())).arg(propertyVar));
-		}
+		iff._then()._return(invoke);
 	    }
+	}
+	if (clazz.hasSuperclass()) {
+	    makeProperty.body()._return(JExpr._super().invoke("makeProperty").arg(propertyId));
+	} else {
+	    makeProperty.body()._return(JExpr._null());
 	}
     }
 
     /**
-     * @param type
-     * @param clazz
-     * @throws JClassAlreadyExistsException
-     * @throws ClassNotFoundException
+     * <code>
+     * _Override
+     * protected _clazz_Item_Base makeItem(_clazz_ itemId) {
+     *     return new _clazz_Item_Base(itemId);
+     * }
+     * 
+     * _Override
+     * protected _clazz_Item_Base makeItem(Class<? extends _clazz_> type) {
+     *     return new _clazz_Item_Base(type);
+     * }
+     * </code>
      */
-    private void generatePropertyId(JCodeModel codegen, JDefinedClass type, DomainClass clazz, String suffix)
-	    throws JClassAlreadyExistsException, ClassNotFoundException {
-	final JClass propIdRef = codegen.ref(PropertyId.class);
-	final JDefinedClass propIdClass = type._class(JMod.PUBLIC | JMod.STATIC, clazz.getName() + "PropertyId");
-	JClass superPropIdClass;
+    private void generateMakeItemMethods(JDefinedClass container, JClass item, JClass containerType) {
+	JMethod makeByInstance = container.method(JMod.PUBLIC, narrowToIfNeeded(item, containerType, true), "makeItem");
+	makeByInstance.annotate(Override.class);
+	JVar itemId = makeByInstance.param(containerType, "itemId");
+	makeByInstance.body()._return(JExpr._new(narrowToIfNeeded(item, containerType)).arg(itemId));
 
-	if (clazz.hasSuperclass()) {
-	    final DomainEntity superclass = clazz.getSuperclass();
-	    final String propertyIdFullName = getPropertyIdFullName(superclass, getSuffix((DomainClass) superclass));
-	    System.out.printf("%s extends %s\n", propIdClass.name(), propertyIdFullName);
-	    superPropIdClass = codegen.ref(propertyIdFullName);
+	JMethod makeByType = container.method(JMod.PUBLIC, narrowToIfNeeded(item, containerType, true), "makeItem");
+	makeByType.annotate(Override.class);
+	JVar type = makeByType.param(container.owner().ref(Class.class).narrow(containerType.wildcard()), "type");
+	makeByType.body()._return(JExpr._new(narrowToIfNeeded(item, containerType)).arg(type));
+    }
+
+    /**
+     * Insert into a method:
+     * 
+     * <code>
+     * public Item makeItem(_containerType_ itemId);
+     * </code>
+     * 
+     * the following:
+     * 
+     * <code>
+     * if (itemId instanceOf _containerType_) {
+     *     return new _item_<_containerType_>((_containerType_) itemId);
+     * }
+     * </code>
+     * 
+     * if (
+     */
+    private void insertSpecificMakerIfClauseForInstance(JDefinedClass container, JClass item, JClass containerType,
+	    JClass itemType) {
+	JMethod makeItemByInstance = container.getMethod("makeItem", new JType[] { containerType });
+	JVar itemId = makeItemByInstance.listParams()[0];
+	makeItemByInstance.body().pos(0);
+	JConditional iff = makeItemByInstance.body()._if(itemId._instanceof(itemType));
+	iff._then()._return(JExpr._new(narrowToIfNeeded(item, itemType)).arg(JExpr.cast(itemType, itemId)));
+    }
+
+    /**
+     * Insert into a method:
+     * 
+     * <code>
+     * public Item makeItem(Class<? extends _containerType_> type);
+     * </code>
+     * 
+     * the following:
+     * 
+     * <code>
+     * if (type.equals(Class< extends _containerType_>)) {
+     *     return new _item_<_class_>((Class< extends _containerType_>) type);
+     * }
+     * </code>
+     * 
+     * if (
+     */
+    private void insertSpecificMakerIfClauseForType(JDefinedClass container, JClass item, JClass containerType, JClass itemType) {
+	JClass narrowedClass = container.owner().ref(Class.class).narrow(containerType.wildcard());
+
+	JMethod makeItemByType = container.getMethod("makeItem", new JType[] { narrowedClass });
+	JVar type = makeItemByType.listParams()[0];
+	makeItemByType.body().pos(0);
+	JConditional iff = makeItemByType.body()._if(type.invoke("equals").arg(itemType.dotclass()));
+	JClass narrowedItemClass = item.owner().ref(Class.class).narrow(itemType.wildcard());
+	iff._then()._return(JExpr._new(narrowToIfNeeded(item, itemType)).arg(JExpr.cast(narrowedItemClass, type)));
+    }
+
+    /**
+     * <code>
+     * public _item_ add_item_() {
+     *     return addItem(_item_.class);
+     * }
+     * </code>
+     */
+    private void generateItemCreateShortcut(JDefinedClass container, JClass item, JClass containerType) {
+	if (container.getMethod("add" + item.name(), new JType[0]) != null) {
+	    System.out.println("Duplicate subclass name: add" + item.name() + "() will not be generated for type: "
+		    + containerType.fullName());
 	} else {
-	    superPropIdClass = propIdRef;
+	    JMethod addItem = container.method(JMod.PUBLIC, item, "add" + item.name());
+	    addItem.body()._return(JExpr.cast(item, JExpr.invoke("addItem").arg(containerType.dotclass())));
 	}
+    }
 
-	propIdClass._extends(superPropIdClass);
+    private String getItemSuffix(DomainEntity clazz) {
+	Boolean isBaseItem = getPackageDir(clazz.getPackageName()) != null;
+	return isBaseItem ? "Item_Base" : "Item";
+    }
 
-	// generate static access methods
-
-	final HashMap<String, JFieldVar> fieldVars = new HashMap<String, JFieldVar>();
-	final int mods = JMod.PUBLIC | JMod.STATIC | JMod.FINAL;
-
-	for (Slot slot : clazz.getSlotsList()) {
-	    final String slotName = slot.getName();
-	    JFieldVar field = propIdClass.field(mods, PropertyId.class, slotName, JExpr._new(propIdRef).arg(JExpr.lit(slotName)));
-	    fieldVars.put(slotName, field);
-	}
-
-	// add constructors
-	JMethod constr = propIdClass.constructor(JMod.PUBLIC);
-	constr.body().invoke("super");
-
-	constr = propIdClass.constructor(JMod.PUBLIC);
-	final JVar param = constr.param(String.class, "piece");
-	final JInvocation invoke = constr.body().invoke("super");
-	invoke.arg(param);
-
-	for (Role role : clazz.getRoleSlotsList()) {
-	    final String roleName = role.getName();
-	    final DomainEntity roleType = role.getType();
-	    if (roleName != null && !roleType.getName().startsWith("Remote")) {
-		final JClass propIdType = codegen.ref(getPropertyIdFullName(roleType, getSuffix(roleType)));
-		final JMethod method = propIdClass.method(mods, propIdType, roleName);
-		method.body()._return(JExpr._new(propIdType).arg(roleName));
-		JFieldVar field = propIdClass.field(mods, propIdType, roleName, JExpr.invoke(method));
-		fieldVars.put(roleName, field);
-	    }
-
-	}
-
-	propertyMap.put(clazz, fieldVars);
-
-	// public static ContactId contact() {
-	// return new ContactId("CONTACT");
-	// }
-
+    private String getContainerSuffix(DomainEntity clazz) {
+	Boolean isBaseItem = getPackageDir(clazz.getPackageName()) != null;
+	return isBaseItem ? "Container_Base" : "Container";
     }
 
     /**
      * @param slot
      * @return
      */
-    private String getSlotType(DomainEntity clazz, Slot slot) {
+    private JClass getSlotType(JCodeModel codegen, DomainEntity clazz, Slot slot) {
 	final ValueType slotType = slot.getSlotType();
 	if (slotType instanceof ParamValueType) {
-	    return slotType.getBaseType().getFullname();
+	    return codegen.ref(slotType.getBaseType().getFullname());
 	}
 	if (slotType instanceof EnumValueType) {
 	    String typeName = slotType.getFullname();
 	    if (typeName.contains(".")) {
-		return typeName;
-	    } else {
-		return clazz.getPackageName() + "." + typeName;
+		return codegen.ref(typeName);
 	    }
+	    return codegen.ref(clazz.getPackageName() + "." + typeName);
 	}
-	return slotType.getFullname();
-    }
-
-    private void generateNotBaseItem(JCodeModel codegen, DomainClass clazz) throws JClassAlreadyExistsException {
-	// JDefinedClass type = codegen._class(clazz.getFullName() + "Item");
-	JDefinedClass type = codegen._class(getProxyFullName(clazz, "Item"));
-	type._extends(domainBaseItemRef(codegen, clazz));
-
-	JMethod byProperty = type.constructor(JMod.PUBLIC);
-	JVar propertyParam = byProperty.param(HintedProperty.class, "value");
-	byProperty.body().invoke("super").arg(propertyParam);
-
-	JMethod byType = type.constructor(JMod.PUBLIC);
-	JVar typeParam = byType.param(codegen.ref(Class.class).narrow(codegen.ref(clazz.getFullName()).wildcard()), "type");
-	byType.body().invoke("super").arg(typeParam);
-
-	JMethod byInstance = type.constructor(JMod.PUBLIC);
-	JVar instanceParam = byInstance.param(codegen.ref(clazz.getFullName()), "instance");
-	byInstance.body().invoke("super").arg(instanceParam);
-    }
-
-    private void generateBaseContainer(JCodeModel codegen, DomainClass clazz) throws JClassAlreadyExistsException {
-	String suffix = getPackageDir(clazz.getPackageName()) != null ? "Container_Base" : "Container";
-	// JDefinedClass type = codegen._class(clazz.getFullName() + suffix);
-	JDefinedClass type = codegen._class(getProxyFullName(clazz, suffix));
-	if (clazz.getSuperclass() != null) {
-	    type._extends(domainContainerRef(codegen, clazz.getSuperclass()));
-	} else {
-	    type._extends(codegen.ref(DomainContainer.class).narrow(codegen.ref(clazz.getFullName())));
+	if (slotType.getFullname().contains(".")) {
+	    return codegen.ref(slotType.getFullname());
 	}
-	// type._implements(domainPropertiesRef(codegen, clazz));
-
-	if (clazz.getSuperclass() == null) {
-	    JMethod noargs = type.constructor(JMod.PUBLIC);
-	    JInvocation noargsInvocation = noargs.body().invoke("super");
-	    noargsInvocation.arg(JExpr._new(codegen.ref(VBoxProperty.class)).arg(JExpr.dotclass(codegen.ref(Collection.class))));
-	    noargsInvocation.arg(JExpr.dotclass(codegen.ref(clazz.getFullName())));
-
-	    JMethod byProperty = type.constructor(JMod.PUBLIC);
-	    JInvocation byPropertyInvocation = byProperty.body().invoke("super");
-	    byPropertyInvocation.arg(byProperty.param(HintedProperty.class, "value"));
-	    byPropertyInvocation.arg(JExpr.dotclass(codegen.ref(clazz.getFullName())));
-
-	    JMethod byCollection = type.constructor(JMod.PUBLIC);
-	    JInvocation byCollectionInvocation = byCollection.body().invoke("super");
-	    JVar valueSet = byCollection.param(codegen.ref(Collection.class).narrow(codegen.ref(clazz.getFullName()).wildcard()),
-		    "valueSet");
-	    byCollectionInvocation.arg(JExpr._new(codegen.ref(VBoxProperty.class)).arg(valueSet));
-	    byCollectionInvocation.arg(JExpr.dotclass(codegen.ref(clazz.getFullName())));
-	} else {
-	    type.constructor(JMod.PUBLIC).body().invoke("super");
-
-	    JMethod byProperty = type.constructor(JMod.PUBLIC);
-	    byProperty.body().invoke("super").arg(byProperty.param(HintedProperty.class, "value"));
-
-	    JMethod byCollection = type.constructor(JMod.PUBLIC);
-	    JVar valueSet = byCollection.param(codegen.ref(Collection.class).narrow(codegen.ref(clazz.getFullName()).wildcard()),
-		    "valueSet");
-	    byCollection.body().invoke("super").arg(valueSet);
-	}
-
-	if (clazz.getSuperclass() == null) {
-	    JMethod makeItem = type.method(JMod.PUBLIC, domainItemRef(codegen, clazz), "makeItem");
-	    JVar itemId = makeItem.param(HintedProperty.class, "itemId");
-	    if (subTypeMap.containsKey(clazz)) {
-		for (DomainClass subType : subTypeMap.get(clazz)) {
-		    JBlock ifBlock = makeItem.body()
-			    ._if(itemId.invoke("getType").eq(JExpr.dotclass(codegen.ref(subType.getFullName()))))._then();
-		    ifBlock._return(JExpr._new(domainItemRef(codegen, subType)).arg(itemId));
-		}
-	    }
-	    makeItem.body()._return(JExpr._new(domainItemRef(codegen, clazz)).arg(itemId));
-	}
-
-	JClass typeItemClass = domainItemRef(codegen, clazz);
-
-	JMethod getItem = type.method(JMod.PUBLIC, typeItemClass, "getItem");
-	getItem.annotate(Override.class);
-	JVar getItemParam = getItem.param(codegen.ref(Object.class), "itemId");
-	getItem.body()._return(JExpr.cast(typeItemClass, JExpr._super().invoke("getItem").arg(getItemParam)));
-
-	if (clazz.getSuperclass() == null) {
-	    JClass domainItem = domainItemRef(codegen, clazz);
-	    JMethod addByType = type.method(JMod.PUBLIC, domainItem, "add" + clazz.getName() + "Item");
-	    addByType.body()
-		    ._return(
-			    JExpr.cast(domainItem,
-				    JExpr._super().invoke("addItem").arg(JExpr.dotclass(codegen.ref(clazz.getFullName())))));
-	}
-    }
-
-    private void generateContainerSuperMethods(JCodeModel codegen, DomainClass clazz) {
-	DomainClass currentSuper = clazz;
-	while (currentSuper.getSuperclass() != null) {
-	    currentSuper = (DomainClass) currentSuper.getSuperclass();
-	}
-	// JDefinedClass supertype =
-	// codegen._getClass(currentSuper.getFullName() + "Container_Base");
-	JDefinedClass supertype = codegen._getClass(getProxyFullName(currentSuper, "Container_Base"));
-	if (supertype != null) {
-	    JClass type = domainItemRef(codegen, clazz);
-	    for (JMethod method : supertype.methods()) {
-		if (method.name().equals("add" + clazz.getName() + "Item")) {
-		    System.out.println("Duplicate subclass name: " + clazz.getName());
-		    return;
-		}
-	    }
-	    JMethod addByType = supertype.method(JMod.PUBLIC, type, "add" + clazz.getName() + "Item");
-	    addByType.body()._return(
-		    JExpr.cast(type, JExpr._super().invoke("addItem").arg(JExpr.dotclass(codegen.ref(clazz.getFullName())))));
-	}
-    }
-
-    private void generateNotBaseContainer(JCodeModel codegen, DomainClass clazz) throws JClassAlreadyExistsException {
-	// JDefinedClass type = codegen._class(clazz.getFullName() +
-	// "Container");
-	JDefinedClass type = codegen._class(getProxyFullName(clazz, "Container"));
-
-	type._extends(domainBaseContainerRef(codegen, clazz));
-
-	type.constructor(JMod.PUBLIC).body().invoke("super");
-
-	JMethod byProperty = type.constructor(JMod.PUBLIC);
-	byProperty.body().invoke("super").arg(byProperty.param(HintedProperty.class, "value"));
-
-	JMethod byCollection = type.constructor(JMod.PUBLIC);
-	JVar valueSet = byCollection.param(codegen.ref(Collection.class).narrow(codegen.ref(clazz.getFullName()).wildcard()),
-		"valueSet");
-	byCollection.body().invoke("super").arg(valueSet);
-    }
-
-    private static String getTableName(final String name) {
-	final StringBuilder stringBuilder = new StringBuilder();
-	boolean isFirst = true;
-	for (final char c : name.toCharArray()) {
-	    if (isFirst) {
-		isFirst = false;
-		stringBuilder.append(Character.toUpperCase(c));
-	    } else {
-		if (Character.isUpperCase(c)) {
-		    stringBuilder.append('_');
-		    stringBuilder.append(c);
-		} else {
-		    stringBuilder.append(Character.toUpperCase(c));
-		}
-	    }
-	}
-	return stringBuilder.toString();
+	return JType.parse(codegen, slotType.getFullname()).boxify();
     }
 
     private File getPackageDir(final String packageName) {
@@ -542,36 +777,52 @@ public class VaadinProxiesCodeGenerator {
 	return file;
     }
 
-    private String getPropertyIdFullName(DomainEntity type, String suffix) {
-	// XptoItem_Base.XptoPropertyId
-	return getProxyFullName(type, suffix + "." + WordUtils.capitalize(type.getName()) + "PropertyId");
-    }
-
     private String getProxyFullName(DomainEntity type, String suffix) {
 	return String.format("%s.data.%s%s", type.getPackageName(), type.getName(), suffix);
     }
 
-    private JClass domainRef(JCodeModel codegen, DomainEntity type, String suffix) {
-	return codegen.ref(getProxyFullName(type, suffix));
+    private JDefinedClass getBaseItem(DomainEntity type) {
+	return itemBaseMap.get(type);
     }
 
-    private JClass domainContainerRef(JCodeModel codegen, DomainEntity type) {
-	return domainRef(codegen, type, "Container");
+    private JDefinedClass getBaseContainer(DomainEntity type) {
+	return containerBaseMap.get(type);
     }
 
-    private JClass domainBaseContainerRef(JCodeModel codegen, DomainEntity type) {
-	return domainRef(codegen, type, "Container_Base");
+    private JDefinedClass getLowestItemFor(DomainEntity type) {
+	return itemMap.containsKey(type) ? itemMap.get(type) : itemBaseMap.get(type);
     }
 
-    private JClass domainItemRef(JCodeModel codegen, DomainEntity type) {
-	return domainRef(codegen, type, "Item");
+    private JDefinedClass getLowestContainerFor(DomainEntity type) {
+	return containerMap.containsKey(type) ? containerMap.get(type) : containerBaseMap.get(type);
     }
 
-    private JClass domainBaseItemRef(JCodeModel codegen, DomainEntity type) {
-	return domainRef(codegen, type, "Item_Base");
+    private JClass getHostType(JDefinedClass container, DomainEntity clazz) {
+	return container.typeParams().length != 0 ? container.typeParams()[0] : ref(container.owner(), clazz);
     }
 
-    private JClass domainPropertiesRef(JCodeModel codegen, DomainEntity type) {
-	return domainRef(codegen, type, "Properties");
+    private JClass ref(JCodeModel model, DomainEntity clazz) {
+	if (!refMap.containsKey(model)) {
+	    refMap.put(model, new HashMap<String, JClass>());
+	}
+	Map<String, JClass> src = refMap.get(model);
+	if (!src.containsKey(clazz.getFullName())) {
+	    src.put(clazz.getFullName(), model.ref(clazz.getFullName()));
+	}
+	return src.get(clazz.getFullName());
+    }
+
+    private JClass narrowToIfNeeded(JClass item, JClass type) {
+	return narrowToIfNeeded(item, type, false);
+    }
+
+    private JClass narrowToIfNeeded(JClass item, JClass type, boolean wildcard) {
+	if (item.typeParams().length != 0 || item.isParameterized()) {
+	    if (wildcard) {
+		return item.narrow(type.wildcard());
+	    }
+	    return item.narrow(type);
+	}
+	return item;
     }
 }

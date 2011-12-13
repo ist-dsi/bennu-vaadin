@@ -24,7 +24,7 @@ package pt.ist.vaadinframework.ui;
 import java.util.ResourceBundle;
 
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
-import pt.ist.vaadinframework.data.BufferedContainer;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.PropertySetChangeEvent;
@@ -39,9 +39,9 @@ public class TransactionalTable extends Table {
     private final PropertySetChangeListener headerUpdater = new PropertySetChangeListener() {
 	@Override
 	public void containerPropertySetChange(PropertySetChangeEvent event) {
-	    if (event.getContainer() instanceof BufferedContainer) {
+	    if (event.getContainer() instanceof AbstractBufferedContainer) {
 		for (Object propertyId : event.getContainer().getContainerPropertyIds()) {
-		    computeHeader((BufferedContainer<?, ?, ?>) event.getContainer(), propertyId);
+		    computeHeader((AbstractBufferedContainer<?, ?, ?>) event.getContainer(), propertyId);
 		}
 	    }
 	}
@@ -75,9 +75,9 @@ public class TransactionalTable extends Table {
 	if (getContainerDataSource() != null && getContainerDataSource() instanceof PropertySetChangeNotifier) {
 	    ((PropertySetChangeNotifier) getContainerDataSource()).removeListener(headerUpdater);
 	}
-	if (newDataSource instanceof BufferedContainer) {
+	if (newDataSource instanceof AbstractBufferedContainer) {
 	    for (Object propertyId : newDataSource.getContainerPropertyIds()) {
-		computeHeader((BufferedContainer<?, ?, ?>) newDataSource, propertyId);
+		computeHeader((AbstractBufferedContainer<?, ?, ?>) newDataSource, propertyId);
 	    }
 	}
 	if (newDataSource instanceof PropertySetChangeNotifier) {
@@ -86,7 +86,7 @@ public class TransactionalTable extends Table {
 	super.setContainerDataSource(newDataSource);
     }
 
-    private void computeHeader(BufferedContainer<?, ?, ?> container, Object propertyId) {
+    private void computeHeader(AbstractBufferedContainer<?, ?, ?> container, Object propertyId) {
 	String key = container.getElementType().getName() + "." + propertyId;
 	if (bundle.containsKey(key)) {
 	    setColumnHeader(propertyId, bundle.getString(key));

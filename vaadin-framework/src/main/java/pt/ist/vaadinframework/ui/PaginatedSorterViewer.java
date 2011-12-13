@@ -120,6 +120,7 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
     }
 
     public class PageChangerControl extends HorizontalLayout {
+
 	private final TextField pageSelection;
 	private final Label totalPagesLabel;
 

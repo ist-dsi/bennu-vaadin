@@ -28,8 +28,7 @@ package pt.ist.vaadinframework.data;
  * 
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
- * @param <PropertyId>
- *            Type of the Ids of the properties
+ * @param <PropertyId> Type of the Ids of the properties
  */
 public interface ItemConstructor<PropertyId> {
     public PropertyId[] getOrderedArguments();

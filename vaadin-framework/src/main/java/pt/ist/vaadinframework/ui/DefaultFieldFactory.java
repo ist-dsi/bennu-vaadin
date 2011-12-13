@@ -3,20 +3,20 @@
  * 
  *      https://fenix-ashes.ist.utl.pt/
  * 
- *   This file is part of the vaadin-framework-ant.
+ *   This file is part of the vaadin-framework.
  *
- *   The vaadin-framework-ant Infrastructure is free software: you can
+ *   The vaadin-framework Infrastructure is free software: you can
  *   redistribute it and/or modify it under the terms of the GNU Lesser General
  *   Public License as published by the Free Software Foundation, either version
  *   3 of the License, or (at your option) any later version.*
  *
- *   vaadin-framework-ant is distributed in the hope that it will be useful,
+ *   vaadin-framework is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *   GNU Lesser General Public License for more details.
  *
  *   You should have received a copy of the GNU Lesser General Public License
- *   along with vaadin-framework-ant. If not, see <http://www.gnu.org/licenses/>.
+ *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 package pt.ist.vaadinframework.ui;
@@ -32,7 +32,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
-import pt.ist.vaadinframework.data.BufferedContainer;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
 import pt.ist.vaadinframework.data.validator.CharacterValidator;
@@ -67,7 +67,6 @@ import com.vaadin.ui.TextField;
  * 
  */
 public class DefaultFieldFactory extends AbstractFieldFactory {
-
     /**
      * @param bundle
      */
@@ -88,9 +87,9 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    field.setNullRepresentation(StringUtils.EMPTY);
 	    return field;
 	}
-	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof BufferedContainer) {
+	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof AbstractBufferedContainer) {
 	    return new ContainerEditor<Object>(this, bundle,
-		    ((BufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
+		    ((AbstractBufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
 	}
 	if (AbstractDomainObject.class.isAssignableFrom(type)) {
 	    Select select = new Select();

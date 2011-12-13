@@ -19,11 +19,31 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.terminal;
+package pt.ist.vaadinframework.domainMockups;
+
+import java.util.Collection;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
- * 
  */
-public abstract class PresentableException extends Error {
+public class Person {
+    private Identification id;
+
+    private Collection<Contact> contacts;
+
+    public Identification getId() {
+	return id;
+    }
+
+    public void setId(Identification id) {
+	this.id = id;
+    }
+
+    public Collection<Contact> getContacts() {
+	return contacts;
+    }
+
+    public void setContacts(Collection<Contact> contacts) {
+	this.contacts = contacts;
+    }
 }

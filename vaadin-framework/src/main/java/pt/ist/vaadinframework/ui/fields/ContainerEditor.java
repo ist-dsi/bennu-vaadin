@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
-import pt.ist.vaadinframework.data.BufferedContainer;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.ui.TransactionalTable;
 
 import com.vaadin.data.Container;
@@ -51,7 +51,6 @@ import com.vaadin.ui.themes.BaseTheme;
 
 public class ContainerEditor<PC> extends FieldWrapper<PC> {
     public static class OrderChanger extends CustomComponent {
-
 	private final Button up = new Button();
 
 	private final Button down = new Button();
@@ -159,8 +158,8 @@ public class ContainerEditor<PC> extends FieldWrapper<PC> {
 	add.addListener(new ClickListener() {
 	    @Override
 	    public void buttonClick(ClickEvent event) {
-		if (getWrappedField().getContainerDataSource() instanceof BufferedContainer) {
-		    BufferedContainer<PC, ?, ?> container = (BufferedContainer<PC, ?, ?>) getWrappedField()
+		if (getWrappedField().getContainerDataSource() instanceof AbstractBufferedContainer) {
+		    AbstractBufferedContainer<PC, ?, ?> container = (AbstractBufferedContainer<PC, ?, ?>) getWrappedField()
 			    .getContainerDataSource();
 		    container.addItem(container.getElementType());
 		} else {

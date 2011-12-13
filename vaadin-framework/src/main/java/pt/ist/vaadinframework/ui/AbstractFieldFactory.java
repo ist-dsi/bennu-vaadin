@@ -59,7 +59,7 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
 	field.setCaption(caption);
 	field.setDescription(makeDescription(item, propertyId, uiContext));
 	if (item.getItemProperty(propertyId) instanceof HintedProperty) {
-	    for (Hint hint : ((HintedProperty) item.getItemProperty(propertyId)).getHints()) {
+	    for (Hint hint : ((HintedProperty<?>) item.getItemProperty(propertyId)).getHints()) {
 		if (hint.appliesTo(field)) {
 		    field = hint.applyHint(field);
 		}

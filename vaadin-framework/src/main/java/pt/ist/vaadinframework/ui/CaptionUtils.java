@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 import org.apache.commons.lang.StringUtils;
 
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
+import pt.ist.vaadinframework.data.PropertyId;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -36,14 +37,15 @@ import com.vaadin.ui.DefaultFieldFactory;
 
 /**
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
- *
+ * 
  */
 
 public class CaptionUtils {
-    
+
     public static String makeCaption(ResourceBundle bundle, Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property) {
-	    String key = getBundleKey(bundle,((Property) item).getType(), propertyId, StringUtils.EMPTY);
+	if (item instanceof Property && propertyId instanceof PropertyId) {
+	    String key = getBundleKey(bundle, ((Property) item).getType(),
+		    StringUtils.join(((PropertyId) propertyId).getPath(), "."), StringUtils.EMPTY);
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }
@@ -52,22 +54,24 @@ public class CaptionUtils {
 	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
     }
 
-    public static String makeDescription(ResourceBundle bundle,Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property) {
-	    String key = getBundleKey(bundle,((Property) item).getType(), propertyId, ".description");
+    public static String makeDescription(ResourceBundle bundle, Item item, Object propertyId, Component uiContext) {
+	if (item instanceof Property && propertyId instanceof PropertyId) {
+	    String key = getBundleKey(bundle, ((Property) item).getType(),
+		    StringUtils.join(((PropertyId) propertyId).getPath(), "."), ".description");
 	    if (bundle.containsKey(key)) {
 		return bundle.getString(key);
 	    }
 	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
 	}
-	return makeCaption(bundle,item, propertyId, uiContext);
+	return makeCaption(bundle, item, propertyId, uiContext);
     }
 
-    private static String getBundleKey(ResourceBundle bundle,Class<?> clazz, Object propertyId, String suffix) {
-	return getBundleKey(bundle,new ArrayList<String>(), clazz, propertyId, suffix);
+    private static String getBundleKey(ResourceBundle bundle, Class<?> clazz, Object propertyId, String suffix) {
+	return getBundleKey(bundle, new ArrayList<String>(), clazz, propertyId, suffix);
     }
 
-    private static String getBundleKey(ResourceBundle bundle,List<String> missed, Class<?> clazz, Object propertyId, String suffix) {
+    private static String getBundleKey(ResourceBundle bundle, List<String> missed, Class<?> clazz, Object propertyId,
+	    String suffix) {
 	String key = clazz.getName() + "." + propertyId + suffix;
 	if (bundle.containsKey(key)) {
 	    return key;
@@ -76,6 +80,6 @@ public class CaptionUtils {
 	if (clazz.getSuperclass() == null) {
 	    return StringUtils.join(missed, " or ");
 	}
-	return getBundleKey(bundle,missed, clazz.getSuperclass(), propertyId, suffix);
+	return getBundleKey(bundle, missed, clazz.getSuperclass(), propertyId, suffix);
     }
 }

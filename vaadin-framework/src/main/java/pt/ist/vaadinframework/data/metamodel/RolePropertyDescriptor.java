@@ -51,7 +51,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     private Class<? extends AbstractDomainObject> elementType;
 
     public RolePropertyDescriptor(Role role, Class<? extends AbstractDomainObject> type) throws IntrospectionException,
-    SecurityException, NoSuchMethodException, ClassNotFoundException {
+	    SecurityException, NoSuchMethodException, ClassNotFoundException {
 	this.propertyId = role.getName();
 	if (role.getMultiplicityUpper() == 1) {
 	    java.beans.PropertyDescriptor property = new java.beans.PropertyDescriptor(role.getName(), type);

@@ -92,7 +92,14 @@ public class MetaModel {
 	    final String methodName = method.getName();
 	    String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
 
-	    if (descriptors.get(fieldName) != null) {
+	    if (fieldName.equalsIgnoreCase("oid")) {
+		continue;
+	    }
+	    if (fieldName.equals("idInternal")) {
+		continue;
+	    }
+	    String replace = fieldName.replace("Count", "").replace("Set", "").replace("Iterator", "");
+	    if (descriptors.containsKey(replace)) {
 		continue;
 	    }
 

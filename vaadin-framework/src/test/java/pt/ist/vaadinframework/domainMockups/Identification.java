@@ -19,11 +19,44 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.terminal;
+package pt.ist.vaadinframework.domainMockups;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public abstract class PresentableException extends Error {
+public class Identification {
+    public static enum Type {
+	CITIZEN_CARD, PASSPORT;
+    }
+
+    private Type type;
+
+    private String value;
+
+    public Identification(Type type, String value) {
+	this.type = type;
+	this.value = value;
+    }
+
+    public Type getType() {
+	return type;
+    }
+
+    public void setType(Type type) {
+	this.type = type;
+    }
+
+    public String getValue() {
+	return value;
+    }
+
+    public void setValue(String value) {
+	this.value = value;
+    }
+
+    @Override
+    public String toString() {
+	return type.name() + ": " + value;
+    }
 }

@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/bennu-widgetset-0.0.1-SNAPSHOT.jar"/>
@@ -11,9 +12,9 @@
 	<classpathentry kind="lib" path="lib/customfield-0.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/db-ojb-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/fenix-tools.jar"/>
-	<classpathentry kind="lib" path="lib/fenix-web-framework-r51756.jar"/>
+	<classpathentry kind="lib" path="lib/fenix-web-framework-r51756.jar" sourcepath="/fenix-web-framework"/>
 	<classpathentry kind="lib" path="lib/gwt-visualization-1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/joda-time-1.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/joda-time-1.5.2.jar" sourcepath="/Users/pedro/.m2/repository/joda-time/joda-time/1.5.2/joda-time-1.5.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/jvstm.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.5-bin.jar"/>
@@ -27,13 +28,14 @@
 	<classpathentry kind="lib" path="lib/validation-api-1.0.0.GA.jar"/>
 	<classpathentry kind="lib" path="lib/widget-rpc-1.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/fenix-framework-search-plugin.jar"/>
-	<classpathentry kind="lib" path="lib/fenix-framework-r53495.jar"/>
+	<classpathentry kind="lib" path="lib/fenix-framework-r53495.jar" sourcepath="/fenix-framework"/>
 	<classpathentry kind="lib" path="lib-dev/ant.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/codemodel-2.5-SNAPSHOT.jar" sourcepath="lib/codemodel-2.5-SNAPSHOT-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/vaadin-framework-latest/lib/codemodel-2.5-SNAPSHOT-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/vaadin-framework-proxy-refactor/lib/codemodel-2.5-SNAPSHOT-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

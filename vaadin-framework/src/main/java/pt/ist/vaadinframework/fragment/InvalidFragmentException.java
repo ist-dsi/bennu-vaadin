@@ -24,11 +24,10 @@ package pt.ist.vaadinframework.fragment;
 
 /**
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
- *
+ * 
  */
 
 class InvalidFragmentException extends Error {
-
     public InvalidFragmentException(String message) {
 	super(message);
     }

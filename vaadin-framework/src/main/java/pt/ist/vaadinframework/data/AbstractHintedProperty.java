@@ -19,11 +19,39 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework.terminal;
+package pt.ist.vaadinframework.data;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+import com.vaadin.data.util.AbstractProperty;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public abstract class PresentableException extends Error {
+public abstract class AbstractHintedProperty<Type> extends AbstractProperty implements HintedProperty<Type> {
+    private Collection<Hint> hints;
+
+    public AbstractHintedProperty(Hint... hints) {
+	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
+    }
+
+    @Override
+    public void addHint(Hint hint) {
+	if (hints == null) {
+	    hints = new ArrayList<Hint>();
+	}
+	hints.add(hint);
+    }
+
+    @Override
+    public Collection<Hint> getHints() {
+	if (hints != null) {
+	    return Collections.unmodifiableCollection(hints);
+	}
+	return Collections.emptyList();
+    }
 }

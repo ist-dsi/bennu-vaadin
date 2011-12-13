@@ -30,5 +30,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmbeddedComponent {
     String[] path();
+
     String[] args() default {};
 }

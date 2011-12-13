@@ -28,12 +28,18 @@ import com.vaadin.data.Property.ReadOnlyStatusChangeNotifier;
 import com.vaadin.data.Property.ValueChangeNotifier;
 import com.vaadin.ui.Field;
 
-public interface HintedProperty extends Property, ValueChangeNotifier, ReadOnlyStatusChangeNotifier {
+public interface HintedProperty<Type> extends Property, ValueChangeNotifier, ReadOnlyStatusChangeNotifier {
     public interface Hint {
 	public Field applyHint(Field field);
 
 	public boolean appliesTo(Field field);
     }
+
+    @Override
+    public Type getValue();
+
+    @Override
+    public Class<? extends Type> getType();
 
     public void addHint(Hint hint);
 

@@ -1,6 +1,5 @@
 package pt.ist.vaadinframework.terminal;
 
-
 /* 
  * Copyright 2010 IT Mill Ltd.
  * 
@@ -17,7 +16,6 @@ package pt.ist.vaadinframework.terminal;
  * the License.
  */
 
-
 import com.vaadin.terminal.ErrorMessage;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -29,8 +27,7 @@ import com.vaadin.terminal.PaintTarget;
  * as stack trace and exception.
  * 
  * @author IT Mill Ltd.
- * @version
- * 6.6.0
+ * @version 6.6.0
  * @since 3.0
  */
 @SuppressWarnings("serial")
@@ -45,63 +42,60 @@ public class DomainExceptionErrorMessage extends RuntimeException implements Err
     /**
      * Constructor for SystemError with error message specified.
      * 
-     * @param message
-     *            the Textual error description.
+     * @param message the Textual error description.
      */
     public DomainExceptionErrorMessage(String message) {
-        super(message);
+	super(message);
     }
 
     /**
      * Constructor for SystemError with causing exception and error message.
      * 
-     * @param message
-     *            the Textual error description.
-     * @param cause
-     *            the throwable causing the system error.
+     * @param message the Textual error description.
+     * @param cause the throwable causing the system error.
      */
     public DomainExceptionErrorMessage(String message, Throwable cause) {
-        super(message);
-        this.cause = cause;
+	super(message);
+	this.cause = cause;
     }
 
     /**
      * Constructor for SystemError with cause.
      * 
-     * @param cause
-     *            the throwable causing the system error.
+     * @param cause the throwable causing the system error.
      */
     public DomainExceptionErrorMessage(Throwable cause) {
-        this.cause = cause;
+	this.cause = cause;
     }
 
     /**
      * @see com.vaadin.terminal.ErrorMessage#getErrorLevel()
      */
+    @Override
     public final int getErrorLevel() {
-        return ErrorMessage.ERROR;
+	return ErrorMessage.ERROR;
     }
 
     /**
      * @see com.vaadin.terminal.Paintable#paint(com.vaadin.terminal.PaintTarget)
      */
+    @Override
     public void paint(PaintTarget target) throws PaintException {
 
-        target.startTag("error");
-        target.addAttribute("level", "error");
+	target.startTag("error");
+	target.addAttribute("level", "error");
 
-        StringBuilder sb = new StringBuilder();
-        final String message = getCause().getLocalizedMessage();
-        if (message != null) {
-            sb.append("<h2>");
-            sb.append(message);
-            sb.append("</h2>");
-        }
+	StringBuilder sb = new StringBuilder();
+	final String message = getCause().getLocalizedMessage();
+	if (message != null) {
+	    sb.append("<h2>");
+	    sb.append(message);
+	    sb.append("</h2>");
+	}
 
-        target.addXMLSection("div", sb.toString(),
-                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+	target.addXMLSection("div", sb.toString(), "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
 
-        target.endTag("error");
+	target.endTag("error");
 
     }
 
@@ -113,32 +107,37 @@ public class DomainExceptionErrorMessage extends RuntimeException implements Err
      */
     @Override
     public Throwable getCause() {
-        return cause;
+	return cause;
     }
 
     /* Documented in super interface */
+    @Override
     public void addListener(RepaintRequestListener listener) {
     }
 
     /* Documented in super interface */
+    @Override
     public void removeListener(RepaintRequestListener listener) {
     }
 
     /* Documented in super interface */
+    @Override
     public void requestRepaint() {
     }
 
     /* Documented in super interface */
+    @Override
     public void requestRepaintRequests() {
     }
 
+    @Override
     public String getDebugId() {
-        return null;
+	return null;
     }
 
+    @Override
     public void setDebugId(String id) {
-        throw new UnsupportedOperationException(
-                "Setting testing id for this Paintable is not implemented");
+	throw new UnsupportedOperationException("Setting testing id for this Paintable is not implemented");
     }
 
 }

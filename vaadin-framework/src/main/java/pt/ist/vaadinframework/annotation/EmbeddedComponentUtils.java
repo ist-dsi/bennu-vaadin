@@ -25,17 +25,17 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 /**
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
- *
+ * 
  */
 public class EmbeddedComponentUtils {
-    
+
     public static EmbeddedComponent getAnnotation(Class<? extends EmbeddedComponentContainer> page) {
 	final EmbeddedComponent annotation = page.getAnnotation(EmbeddedComponent.class);
 	return annotation == null ? null : annotation;
     }
-    
+
     public static String getAnnotationPath(EmbeddedComponent annotation) {
-	
+
 	final String[] path = annotation.path();
 	if (path.length != 1) {
 	    return null;

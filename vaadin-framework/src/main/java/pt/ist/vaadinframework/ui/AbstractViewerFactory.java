@@ -32,10 +32,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 
 public abstract class AbstractViewerFactory implements ViewerFactory {
-    private final ResourceBundle bundle;
-
     public AbstractViewerFactory(ResourceBundle bundle) {
-	this.bundle = bundle;
     }
 
     @Override

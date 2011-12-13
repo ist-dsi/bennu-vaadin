@@ -25,29 +25,70 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
-import pt.ist.vaadinframework.data.BufferedItem;
+import pt.ist.vaadinframework.data.AbstractBufferedItem;
+import pt.ist.vaadinframework.data.BufferedProperty;
 import pt.ist.vaadinframework.data.HintedProperty;
-import pt.ist.vaadinframework.data.VBoxProperty;
 import pt.ist.vaadinframework.data.hints.Required;
 import pt.ist.vaadinframework.data.metamodel.MetaModel;
 import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.AbstractProperty;
 
-public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<Object, Type> {
-    private final Map<String, PropertyDescriptor> descriptorCache = new HashMap<String, PropertyDescriptor>();
+public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
+    public class DescriptorProperty extends AbstractProperty {
+	private final PropertyDescriptor descriptor;
 
-    public DomainItem(HintedProperty value) {
-	super(value);
+	public DescriptorProperty(PropertyDescriptor descriptor) {
+	    this.descriptor = descriptor;
+	}
+
+	@Override
+	public Class<?> getType() {
+	    return descriptor.getPropertyType();
+	}
+
+	@Override
+	public Object getValue() {
+	    Type host = getHost();
+	    return host != null ? descriptor.read(host) : null;
+	}
+
+	@Override
+	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+	    descriptor.write(getHost(), newValue);
+	}
+
+	protected Type getHost() {
+	    return DomainItem.this.getValue();
+	}
     }
 
-    public DomainItem(Type instance) {
-	this(new VBoxProperty(instance));
+    private final Map<Object, PropertyDescriptor> descriptorCache = new HashMap<Object, PropertyDescriptor>();
+
+    public DomainItem(Property wrapped, Hint... hints) {
+	super(wrapped, hints);
     }
 
-    public DomainItem(Class<? extends Type> type) {
-	this(new VBoxProperty(type));
+    public DomainItem(Class<? extends Type> type, Hint... hints) {
+	super(type, hints);
+    }
+
+    public DomainItem(Type value, Hint... hints) {
+	super(value, hints);
+    }
+
+    public DomainItem(Type value, Class<? extends Type> type, Hint... hints) {
+	super(value, type, hints);
+    }
+
+    public void discoverAllItems() {
+	if (AbstractDomainObject.class.isAssignableFrom(getType())) {
+	    MetaModel model = MetaModel.findMetaModelForType((Class<? extends AbstractDomainObject>) getType());
+	    for (String propertyId : model.getPropertyIds()) {
+		getItemProperty(propertyId);
+	    }
+	}
     }
 
     @Override
@@ -63,9 +104,9 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
 	    String first = ((String) propertyId).substring(0, split);
 	    String rest = ((String) propertyId).substring(split + 1);
 	    property = getItemProperty(first);
-	    if (property != null && property instanceof Item) {
+	    if (property != null && property instanceof AbstractBufferedItem) {
 		addItemProperty(first, property);
-		property = ((Item) property).getItemProperty(rest);
+		property = ((AbstractBufferedItem<?, ?>) property).getItemProperty(rest);
 	    } else {
 		throw new RuntimeException("could not load property: " + propertyId + " for type: " + getType());
 	    }
@@ -76,46 +117,30 @@ public class DomainItem<Type extends AbstractDomainObject> extends BufferedItem<
     private Property fromDescriptor(String propertyId) {
 	PropertyDescriptor descriptor = getDescriptor(propertyId);
 	if (descriptor != null) {
-	    BufferedProperty property;
-	    if (descriptor.isRequired()) {
-		property = new BufferedProperty(propertyId, descriptor.getPropertyType(), new Required());
-	    } else {
-		property = new BufferedProperty(propertyId, descriptor.getPropertyType());
-	    }
+	    Property property;
 	    if (AbstractDomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
-		return new DomainItem(property);
+		property = new DomainItem(new DescriptorProperty(descriptor));
 	    } else if (descriptor.isCollection()) {
-		return new DomainContainer(property, descriptor.getCollectionElementType());
+		property = new DomainContainer(new DescriptorProperty(descriptor), descriptor.getCollectionElementType());
+	    } else {
+		property = new BufferedProperty(new DescriptorProperty(descriptor));
+	    }
+	    if (descriptor.isRequired()) {
+		if (property instanceof HintedProperty) {
+		    ((HintedProperty<?>) property).addHint(new Required());
+		}
 	    }
 	    return property;
 	}
 	throw new RuntimeException("could not load property: " + propertyId + " for type: " + getType());
     }
 
-    @Override
-    protected Object readPropertyValue(AbstractDomainObject host, Object propertyId) {
-	PropertyDescriptor descriptor = getDescriptor((String) propertyId);
-	if (descriptor != null) {
-	    return descriptor.read(host);
-	}
-	return null;
-    }
-
-    @Override
-    protected void writePropertyValue(AbstractDomainObject host, Object propertyId, Object newValue) {
-	PropertyDescriptor descriptor = getDescriptor((String) propertyId);
-	if (descriptor != null) {
-	    if (newValue == null) {
-		newValue = descriptor.getDefaultValue();
-	    }
-	    descriptor.write(host, newValue);
-	}
-    }
-
     private PropertyDescriptor getDescriptor(String propertyId) {
 	if (!descriptorCache.containsKey(propertyId)) {
-	    MetaModel model = MetaModel.findMetaModelForType(getType());
-	    descriptorCache.put(propertyId, model.getPropertyDescriptor(propertyId));
+	    if (AbstractDomainObject.class.isAssignableFrom(getType())) {
+		MetaModel model = MetaModel.findMetaModelForType((Class<? extends AbstractDomainObject>) getType());
+		descriptorCache.put(propertyId, model.getPropertyDescriptor(propertyId));
+	    }
 	}
 	return descriptorCache.get(propertyId);
     }
