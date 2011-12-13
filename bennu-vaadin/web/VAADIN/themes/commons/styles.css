@@ -1,5 +1,3 @@
-@import url(../reindeer/styles.css);
-
 .v-panel-caption {
     white-space: normal;
 }
@@ -77,14 +75,16 @@
 */
 
 /* BennuTheme.WIDE_FORM */
-.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr {
-    border-bottom: 1px solid #DDDDDD;
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr,
+.v-formlayout-wide > table > tbody > tr {
+	border-bottom: 1px solid #DDDDDD;
     border-top: 1px solid #DDDDDD;
     vertical-align: top;
 }
 
-.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr > td > .v-caption {
-    text-align: left;
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr > td > .v-caption,
+.v-formlayout.wide > table > tbody > tr > td > .v-caption {
+	text-align: left;
 }
 
 /* BennuTheme.TABLE_CLEAR */
