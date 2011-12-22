@@ -19,13 +19,33 @@
  *   along with vaadin-framework. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package pt.ist.vaadinframework;
+package pt.ist.vaadinframework.terminal;
 
-import com.vaadin.Application;
-import com.vaadin.terminal.Terminal.ErrorEvent;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Window;
 
-public interface ApplicationErrorListener {
+/**
+ * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
+ * 
+ */
+public abstract class SystemErrorWindow extends Window {
+    public SystemErrorWindow() {
+	super();
+    }
 
-    public void terminalError(final ErrorEvent event, final Application application);
+    public SystemErrorWindow(String caption, ComponentContainer content) {
+	super(caption, content);
+    }
 
+    public SystemErrorWindow(String caption) {
+	super(caption);
+    }
+
+    public void showError(Window parent, final Throwable systemError) {
+	setErrorContext(systemError);
+	parent.addWindow(this);
+	focus();
+    }
+
+    protected abstract void setErrorContext(Throwable systemError);
 }

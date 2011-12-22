@@ -52,7 +52,7 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 	Item.PropertySetChangeNotifier {
     private final LinkedList<Id> list = new LinkedList<Id>();
 
-    protected final HashMap<Id, Property> map = new HashMap<Id, Property>();
+    private final HashMap<Id, Property> map = new HashMap<Id, Property>();
 
     private ItemConstructor<Id> constructor;
 

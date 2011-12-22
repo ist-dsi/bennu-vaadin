@@ -23,7 +23,6 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 import jvstm.cps.ConsistencyException;
@@ -39,6 +38,7 @@ import pt.ist.vaadinframework.ui.layout.ControlsLayout;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -65,7 +65,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after successful commit of the form
      * 
-     * @param successRedirectFactory redirector instance
+     * @param successRedirectFactory
+     *            redirector instance
      */
     public void setSuccessRedirectFactory(Redirector successRedirectFactory) {
 	this.successRedirectFactory = successRedirectFactory;
@@ -78,7 +79,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Factory of the page to redirect to after form cancel
      * 
-     * @param cancelRedirectFactory redirector instance
+     * @param cancelRedirectFactory
+     *            redirector instance
      */
     public void setCancelRedirectFactory(Redirector cancelRedirectFactory) {
 	this.cancelRedirectFactory = cancelRedirectFactory;
@@ -91,7 +93,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after successful commit of the form
      * 
-     * @param successRedirect resource to redirect to
+     * @param successRedirect
+     *            resource to redirect to
      */
     public void setSuccessRedirect(FragmentQuery successRedirect) {
 	this.successRedirect = successRedirect;
@@ -104,7 +107,8 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     /**
      * Page to redirect to after form cancel
      * 
-     * @param cancelRedirect resource to redirect to
+     * @param cancelRedirect
+     *            resource to redirect to
      */
     public void setCancelRedirect(FragmentQuery cancelRedirect) {
 	this.cancelRedirect = cancelRedirect;
@@ -243,85 +247,21 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 
     @Override
     @Service
-    public void commit() {
-	LinkedList<SourceException> problems = null;
-
+    public void commit() throws SourceException, InvalidValueException {
 	try {
-	    if (!isWriteThrough()) {
-		try {
-		    super.commit();
-		} catch (Buffered.SourceException se) {
-		    findIllegalWritesInside(se);
-		    focus();
-		    if (problems == null) {
-			problems = new LinkedList<SourceException>();
-		    }
-		    problems.add(se);
-		}
-		if (problems != null && !problems.isEmpty()) {
-		    // Commit problems
-		    final Throwable[] causes = new Throwable[problems.size()];
-		    int index = 0;
-		    for (final Iterator<SourceException> i = problems.iterator(); i.hasNext();) {
-			causes[index++] = i.next();
-		    }
-		    final Buffered.SourceException e = new Buffered.SourceException(this, causes);
-		    // currentBufferedSourceException = e;
-		    throw e;
-		}
-
-	    } else {
-		if (!isInvalidCommitted() && !isValid()) {
-		    if (isValidationVisibleOnCommit()) {
-			setValidationVisible(true);
-		    }
-		    validate();
-		}
+	    super.commit();
+	    if (getItemDataSource() instanceof Buffered) {
+		((Buffered) getItemDataSource()).commit();
 	    }
-
-	    if (isValid() && getItemDataSource() instanceof Buffered) {
-		Buffered buffer = (Buffered) getItemDataSource();
-		if (!buffer.isWriteThrough()) {
-		    try {
-			buffer.commit();
-		    } catch (final Buffered.SourceException e) {
-			findIllegalWritesInside(e);
-			focus();
-			if (problems == null) {
-			    problems = new LinkedList<SourceException>();
-			}
-			problems.add(e);
-		    }
-
-		}
+	    if (successRedirect != null) {
+		EmbeddedApplication.open(getApplication(), successRedirect.getQueryString());
+	    } else if (successRedirectFactory != null) {
+		successRedirectFactory.redirect();
+	    } else if (getWindow().isClosable() && getWindow().getParent() != null) {
+		getWindow().getParent().removeWindow(getWindow());
 	    }
-
-	    // No problems occurred
-	    if (problems == null) {
-		if (successRedirect != null) {
-		    EmbeddedApplication.open(getApplication(), successRedirect.getQueryString());
-		} else if (successRedirectFactory != null) {
-		    successRedirectFactory.redirect();
-		} else if (getWindow().isClosable() && getWindow().getParent() != null) {
-		    getWindow().getParent().removeWindow(getWindow());
-		}
-		// currentBufferedSourceException = null;
-		setComponentError(null);
-		return;
-	    }
-
-	    // Commit problems
-	    final Throwable[] causes = new Throwable[problems.size()];
-	    int index = 0;
-	    for (final Iterator<SourceException> i = problems.iterator(); i.hasNext();) {
-		causes[index++] = i.next();
-	    }
-	    final Buffered.SourceException e = new Buffered.SourceException(this, causes);
-	    // currentBufferedSourceException = e;
-	    throw e;
-	} catch (Buffered.SourceException e) {
+	} catch (SourceException e) {
 	    findIllegalWritesInside(e);
-	    focus();
 	    throw e;
 	}
     }

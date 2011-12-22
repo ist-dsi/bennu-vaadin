@@ -21,17 +21,27 @@
  */
 package pt.ist.vaadinframework;
 
+import java.lang.reflect.Field;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import pt.ist.fenixframework.FFDomainException;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
+import pt.ist.vaadinframework.terminal.DefaultSystemErrorWindow;
+import pt.ist.vaadinframework.terminal.DomainExceptionErrorMessage;
+import pt.ist.vaadinframework.terminal.SystemErrorWindow;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 
 import com.vaadin.Application;
-import com.vaadin.ui.Label;
+import com.vaadin.data.Buffered;
+import com.vaadin.data.Buffered.SourceException;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Form;
 import com.vaadin.ui.Window;
 
 /**
@@ -117,7 +127,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
     private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
     private static final Set<Class<? extends EmbeddedComponentContainer>> pages = new HashSet<Class<? extends EmbeddedComponentContainer>>();
 
-    private static ApplicationErrorListener errorListener = null;
+    private static SystemErrorWindow errorWindow = new DefaultSystemErrorWindow();
 
     @Override
     public void init() {
@@ -185,9 +195,11 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      * {@link EmbeddedComponentContainer} using
      * {@link EmbeddedComponentContainer#setArguments(String...)}.
      * 
-     * @param pattern The compiled {@link Pattern} instance.
-     * @param type The container that will be instantiated if the pattern
-     *            matches the {@link EmbeddedApplication#VAADIN_PARAM}.
+     * @param pattern
+     *            The compiled {@link Pattern} instance.
+     * @param type
+     *            The container that will be instantiated if the pattern matches
+     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
     public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
 	resolver.put(pattern, type);
@@ -261,30 +273,90 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	};
     }
 
-    /**
-     * @see com.vaadin.Application#terminalError(com.vaadin.terminal.Terminal.ErrorEvent)
-     */
+    public static void registerErrorWindow(SystemErrorWindow customErrorWindow) {
+	errorWindow = customErrorWindow;
+    }
+
     @Override
     public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
-	if (errorListener != null) {
-	    errorListener.terminalError(event, this);
+	final Throwable t = event.getThrowable();
+	if (t instanceof SocketException) {
+	    // Most likely client browser closed socket
+	    VaadinFrameworkLogger.getLogger().info(
+		    "SocketException in CommunicationManager." + " Most likely client (browser) closed socket.");
+	    return;
+	}
+
+	if (findInvalidValueException(t) != null) {
+	    // validation errors are handled by their fields
+	    return;
+	}
+
+	FFDomainException de = findDomainExceptionCause(t);
+	Buffered source = findSource(t);
+	if (de != null) {
+	    setErrorsOn(source, de);
 	} else {
-	    super.terminalError(event);
+	    setErrorsOn(source, null);
+	    VaadinFrameworkLogger.getLogger().error("Uncaught Error", t);
+	    errorWindow.showError(getMainWindow(), t);
 	}
     }
 
-    public static class TerminalErrorWindow extends Window {
-	public TerminalErrorWindow(Throwable throwable) {
-	    setCaption(VaadinResources.getString(SYSTEM_TITLE_TERMINAL_ERROR));
-	    addComponent(new Label(VaadinResources.getString(SYSTEM_MESSAGE_TERMINAL_ERROR), Label.CONTENT_XHTML));
-	    setModal(true);
-	    getContent().setSizeUndefined();
-	    center();
+    private Buffered findSource(Throwable t) {
+	if (t instanceof SourceException) {
+	    return ((SourceException) t).getSource();
+	}
+	if (t.getCause() != null) {
+	    return findSource(t.getCause());
+	}
+	return null;
+    }
+
+    private FFDomainException findDomainExceptionCause(Throwable t) {
+	if (t instanceof FFDomainException) {
+	    return (FFDomainException) t;
+	}
+	if (t.getCause() != null) {
+	    return findDomainExceptionCause(t.getCause());
+	}
+	return null;
+    }
+
+    private InvalidValueException findInvalidValueException(Throwable t) {
+	if (t instanceof InvalidValueException) {
+	    return (InvalidValueException) t;
+	}
+	if (t.getCause() != null) {
+	    return findInvalidValueException(t.getCause());
+	}
+	return null;
+    }
+
+    private static void setErrorsOn(Buffered source, FFDomainException message) {
+	DomainExceptionErrorMessage se = null;
+	if (message != null) {
+	    se = new DomainExceptionErrorMessage(source, message);
+	}
+	if (source != null) {
+	    if (source instanceof Form) {
+		Form form = (Form) source;
+		try {
+		    Field formError = Form.class.getDeclaredField("currentBufferedSourceException");
+		    formError.setAccessible(true);
+		    formError.set(form, se);
+		} catch (IllegalArgumentException e) {
+		} catch (IllegalAccessException e) {
+		} catch (SecurityException e) {
+		} catch (NoSuchFieldException e) {
+		}
+		for (Object propertyId : form.getItemPropertyIds()) {
+		    ((AbstractField) form.getField(propertyId)).setCurrentBufferedSourceException(null);
+		}
+	    } else if (source instanceof AbstractField) {
+		AbstractField field = (AbstractField) source;
+		field.setCurrentBufferedSourceException(se);
+	    }
 	}
     }
-
-    public static void registerErrorListener(final ApplicationErrorListener errorListenerArg) {
-	errorListener = errorListenerArg;
-    }
-
 }

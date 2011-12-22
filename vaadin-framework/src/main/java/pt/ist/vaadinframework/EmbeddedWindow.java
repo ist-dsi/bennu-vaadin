@@ -46,7 +46,7 @@ import com.vaadin.ui.Window;
  *         (sergio.silva@ist.utl.pt)
  */
 public class EmbeddedWindow extends Window {
-    private final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
+    final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
 
     private Component current;
 
@@ -108,15 +108,6 @@ public class EmbeddedWindow extends Window {
 	    }
 	});
 	setContent(layout);
-	// addListener(new CloseListener() {
-	// @Override
-	// public void windowClose(CloseEvent e) {
-	// getContent().removeAllComponents();
-	// getContent().addComponent(fragmentUtility);
-	// System.out.println("Closing embedded window!:" +
-	// e.getWindow().getName());
-	// }
-	// });
     }
 
     public void refreshContent() {
