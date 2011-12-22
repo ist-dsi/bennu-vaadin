@@ -10,9 +10,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
-import myorg._development.PropertiesManager;
-import pt.ist.bennu.vaadin.errorHandling.VirtualHostAwareErrorHandler;
-import pt.ist.vaadinframework.ApplicationErrorListener;
+import pt.ist.bennu.vaadin.errorHandling.ReporterErrorWindow;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor;
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
@@ -38,7 +36,6 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 
 	    for (String path : paths) {
 		try {
-//		    EmbeddedApplication.addResolutionPattern(Pattern.compile(path), embeddedComponentClass);
 		    EmbeddedApplication.addPage(embeddedComponentClass);
 		} catch (PatternSyntaxException e) {
 		    throw new Error("Error interpreting pattern: " + path, e);
@@ -46,7 +43,7 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 	    }
 	}
 
-	initErrorListener();
+	EmbeddedApplication.registerErrorWindow(new ReporterErrorWindow());
     }
 
     private void loadEmbeddedComponentsFromFile(final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses) {
@@ -71,26 +68,4 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 	    throw new Error("Error opening file: " + EmbeddedAnnotationProcessor.LOG_FILENAME);
 	}
     }
-
-    private void initErrorListener() {
-	final String errorListenerClassName = PropertiesManager.getProperty("error.listener.vaadin.class.name");
-	final ApplicationErrorListener errorListener;
-	if (errorListenerClassName == null || errorListenerClassName.isEmpty()) {
-	    System.out.println("Init virtual host aware...");
-	    errorListener = new VirtualHostAwareErrorHandler();
-	} else {
-	    try {
-		final Class errorListenerClass = Class.forName(errorListenerClassName);
-		errorListener = (ApplicationErrorListener) errorListenerClass.newInstance();
-	    } catch (final ClassNotFoundException e) {
-		throw new Error(e);
-	    } catch (final InstantiationException e) {
-		throw new Error(e);
-	    } catch (final IllegalAccessException e) {
-		throw new Error(e);
-	    }
-	}
-	EmbeddedApplication.registerErrorListener(errorListener);
-    }
-
 }
