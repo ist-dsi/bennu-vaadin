@@ -5079,3 +5079,10 @@ body .v-filterselect-suggestpopup-big td {
 .v-csslayout-toolbar .segment .v-button {
 	margin-right: 0;
 	}
+
+.v-caption-section {
+	white-space: normal;
+	height: 1.8em;
+	font-size: large;
+	font-weight: bold;
+}

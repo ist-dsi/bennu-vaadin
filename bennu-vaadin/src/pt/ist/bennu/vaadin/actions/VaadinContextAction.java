@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import myorg.presentationTier.Context;
-import myorg.presentationTier.LayoutContext;
 import myorg.presentationTier.actions.ContextBaseAction;
 
 import org.apache.struts.action.ActionForm;
@@ -15,13 +14,6 @@ import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 
 @Mapping(path = "/vaadinContext")
 public class VaadinContextAction extends ContextBaseAction {
-
-    public static class VaadinLayoutContext extends LayoutContext {
-	public VaadinLayoutContext(String path) {
-	    super(path);
-	    addHead("/layout/vaadinHead.jsp");
-	}
-    }
 
     public static class FullVaadinLayoutContext extends Context {
 
@@ -46,8 +38,7 @@ public class VaadinContextAction extends ContextBaseAction {
     }
 
     public static ActionForward forwardToVaadin(final HttpServletRequest request, final boolean useBennuLayout) {
-	final Context context = useBennuLayout ? new VaadinLayoutContext(getContext(request).getPath())
-		: new FullVaadinLayoutContext();
+	final Context context = useBennuLayout ? getContext(request) : new FullVaadinLayoutContext();
 	setContext(request, context);
 	return forward(request, "/embedded/vaadin-embedded.jsp");
     }

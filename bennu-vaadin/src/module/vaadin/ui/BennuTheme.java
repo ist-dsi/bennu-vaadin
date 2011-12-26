@@ -297,6 +297,11 @@ public class BennuTheme extends BaseTheme {
      */
     public static final String LAYOUT_INSET = "inset";
 
+    /**
+     * Layout that defines a page section, with a caption properly sized
+     */
+    public static final String LAYOUT_SECTION = "section";
+
     /***************************************************************************
      * Window styles
      **************************************************************************/
