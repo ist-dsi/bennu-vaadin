@@ -53,6 +53,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -62,7 +63,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.Reindeer;
 
-public class PaginatedSorterViewer extends VerticalLayout implements Viewer, VaadinResourceConstants {
+public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinResourceConstants {
     interface PageChangeListener {
 	public void pageChanged(PageChangeEvent event);
     }
@@ -390,7 +391,7 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
 	}
     }
 
-    private static class ControlVisibilityListener implements ComponentAttachListener, ComponentDetachListener {
+    static class ControlVisibilityListener implements ComponentAttachListener, ComponentDetachListener {
 	@Override
 	public void componentDetachedFromContainer(ComponentDetachEvent event) {
 	    determineVisibility(event.getContainer());
@@ -408,9 +409,6 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
 
     private final GroupWrapper content;
 
-    private final HorizontalLayout topControls = new HorizontalLayout();
-    private final HorizontalLayout bottomControls = new HorizontalLayout();
-
     private GroupControl currentGrouper;
     private SorterControl currentSorter;
     private PageLengthControl pageLengthControl;
@@ -423,21 +421,39 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
     private List<PageChangeListener> listeners = null;
 
     public PaginatedSorterViewer(ContentViewerFactory factory) {
+	super(3, 3);
+	setWidth(100, UNITS_PERCENTAGE);
+	setSpacing(true);
 	this.content = new GroupWrapper(factory);
-	topControls.setSpacing(true);
-	topControls.setWidth("100%");
-	addComponent(topControls);
-	addComponent(content);
-	bottomControls.setSpacing(true);
-	bottomControls.setWidth("100%");
-	addComponent(bottomControls);
+	Component topleft = makeControlsLayout();
+	addComponent(topleft);
+	setComponentAlignment(topleft, Alignment.MIDDLE_LEFT);
+	Component topcenter = makeControlsLayout();
+	addComponent(topcenter);
+	setComponentAlignment(topcenter, Alignment.MIDDLE_CENTER);
+	Component topright = makeControlsLayout();
+	addComponent(topright);
+	setComponentAlignment(topright, Alignment.MIDDLE_RIGHT);
+	addComponent(content, 0, 1, 2, 1);
+	Component bottomleft = makeControlsLayout();
+	addComponent(bottomleft);
+	setComponentAlignment(bottomleft, Alignment.MIDDLE_LEFT);
+	Component bottomcenter = makeControlsLayout();
+	addComponent(bottomcenter);
+	setComponentAlignment(bottomcenter, Alignment.MIDDLE_CENTER);
+	Component bottomright = makeControlsLayout();
+	addComponent(bottomright);
+	setComponentAlignment(bottomright, Alignment.MIDDLE_RIGHT);
+    }
+
+    private static Component makeControlsLayout() {
+	HorizontalLayout layout = new HorizontalLayout();
+	layout.setSpacing(true);
+	layout.setVisible(false);
 	ControlVisibilityListener controlVisibilityListener = new ControlVisibilityListener();
-	topControls.addListener((ComponentAttachListener) controlVisibilityListener);
-	topControls.addListener((ComponentDetachListener) controlVisibilityListener);
-	ControlVisibilityListener.determineVisibility(topControls);
-	bottomControls.addListener((ComponentAttachListener) controlVisibilityListener);
-	bottomControls.addListener((ComponentDetachListener) controlVisibilityListener);
-	ControlVisibilityListener.determineVisibility(bottomControls);
+	layout.addListener((ComponentAttachListener) controlVisibilityListener);
+	layout.addListener((ComponentDetachListener) controlVisibilityListener);
+	return layout;
     }
 
     public void setPagination() {
@@ -502,7 +518,7 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
     }
 
     public void setFilter(Object[] filterIds, String[] filterLabels) {
-	setFilter(Alignment.TOP_LEFT, filterIds, filterLabels);
+	setFilter(Alignment.TOP_RIGHT, filterIds, filterLabels);
     }
 
     public void setFilter(Alignment position, Object[] filterIds, String[] filterLabels) {
@@ -521,17 +537,12 @@ public class PaginatedSorterViewer extends VerticalLayout implements Viewer, Vaa
 	addControls(controls, position);
     }
 
-    private void addControls(HorizontalLayout controls, Alignment position) {
+    private void addControls(Component controls, Alignment position) {
 	HorizontalLayout controlBar;
-	if (position.isTop()) {
-	    controlBar = topControls;
-	} else if (position.isBottom()) {
-	    controlBar = bottomControls;
-	} else {
-	    throw new UnsupportedOperationException("unsupported alignment");
-	}
+	int x = position.isLeft() ? 0 : (position.isCenter() ? 1 : 2);
+	int y = position.isTop() ? 0 : 2;
+	controlBar = (HorizontalLayout) getComponent(x, y);
 	controlBar.addComponent(controls);
-	controlBar.setComponentAlignment(controls, position);
     }
 
     @Override
