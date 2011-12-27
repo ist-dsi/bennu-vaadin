@@ -4790,8 +4790,7 @@ body .v-filterselect-suggestpopup-big td {
 
 /* Inset box */
 
-.inset.big {
-	margin:30px 0;
+.inset {
 	background:rgba(179, 172, 157, 0.18);
 	box-shadow:0px 1px 1px rgba(0, 0, 0, 0.15) inset, 0px 1px 0px #F8F3EB;
 	
@@ -4801,9 +4800,13 @@ body .v-filterselect-suggestpopup-big td {
 	-o-border-radius:3px;
 }
 
-.inset.big input.v-textfield {
-	font-size:16px;
-	padding:10px 6px 5px;
+.inset.big {
+	margin:30px 0;
+}
+
+.inset input.v-textfield {
+	font-size:13px;
+	padding:4px 8px;
 	border: 1px solid rgba(0, 0, 0, 0.25);
 	
 	border-radius:3px;
@@ -4814,6 +4817,25 @@ body .v-filterselect-suggestpopup-big td {
 	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
+.inset.big input.v-textfield {
+	font-size:16px;
+	padding:10px 6px 5px;
+}
+
+.inset .v-orderedlayout-margin-top,
+.inset .v-horizontallayout-margin-top,
+.inset .v-verticallayout-margin-top,
+.inset .v-orderedlayout-margin-right,
+.inset .v-horizontallayout-margin-right,
+.inset .v-verticallayout-margin-right,
+.inset .v-orderedlayout-margin-bottom,
+.inset .v-horizontallayout-margin-bottom,
+.inset .v-verticallayout-margin-bottom,
+.inset .v-orderedlayout-margin-left,
+.inset .v-horizontallayout-margin-left,
+.inset .v-verticallayout-margin-left {
+    padding: 8px;
+}
 
 .inset.big .v-orderedlayout-margin-top,
 .inset.big .v-horizontallayout-margin-top,
@@ -4833,25 +4855,42 @@ body .v-filterselect-suggestpopup-big td {
 
 /* Panels */
 
-.v-panel-caption {
-	color:#615C54;
-	background:transparent;
-	padding:1em 0 0.5em;
+.v-panel {
+	border:1px solid #817868;
 }
+	.v-panel-caption {
+		color:#615C54;
+		background:transparent;
+		padding:1em 0 0.5em;
+	}
 
-.v-panel-content {
-	background:transparent;
-	border:none;
-}
+	.v-panel .v-panel-caption span {
+		padding-left:0.75em;
+	}
+	
+	.v-panel-content {
+		background:transparent;
+	}
 
-.v-panel-deco {
-	border:none;
-}
-
-.v-panel.v-panel-borderless {
-	border:none;
-	border-top:2px solid #D4CDBD;
-}
+	.v-panel-caption,
+	.v-panel-content,
+	.v-panel-content-borderless,
+	.v-panel-content-light,
+	.v-panel-deco,
+	.v-panel-nocaption,
+	.v-panel.v-panel-borderless,
+	.v-panel.v-panel-light,
+	.v-panel.v-panel-borderless .v-panel-caption-borderless,
+	.v-panel.v-panel-light .v-panel-caption-light {
+		border:none;
+	}
+	
+	.v-panel.v-panel-light {
+		border-top:2px solid #D4CDBD;
+	}
+	
+	
+	
 
 
 /* Buttons */
@@ -4862,9 +4901,14 @@ body .v-filterselect-suggestpopup-big td {
 }
 	.submit .v-button-wrap,
 	.cancel .v-button-wrap {
-		padding:8px 16px;
+		padding:4px 8px;
 		background:none;
 		border:0px;
+	}
+	
+	.big .submit .v-button-wrap,
+	.big .cancel .v-button-wrap {
+		padding:8px 16px;
 	}
 
 	.v-button-down .submit .v-button-wrap,
@@ -4873,9 +4917,18 @@ body .v-filterselect-suggestpopup-big td {
 	.cancel:active .v-button-wrap,
 	.v-ie7 .submit.v-pressed .v-button-wrap,
 	.v-ie8 .cancel.v-pressed .v-button-wrap {
-		padding: 8px 16px;
+		padding: 4px 8px;
 		background:none;
 		border:0px;
+	}
+	
+	.big .v-button-down .submit .v-button-wrap,
+	.big .v-button-down .cancel .v-button-wrap,
+	.big .submit:active .v-button-wrap,
+	.big .cancel:active .v-button-wrap,
+	.v-ie7 .big .submit.v-pressed .v-button-wrap,
+	.v-ie8 .big .cancel.v-pressed .v-button-wrap {
+		padding: 8px 16px;
 	}
 	
 	
@@ -4999,9 +5052,9 @@ body .v-filterselect-suggestpopup-big td {
 
 /* Select Input */
 
-.v-filterselect-input {
+/* .v-filterselect-input {
 	min-width:160px;
-}
+} */
 
 /* @import "../chameleon/styles.css"; */
 
@@ -5458,4 +5511,3 @@ td.v-datefield-calendarpanel-month,
 .v-csslayout-toolbar .segment .v-button {
 	margin-right: 0;
 	}
-	
