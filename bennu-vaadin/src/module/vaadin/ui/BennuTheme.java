@@ -202,7 +202,7 @@ public class BennuTheme extends BaseTheme {
      * the theme, and adds slight rounded corners (not supported in all
      * browsers)
      */
-    public static final String PANEL_BUBBLE = "bubble";
+    // public static final String PANEL_BUBBLE = "bubble";
 
     /**
      * Removes borders and background color from the panel
