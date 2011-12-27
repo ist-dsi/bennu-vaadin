@@ -342,7 +342,7 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 	    if (limboItems.containsKey(itemId)) {
 		return limboItems.get(itemId);
 	    }
-	    if (getValue().contains(itemId)) {
+	    if (getAllItemIds().contains(itemId)) {
 		if (!items.containsKey(itemId)) {
 		    items.put((ItemId) itemId, makeItem((ItemId) itemId));
 		}
