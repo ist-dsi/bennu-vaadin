@@ -310,6 +310,7 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 
 	public GroupWrapper(ContentViewerFactory factory) {
 	    this.factory = factory;
+	    setSpacing(true);
 	}
 
 	public void setGroupPropertyId(Object groupPropertyId) {
