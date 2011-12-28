@@ -634,7 +634,7 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 
     private void addShownItem(Object itemId) {
 	Item realItem = realContainer.getItem(itemId);
-	Item shownItem = shownContainer.addItem(itemId);
+	Item shownItem = shownContainer.addItem(realItem);
 	for (Object property : realContainer.getContainerPropertyIds()) {
 	    shownItem.getItemProperty(property).setValue(realItem.getItemProperty(property).getValue());
 	}
