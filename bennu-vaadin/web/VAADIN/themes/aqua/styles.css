@@ -4698,7 +4698,7 @@ body .v-filterselect-suggestpopup-big td {
 
 
 /*******************************************************************************
- * SOTIS
+ * Aqua
  ******************************************************************************/
 
 .v-app.v-theme-aqua {
@@ -4724,30 +4724,32 @@ body .v-filterselect-suggestpopup-big td {
 	
 	border-radius:40px;
 }
-.v-label.numeral.big {
-	width:24px;
-	height:24px;
-	vertical-align:-2px;
-	font-size:18px;
+	.v-label.numeral.big {
+		width:24px;
+		height:24px;
+		vertical-align:-2px;
+		font-size:18px;
 	
-	border-radius:40px;
-}
-.v-label.numeral.green {
-	background:#68c23b;
-	text-shadow:0px -1px 0px #539b2f;
-}
-.v-label.numeral.yellow {
-	background:#ffaa4e;
-	text-shadow:0px -1px 0px #cc883e;
-}
-.v-label.numeral.blue {
-	background:#4ec3ff;
-	text-shadow:0px -1px 0px #3e9ccc;
-}
+		border-radius:40px;
+	}
+	.v-label.numeral.green {
+		background:#68c23b;
+		text-shadow:0px -1px 0px #539b2f;
+	}
+	.v-label.numeral.yellow {
+		background:#ffaa4e;
+		text-shadow:0px -1px 0px #cc883e;
+	}
+	.v-label.numeral.blue {
+		background:#4ec3ff;
+		text-shadow:0px -1px 0px #3e9ccc;
+	}
+
 
 /* Inset box */
 
-.inset {
+.inset.big {
+	margin:30px 0;
 	background:rgba(179, 172, 157, 0.18);
 	box-shadow:0px 1px 1px rgba(0, 0, 0, 0.15) inset, 0px 1px 0px #F8F3EB;
 	
@@ -4757,11 +4759,7 @@ body .v-filterselect-suggestpopup-big td {
 	-o-border-radius:3px;
 }
 
-.inset.big {
-	margin:30px 0;
-}
-
-.inset input.v-textfield {
+.inset.big input.v-textfield {
 	border: 1px solid rgba(0, 0, 0, 0.25);
 	
 	border-radius:3px;
@@ -4772,19 +4770,10 @@ body .v-filterselect-suggestpopup-big td {
 	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
-.inset .v-orderedlayout-margin-top,
-.inset .v-horizontallayout-margin-top,
-.inset .v-verticallayout-margin-top,
-.inset .v-orderedlayout-margin-right,
-.inset .v-horizontallayout-margin-right,
-.inset .v-verticallayout-margin-right,
-.inset .v-orderedlayout-margin-bottom,
-.inset .v-horizontallayout-margin-bottom,
-.inset .v-verticallayout-margin-bottom,
-.inset .v-orderedlayout-margin-left,
-.inset .v-horizontallayout-margin-left,
-.inset .v-verticallayout-margin-left {
-    padding: 8px;
+
+.v-textfield-big {
+	font-size:16px;
+	padding:10px 6px 5px;
 }
 
 .inset.big .v-orderedlayout-margin-top,
@@ -4802,11 +4791,76 @@ body .v-filterselect-suggestpopup-big td {
     padding: 30px;
 }
 
+/* Inset box & big */
+
+.inset {
+	background:rgba(179, 172, 157, 0.18);
+	box-shadow:0px 1px 1px rgba(0, 0, 0, 0.15) inset, 0px 1px 0px #F8F3EB;
+	
+	border-radius:3px;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	-o-border-radius:3px;
+}
+
+.big {
+	margin:30px 0;
+}
+
+.inset input.v-textfield {
+	font-size:13px;
+	padding:4px 8px;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	
+	border-radius:3px;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	-o-border-radius:3px;
+	
+	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
+}
+
+.inset.big input.v-textfield {
+	font-size:16px;
+	padding:10px 6px 5px;
+}
+
+.inset .v-orderedlayout-margin-top,
+.inset .v-horizontallayout-margin-top,
+.inset .v-verticallayout-margin-top,
+.inset .v-orderedlayout-margin-right,
+.inset .v-horizontallayout-margin-right,
+.inset .v-verticallayout-margin-right,
+.inset .v-orderedlayout-margin-bottom,
+.inset .v-horizontallayout-margin-bottom,
+.inset .v-verticallayout-margin-bottom,
+.inset .v-orderedlayout-margin-left,
+.inset .v-horizontallayout-margin-left,
+.inset .v-verticallayout-margin-left {
+    padding: 8px;
+}
+
+.big .v-orderedlayout-margin-top,
+.big .v-horizontallayout-margin-top,
+.big .v-verticallayout-margin-top,
+.big .v-orderedlayout-margin-right,
+.big .v-horizontallayout-margin-right,
+.big .v-verticallayout-margin-right,
+.big .v-orderedlayout-margin-bottom,
+.big .v-horizontallayout-margin-bottom,
+.big .v-verticallayout-margin-bottom,
+.big .v-orderedlayout-margin-left,
+.big .v-horizontallayout-margin-left,
+.big .v-verticallayout-margin-left {
+    padding: 30px;
+}
+
 
 /* Panels */
 
 .v-panel {
-	border:1px solid #817868;
+	border:0px solid #817868;
+	background:#dfd6c6;
 }
 	.v-panel-caption {
 		color:#615C54;
@@ -4815,6 +4869,7 @@ body .v-filterselect-suggestpopup-big td {
 	}
 
 	.v-panel .v-panel-caption span {
+		font-weight:bold;
 		padding-left:0.75em;
 	}
 	
@@ -4838,6 +4893,10 @@ body .v-filterselect-suggestpopup-big td {
 	.v-panel.v-panel-light {
 		border-top:2px solid #D4CDBD;
 	}
+	.v-panel.v-panel-light,
+	.v-panel.v-panel-borderless {
+		background:transparent;
+	}
 	
 	
 	
@@ -4851,7 +4910,7 @@ body .v-filterselect-suggestpopup-big td {
 }
 	.submit .v-button-wrap,
 	.cancel .v-button-wrap {
-		padding:4px 8px;
+		padding: 4px 8px;
 		background:none;
 		border:0px;
 	}
@@ -4859,6 +4918,10 @@ body .v-filterselect-suggestpopup-big td {
 	.big .submit .v-button-wrap,
 	.big .cancel .v-button-wrap {
 		padding:8px 16px;
+	}
+	
+	.v-button-submit .big {
+		
 	}
 
 	.v-button-down .submit .v-button-wrap,
@@ -5005,6 +5068,55 @@ body .v-filterselect-suggestpopup-big td {
 /* .v-filterselect-input {
 	min-width:160px;
 } */
+
+.v-button-link,
+.v-button-wrap {
+	vertical-align:top;
+}
+
+
+
+/* Item editor */
+
+.v-formlayout-captioncell {
+	vertical-align:top;
+	font-weight:bold;
+}
+
+.v-label hr {
+	border:0px;
+	color:#817868;
+	background-color:#817868;
+	height:1px;
+}
+
+/* SotisTheme.SHADED */
+.shaded, .v-table-shaded > .v-table-body {
+    background:#dfd6c6;
+}
+
+/* SotisTheme.GRID_SHADED */
+.v-gridlayout-shaded .v-gridlayout-margin-top,
+.v-verticallayout-shaded .v-verticallayout-margin-top,
+.v-gridlayout-shaded .v-gridlayout-margin-bottom,
+.v-verticallayout-shaded .v-verticallayout-margin-bottom,
+.v-gridlayout-shaded .v-gridlayout-margin-left,
+.v-verticallayout-shaded .v-verticallayout-margin-left,
+.v-gridlayout-shaded .v-gridlayout-margin-right,
+.v-verticallayout-shaded .v-verticallayout-margin-right, {
+    padding: 10px;
+}
+
+.v-gridlayout-shaded .v-gridlayout-spacing-on {
+    padding-left: 6px;
+    padding-top: 6px;
+}
+
+
+
+.v-tree-node-caption div {
+	white-space: normal;
+}
 
 /* @import "../chameleon/styles.css"; */
 
