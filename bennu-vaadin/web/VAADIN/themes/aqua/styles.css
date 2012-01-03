@@ -4747,50 +4747,6 @@ body .v-filterselect-suggestpopup-big td {
 
 
 /* Inset box */
-
-.inset.big {
-	margin:30px 0;
-	background:rgba(179, 172, 157, 0.18);
-	box-shadow:0px 1px 1px rgba(0, 0, 0, 0.15) inset, 0px 1px 0px #F8F3EB;
-	
-	border-radius:3px;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	-o-border-radius:3px;
-}
-
-.inset.big input.v-textfield {
-	border: 1px solid rgba(0, 0, 0, 0.25);
-	
-	border-radius:3px;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	-o-border-radius:3px;
-	
-	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
-}
-
-
-.v-textfield-big {
-	font-size:16px;
-	padding:10px 6px 5px;
-}
-
-.inset.big .v-orderedlayout-margin-top,
-.inset.big .v-horizontallayout-margin-top,
-.inset.big .v-verticallayout-margin-top,
-.inset.big .v-orderedlayout-margin-right,
-.inset.big .v-horizontallayout-margin-right,
-.inset.big .v-verticallayout-margin-right,
-.inset.big .v-orderedlayout-margin-bottom,
-.inset.big .v-horizontallayout-margin-bottom,
-.inset.big .v-verticallayout-margin-bottom,
-.inset.big .v-orderedlayout-margin-left,
-.inset.big .v-horizontallayout-margin-left,
-.inset.big .v-verticallayout-margin-left {
-    padding: 30px;
-}
-
 /* Inset box & big */
 
 .inset {
@@ -4801,10 +4757,6 @@ body .v-filterselect-suggestpopup-big td {
 	-webkit-border-radius:3px;
 	-moz-border-radius:3px;
 	-o-border-radius:3px;
-}
-
-.big {
-	margin:30px 0;
 }
 
 .inset input.v-textfield {
@@ -4825,35 +4777,60 @@ body .v-filterselect-suggestpopup-big td {
 	padding:10px 6px 5px;
 }
 
-.inset .v-orderedlayout-margin-top,
-.inset .v-horizontallayout-margin-top,
-.inset .v-verticallayout-margin-top,
-.inset .v-orderedlayout-margin-right,
-.inset .v-horizontallayout-margin-right,
-.inset .v-verticallayout-margin-right,
-.inset .v-orderedlayout-margin-bottom,
-.inset .v-horizontallayout-margin-bottom,
-.inset .v-verticallayout-margin-bottom,
-.inset .v-orderedlayout-margin-left,
-.inset .v-horizontallayout-margin-left,
-.inset .v-verticallayout-margin-left {
-    padding: 8px;
+.inset.big input.v-textfield {
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	
+	border-radius:3px;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	-o-border-radius:3px;
+	
+	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
-.big .v-orderedlayout-margin-top,
-.big .v-horizontallayout-margin-top,
-.big .v-verticallayout-margin-top,
-.big .v-orderedlayout-margin-right,
-.big .v-horizontallayout-margin-right,
-.big .v-verticallayout-margin-right,
-.big .v-orderedlayout-margin-bottom,
-.big .v-horizontallayout-margin-bottom,
-.big .v-verticallayout-margin-bottom,
-.big .v-orderedlayout-margin-left,
-.big .v-horizontallayout-margin-left,
-.big .v-verticallayout-margin-left {
-    padding: 30px;
+
+.v-textfield-big {
+	font-size:16px;
+	padding:10px 6px 5px;
 }
+
+
+.v-horizontallayout-inset .v-horizontallayout-margin-top,
+.v-verticallayout-inset .v-verticallayout-margin-top {
+    padding-top:8px;
+}
+.v-horizontallayout-inset .v-horizontallayout-margin-right,
+.v-verticallayout-inset .v-verticallayout-margin-right {
+	padding-right:8px;
+}
+.v-horizontallayout-inset .v-horizontallayout-margin-bottom,
+.v-verticallayout-inset .v-verticallayout-margin-bottom {
+	padding-bottom:8px;
+}
+.v-horizontallayout-inset .v-horizontallayout-margin-left,
+.v-verticallayout-inset .v-verticallayout-margin-left {
+	padding-left:8px;
+}
+
+
+.v-horizontallayout-big .v-horizontallayout-margin-top,
+.v-verticallayout-big .v-verticallayout-margin-top {
+    padding-top:30px;
+}
+.v-horizontallayout-big .v-horizontallayout-margin-right,
+.v-verticallayout-big .v-verticallayout-margin-right {
+	padding-right:30px;
+}
+.v-horizontallayout-big .v-horizontallayout-margin-bottom,
+.v-verticallayout-big .v-verticallayout-margin-bottom {
+	padding-bottom:30px;
+}
+.v-horizontallayout-big .v-horizontallayout-margin-left,
+.v-verticallayout-big .v-verticallayout-margin-left {
+	padding-left:30px;
+}
+
+
 
 
 /* Panels */
@@ -4917,7 +4894,7 @@ body .v-filterselect-suggestpopup-big td {
 	
 	.big .submit .v-button-wrap,
 	.big .cancel .v-button-wrap {
-		padding:8px 16px;
+		padding:7px 16px;
 	}
 	
 	.v-button-submit .big {
@@ -4941,7 +4918,7 @@ body .v-filterselect-suggestpopup-big td {
 	.big .cancel:active .v-button-wrap,
 	.v-ie7 .big .submit.v-pressed .v-button-wrap,
 	.v-ie8 .big .cancel.v-pressed .v-button-wrap {
-		padding: 8px 16px;
+		padding: 7px 16px;
 	}
 	
 	
