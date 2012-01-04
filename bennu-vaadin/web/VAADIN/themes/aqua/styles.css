@@ -4772,27 +4772,12 @@ body .v-filterselect-suggestpopup-big td {
 	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
-.inset.big input.v-textfield {
-	font-size:16px;
-	padding:10px 6px 5px;
-}
-
-.inset.big input.v-textfield {
-	border: 1px solid rgba(0, 0, 0, 0.25);
-	
-	border-radius:3px;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	-o-border-radius:3px;
-	
-	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2) inset;
-}
-
-
+.inset input.v-textfield-big,
 .v-textfield-big {
 	font-size:16px;
 	padding:10px 6px 5px;
 }
+
 
 
 .v-horizontallayout-inset .v-horizontallayout-margin-top,
@@ -4876,7 +4861,13 @@ body .v-filterselect-suggestpopup-big td {
 	}
 	
 	
-	
+/* Trees */
+
+.v-tree .v-tree-node .v-tree-node-caption span,
+.v-tree .v-tree-none .v-tree-node-children span {
+	color:#4f7e7f;
+	text-decoration:underline;
+}
 
 
 /* Buttons */
