@@ -4698,7 +4698,7 @@ body .v-filterselect-suggestpopup-big td {
 
 
 /*******************************************************************************
- * Aqua
+ * 			Aqua theme - NME/Fénix 2011-2012		Filipe Varela
  ******************************************************************************/
 
 .v-app.v-theme-aqua {
@@ -4821,8 +4821,8 @@ body .v-filterselect-suggestpopup-big td {
 /* Panels */
 
 .v-panel {
-	border:0px solid #817868;
-	background:#dfd6c6;
+	border:none;
+	background:#e5dcca;
 }
 	.v-panel-caption {
 		color:#615C54;
@@ -4871,6 +4871,74 @@ body .v-filterselect-suggestpopup-big td {
 
 
 /* Buttons */
+/* Default */
+.v-button-default {
+	margin-bottom:3px;
+	
+	border-color:#7a746b;
+	
+	background-color: #6db1b2;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(109, 177, 178)), to(rgb(75, 143, 145)));
+	background-image: -webkit-linear-gradient(top, rgb(109, 177, 178), rgb(75, 143, 145));
+	background-image: -moz-linear-gradient(top, rgb(109, 177, 178), rgb(75, 143, 145));
+	background-image: -o-linear-gradient(top, rgb(109, 177, 178), rgb(75, 143, 145));
+	background-image: -ms-linear-gradient(top, rgb(109, 177, 178), rgb(75, 143, 145));
+	background-image: linear-gradient(top, rgb(109, 177, 178), rgb(75, 143, 145));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#6db1b2', EndColorStr='#4b8f91');
+	
+	box-shadow:0px 1px 0px #98d3d4 inset, 0px 1px 3px rgba(0,0,0,0.25);
+}
+
+.v-button-default:hover,
+.v-button.v-button-default:active,
+.v-ie7 .v-button-default .v-pressed.v-button,
+.v-ie8 .v-button-default .v-pressed.v-button,
+div.v-button-default.v-button-down {
+	background-color: #8ac1c1;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(138, 193, 193)), to(rgb(111, 165, 167)));
+	background-image: -webkit-linear-gradient(top, rgb(138, 193, 193), rgb(111, 165, 167));
+	background-image: -moz-linear-gradient(top, rgb(138, 193, 193), rgb(111, 165, 167));
+	background-image: -o-linear-gradient(top, rgb(138, 193, 193), rgb(111, 165, 167));
+	background-image: -ms-linear-gradient(top, rgb(138, 193, 193), rgb(111, 165, 167));
+	background-image: linear-gradient(top, rgb(138, 193, 193), rgb(111, 165, 167));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#8ac1c1', EndColorStr='#6fa5a7');
+	
+	box-shadow:0px 1px 0px #addcdd inset, 0px 1px 3px rgba(0,0,0,0.35);
+}
+.v-button-default.v-button-down,
+.v-button-default.v-pressed {
+	text-shadow:0px -1px 1px #43797b;
+	
+	background-color: #4b8f91;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(75, 143, 145)), to(rgb(109, 177, 178)));
+	background-image: -webkit-linear-gradient(top, rgb(75, 143, 145), rgb(109, 177, 178));
+	background-image: -moz-linear-gradient(top, rgb(75, 143, 145), rgb(109, 177, 178));
+	background-image: -o-linear-gradient(top, rgb(75, 143, 145), rgb(109, 177, 178));
+	background-image: -ms-linear-gradient(top, rgb(75, 143, 145), rgb(109, 177, 178));
+	background-image: linear-gradient(top, rgb(75, 143, 145), rgb(109, 177, 178));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#4b8f91', EndColorStr='#6db1b2');
+	
+	box-shadow:0px 1px 2px rgba(0,0,0,0.25) inset, 0px 1px 2px rgba(0,0,0,0.25);
+}
+
+	.v-button-default .v-button-caption {
+		text-shadow:0px -1px 0px #43797b;
+	}
+	
+	.v-button:active .v-button-wrap,
+	div.v-button-default.v-button-down .v-button-wrap,
+	.v-button-default .v-button-wrap,
+	.v-button-default .v-button-wrap,
+	.v-button-default.v-pressed .v-button-wrap,
+	.v-button-default.v-pressed .v-button-wrap,
+	.v-button-default-down .v-button-wrap,
+	.v-button-default-down .v-button-wrap {
+		background:none;
+	}
+
+	/* SUBMIT */
+	
+	
 
 .submit,
 .cancel {
