@@ -4707,8 +4707,26 @@ body .v-filterselect-suggestpopup-big td {
 
 .v-app.v-theme-aqua .v-label-big {
 	font-size:1.6em;
+	color:#615C54;
 }
 
+.v-app.v-theme-aqua .v-caption-section .v-captiontext {
+	font-weight:bold;
+	font-size:1.85em;
+	color:#615C54;
+}
+
+.v-app.v-theme-aqua .section .v-caption-section .v-captiontext {
+	font-size:1.6em;
+}
+
+.v-app.v-theme-aqua .section .section .v-caption-section .v-captiontext {
+	font-size:1.4em;
+}
+
+.v-app.v-theme-aqua .section .section .section .v-caption-section .v-captiontext {
+	font-size:1.1em;
+}
 
 /* Labels */
 
