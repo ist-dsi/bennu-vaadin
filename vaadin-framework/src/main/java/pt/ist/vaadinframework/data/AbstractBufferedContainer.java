@@ -333,6 +333,23 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 	return getSortablePropertyIds();
     }
 
+    @Override
+    public boolean containsId(Object itemId) {
+	// only look at visible items after filtering
+	if (itemId == null) {
+	    return false;
+	}
+	if (isFiltered()) {
+	    return getFilteredItemIds().contains(itemId);
+	}
+	// items are lazy loaded so this next condition is not guaranteed to
+	// find the item.
+	if (items.containsKey(itemId)) {
+	    return true;
+	}
+	return getAllItemIds().contains(itemId);
+    }
+
     /**
      * @see com.vaadin.data.util.AbstractInMemoryContainer#getUnfilteredItem(java.lang.Object)
      */
@@ -342,12 +359,10 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 	    if (limboItems.containsKey(itemId)) {
 		return limboItems.get(itemId);
 	    }
-	    if (getAllItemIds().contains(itemId)) {
-		if (!items.containsKey(itemId)) {
-		    items.put((ItemId) itemId, makeItem((ItemId) itemId));
-		}
-		return items.get(itemId);
+	    if (!items.containsKey(itemId)) {
+		items.put((ItemId) itemId, makeItem((ItemId) itemId));
 	    }
+	    return items.get(itemId);
 	}
 	return null;
     }
