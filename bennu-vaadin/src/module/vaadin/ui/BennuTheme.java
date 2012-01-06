@@ -64,6 +64,11 @@ public class BennuTheme extends BaseTheme {
      */
     public static final String LABEL_LOADING = "loading";
 
+    /**
+     * Wraps the text
+     */
+    public static final String LABEL_WRAP = "wrap";
+
     /***************************************************************************
      * Button styles
      **************************************************************************/
@@ -125,11 +130,6 @@ public class BennuTheme extends BaseTheme {
      * toggle button.
      */
     public static final String BUTTON_DOWN = "down";
-
-    /**
-     * Button for form submit
-     */
-    public static final String BUTTON_SUBMIT = "submit";
 
     /***************************************************************************
      * Link styles
