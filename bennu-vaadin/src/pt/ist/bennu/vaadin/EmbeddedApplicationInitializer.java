@@ -9,8 +9,11 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import pt.ist.bennu.vaadin.errorHandling.ReporterErrorWindow;
+import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.RequestChecksumFilter;
+import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.RequestChecksumFilter.ChecksumPredicate;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor;
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
@@ -19,6 +22,15 @@ import pt.utl.ist.fenix.tools.util.FileUtils;
 
 @SuppressWarnings("serial")
 public class EmbeddedApplicationInitializer extends HttpServlet {
+    static {
+	RequestChecksumFilter.registerFilterRule(new ChecksumPredicate() {
+	    @Override
+	    public boolean shouldFilter(HttpServletRequest httpServletRequest) {
+		return !httpServletRequest.getRequestURI().endsWith("/vaadinContext.do");
+	    }
+	});
+    }
+
     private static final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses = new HashSet<Class<? extends EmbeddedComponentContainer>>();
 
     @Override
