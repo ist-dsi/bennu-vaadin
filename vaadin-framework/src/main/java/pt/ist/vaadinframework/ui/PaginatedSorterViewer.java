@@ -197,11 +197,12 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
     }
 
     public class GroupControl extends Button {
-	private boolean ascending = true;
+	private boolean ascending;
 
 	private final Object propertyId;
 
-	public GroupControl(final Object propertyId, String label) {
+	public GroupControl(final Object propertyId, boolean initialAscending, String label) {
+	    this.ascending = initialAscending;
 	    this.propertyId = propertyId;
 	    setCaption(label);
 	    addStyleName(BaseTheme.BUTTON_LINK);
@@ -240,11 +241,12 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
     }
 
     public class SorterControl extends Button {
-	private boolean ascending = true;
+	private boolean ascending;
 
 	private final Object propertyId;
 
-	public SorterControl(final Object propertyId, String label) {
+	public SorterControl(final Object propertyId, boolean initialAscending, String label) {
+	    this.ascending = initialAscending;
 	    this.propertyId = propertyId;
 	    setCaption(label);
 	    addStyleName(BaseTheme.BUTTON_LINK);
@@ -408,7 +410,7 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 	}
     }
 
-    private final GroupWrapper content;
+    private GroupWrapper content;
 
     private GroupControl currentGrouper;
     private SorterControl currentSorter;
@@ -457,6 +459,13 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 	return layout;
     }
 
+    public void setContentViewerFactory(ContentViewerFactory factory) {
+	removeComponent(content);
+	content = new GroupWrapper(factory);
+	addComponent(content, 0, 1, 2, 1);
+	setContainerDataSource(getContainerDataSource());
+    }
+
     public void setPagination() {
 	setPagination(25);
     }
@@ -472,21 +481,21 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 	addControls(pageChangerControl, pageChangerPosition);
     }
 
-    public void setGrouper(Object[] grouperIds, String[] grouperLabels) {
-	setGrouper(Alignment.TOP_LEFT, grouperIds, grouperLabels);
+    public void setGrouper(Object[] grouperIds, boolean[] initialAscending, String[] grouperLabels) {
+	setGrouper(Alignment.TOP_LEFT, grouperIds, initialAscending, grouperLabels);
     }
 
-    public void setGrouper(Alignment position, Object[] grouperIds, String[] grouperLabels) {
+    public void setGrouper(Alignment position, Object[] grouperIds, boolean[] initialAscending, String[] grouperLabels) {
 	HorizontalLayout controls = new HorizontalLayout();
 	controls.setSpacing(true);
 	if (grouperIds.length > 0) {
 	    controls.setVisible(true);
 	    controls.addComponent(new Label(VaadinResources.getString(COMMONS_GROUPBY_LABEL) + ":"));
-	    currentGrouper = new GroupControl(grouperIds[0], grouperLabels[0]);
+	    currentGrouper = new GroupControl(grouperIds[0], initialAscending[0], grouperLabels[0]);
 	    controls.addComponent(currentGrouper);
 	    for (int i = 1; i < grouperIds.length; i++) {
 		controls.addComponent(new Label("|"));
-		controls.addComponent(new GroupControl(grouperIds[i], grouperLabels[i]));
+		controls.addComponent(new GroupControl(grouperIds[i], initialAscending[i], grouperLabels[i]));
 	    }
 	} else {
 	    controls.removeAllComponents();
@@ -495,21 +504,21 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 	addControls(controls, position);
     }
 
-    public void setSorter(Object[] sorterIds, String[] sorterLabels) {
-	setSorter(Alignment.TOP_LEFT, sorterIds, sorterLabels);
+    public void setSorter(Object[] sorterIds, boolean[] initialAscending, String[] sorterLabels) {
+	setSorter(Alignment.TOP_LEFT, sorterIds, initialAscending, sorterLabels);
     }
 
-    public void setSorter(Alignment position, Object[] sorterIds, String[] sorterLabels) {
+    public void setSorter(Alignment position, Object[] sorterIds, boolean[] initialAscending, String[] sorterLabels) {
 	HorizontalLayout controls = new HorizontalLayout();
 	controls.setSpacing(true);
 	if (sorterIds.length > 0) {
 	    controls.setVisible(true);
 	    controls.addComponent(new Label(VaadinResources.getString(COMMONS_SORTBY_LABEL) + ":"));
-	    currentSorter = new SorterControl(sorterIds[0], sorterLabels[0]);
+	    currentSorter = new SorterControl(sorterIds[0], initialAscending[0], sorterLabels[0]);
 	    controls.addComponent(currentSorter);
 	    for (int i = 1; i < sorterIds.length; i++) {
 		controls.addComponent(new Label("|"));
-		controls.addComponent(new SorterControl(sorterIds[i], sorterLabels[i]));
+		controls.addComponent(new SorterControl(sorterIds[i], initialAscending[i], sorterLabels[i]));
 	    }
 	} else {
 	    controls.removeAllComponents();
