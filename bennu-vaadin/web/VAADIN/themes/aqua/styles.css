@@ -4710,24 +4710,6 @@ body .v-filterselect-suggestpopup-big td {
 	color:#615C54;
 }
 
-.v-app.v-theme-aqua .v-caption-section .v-captiontext {
-	font-weight:bold;
-	font-size:1.85em;
-	color:#615C54;
-}
-
-.v-app.v-theme-aqua .section .v-caption-section .v-captiontext {
-	font-size:1.6em;
-}
-
-.v-app.v-theme-aqua .section .section .v-caption-section .v-captiontext {
-	font-size:1.4em;
-}
-
-.v-app.v-theme-aqua .section .section .section .v-caption-section .v-captiontext {
-	font-size:1.1em;
-}
-
 /* Labels */
 
 .v-label.numeral {
@@ -4878,6 +4860,31 @@ body .v-filterselect-suggestpopup-big td {
 		background:transparent;
 	}
 	
+	
+/* Captions */
+
+.v-caption-section .v-captiontext {
+	font-weight:bold;
+	font-size:1.85em;
+	color:#615C54;
+}
+
+.section .v-caption-section .v-captiontext {
+	font-size:1.6em;
+}
+
+.section .section .v-caption-section .v-captiontext {
+	font-size:1.4em;
+}
+
+.section .section .section .v-caption-section .v-captiontext {
+	font-size:1.1em;
+}
+
+.section .v-panel-light .v-panel-caption {
+	font-size:1.6em;
+}
+
 	
 /* Trees */
 
