@@ -4705,7 +4705,7 @@ body .v-filterselect-suggestpopup-big td {
 	color:#817868;
 }
 
-.v-app.v-theme-aqua .v-label-big {
+.v-label-big {
 	font-size:1.6em;
 	color:#615C54;
 }
@@ -4745,6 +4745,13 @@ body .v-filterselect-suggestpopup-big td {
 		text-shadow:0px -1px 0px #3e9ccc;
 	}
 
+/*
+.v-button-wraps,
+.v-button-wraps .v-button-wrap,
+.v-button-wraps .v-button-caption {
+	white-space: normal;
+}
+*/
 
 /* Inset box */
 /* Inset box & big */
