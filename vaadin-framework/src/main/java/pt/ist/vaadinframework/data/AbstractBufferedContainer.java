@@ -104,6 +104,7 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 			ContainerPropertyWrapper.super.commit();
 		    } catch (Throwable e) {
 			ServiceUtils.handleException(e);
+			throw new SourceException(AbstractBufferedContainer.this, e);
 		    }
 		}
 	    });
@@ -575,6 +576,7 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 		    value.commit();
 		} catch (Throwable e) {
 		    ServiceUtils.handleException(e);
+		    throw new SourceException(AbstractBufferedContainer.this, e);
 		}
 	    }
 	});

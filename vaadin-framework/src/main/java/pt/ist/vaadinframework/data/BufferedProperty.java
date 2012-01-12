@@ -59,7 +59,8 @@ public class BufferedProperty<Type> extends AbstractHintedProperty<Type> impleme
     /**
      * Override to enable property conversion on cache update.
      * 
-     * @param value Value read from the wrapped property.
+     * @param value
+     *            Value read from the wrapped property.
      * @return Converted value to submit to the cache.
      */
     protected Type convertValue(Object value) throws ConversionException {
@@ -143,6 +144,7 @@ public class BufferedProperty<Type> extends AbstractHintedProperty<Type> impleme
 		    modified = false;
 		} catch (Throwable e) {
 		    ServiceUtils.handleException(e);
+		    throw new SourceException(BufferedProperty.this, e);
 		}
 	    }
 	});

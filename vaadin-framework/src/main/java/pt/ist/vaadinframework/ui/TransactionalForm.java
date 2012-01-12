@@ -25,12 +25,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
-import jvstm.cps.ConsistencyException;
 import pt.ist.fenixWebFramework.services.Service;
-import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
-import pt.ist.fenixframework.pstm.IllegalWriteException;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
+import pt.ist.vaadinframework.data.util.ServiceUtils;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Item;
@@ -193,7 +191,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 		getWindow().getParent().removeWindow(getWindow());
 	    }
 	} catch (SourceException e) {
-	    findIllegalWritesInside(e);
+	    ServiceUtils.handleException(e);
 	    throw e;
 	}
     }
@@ -208,8 +206,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	    // }
 	    super.discard();
 	} catch (Buffered.SourceException e) {
-	    findIllegalWritesInside(e);
-	    focus();
+	    ServiceUtils.handleException(e);
 	    throw e;
 	}
     }
@@ -218,22 +215,6 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
 	discard();
 	if (getWindow().isClosable() && getWindow().getParent() != null) {
 	    getWindow().getParent().removeWindow(getWindow());
-	}
-    }
-
-    public void findIllegalWritesInside(Throwable throwable) {
-	if (throwable instanceof IllegalWriteException) {
-	    throw (IllegalWriteException) throwable;
-	} else if (throwable instanceof ConsistencyException) {
-	    throw (ConsistencyException) throwable;
-	} else if (throwable instanceof UnableToDetermineIdException) {
-	    throw (UnableToDetermineIdException) throwable;
-	} else if (throwable instanceof Buffered.SourceException) {
-	    for (Throwable cause : ((Buffered.SourceException) throwable).getCauses()) {
-		findIllegalWritesInside(cause);
-	    }
-	} else if (throwable.getCause() != null) {
-	    findIllegalWritesInside(throwable.getCause());
 	}
     }
 }

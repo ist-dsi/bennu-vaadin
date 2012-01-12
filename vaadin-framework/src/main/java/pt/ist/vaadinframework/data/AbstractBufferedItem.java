@@ -30,15 +30,10 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import jvstm.CommitException;
-import jvstm.cps.ConsistencyException;
-
 import org.apache.commons.lang.StringUtils;
 
 import pt.ist.fenixWebFramework.services.ServiceManager;
 import pt.ist.fenixWebFramework.services.ServicePredicate;
-import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
-import pt.ist.fenixframework.pstm.IllegalWriteException;
 import pt.ist.vaadinframework.data.util.ServiceUtils;
 
 import com.vaadin.data.Buffered;
@@ -155,7 +150,8 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
      * ensure that the returned properties are of {@link BufferedProperty}s or
      * {@link Item}s or {@link Collection}s over {@link BufferedProperty}s.
      * 
-     * @param propertyId The key of the property.
+     * @param propertyId
+     *            The key of the property.
      * @return A {@link Property} instance.
      */
     protected abstract Property makeProperty(Id propertyId);
@@ -186,6 +182,7 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 		    modified = false;
 		} catch (Throwable e) {
 		    ServiceUtils.handleException(e);
+		    throw new SourceException(AbstractBufferedItem.this, e);
 		}
 	    }
 	});
@@ -208,14 +205,14 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 		    }
 		}
 	    } catch (Throwable e) {
-		handleException(e);
+		ServiceUtils.handleException(e);
 		throw new SourceException(this, e);
 	    }
 	} else {
 	    try {
 		cache = convertValue(getType().newInstance());
 	    } catch (Throwable e) {
-		handleException(e);
+		ServiceUtils.handleException(e);
 		throw new SourceException(this, e);
 	    }
 	}
@@ -247,7 +244,7 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 		    }
 		}
 	    } catch (Throwable e) {
-		handleException(e);
+		ServiceUtils.handleException(e);
 		throw new SourceException(this, e);
 	    }
 	}
@@ -318,26 +315,6 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 	}
 	final String message = "Must specify a method in class %s with a signature compatible with the arguments in getOrderedArguments() [%s]";
 	throw new NoSuchMethodException(String.format(message, type.getName(), StringUtils.join(types, ",")));
-    }
-
-    private void handleException(Throwable throwable) {
-	// This is a little hackish but is somewhat forced by the
-	// combination of architectures of both vaadin and the jvstm
-	if (throwable instanceof IllegalWriteException) {
-	    throw (IllegalWriteException) throwable;
-	} else if (throwable instanceof ConsistencyException) {
-	    throw (ConsistencyException) throwable;
-	} else if (throwable instanceof UnableToDetermineIdException) {
-	    throw (UnableToDetermineIdException) throwable;
-	} else if (throwable instanceof CommitException) {
-	    throw (CommitException) throwable;
-	} else if (throwable instanceof Buffered.SourceException) {
-	    for (Throwable cause : ((Buffered.SourceException) throwable).getCauses()) {
-		handleException(cause);
-	    }
-	} else if (throwable.getCause() != null) {
-	    handleException(throwable.getCause());
-	}
     }
 
     private Class<?>[] getArgumentTypes(Id[] argumentIds) {
@@ -452,7 +429,8 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
     /**
      * Registers a new property set change listener for this Item.
      * 
-     * @param listener the new Listener to be registered.
+     * @param listener
+     *            the new Listener to be registered.
      */
     @Override
     public void addListener(Item.PropertySetChangeListener listener) {
@@ -465,7 +443,8 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
     /**
      * Removes a previously registered property set change listener.
      * 
-     * @param listener the Listener to be removed.
+     * @param listener
+     *            the Listener to be removed.
      */
     @Override
     public void removeListener(Item.PropertySetChangeListener listener) {
