@@ -23,7 +23,6 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.ResourceBundle;
 
-import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 
 import com.vaadin.data.Container;
@@ -87,11 +86,6 @@ public class TransactionalTable extends Table {
     }
 
     private void computeHeader(AbstractBufferedContainer<?, ?, ?> container, Object propertyId) {
-	String key = container.getElementType().getName() + "." + propertyId;
-	if (bundle.containsKey(key)) {
-	    setColumnHeader(propertyId, bundle.getString(key));
-	} else {
-	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
-	}
+	setColumnHeader(propertyId, CaptionUtils.makeCaption(bundle, container, propertyId, this));
     }
 }

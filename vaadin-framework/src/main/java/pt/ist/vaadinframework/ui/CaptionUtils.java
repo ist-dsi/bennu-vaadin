@@ -28,8 +28,9 @@ import java.util.ResourceBundle;
 import org.apache.commons.lang.StringUtils;
 
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
-import pt.ist.vaadinframework.data.PropertyId;
+import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
@@ -41,29 +42,51 @@ import com.vaadin.ui.DefaultFieldFactory;
  */
 
 public class CaptionUtils {
-
-    public static String makeCaption(ResourceBundle bundle, Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property && propertyId instanceof PropertyId) {
-	    String key = getBundleKey(bundle, ((Property) item).getType(),
-		    StringUtils.join(((PropertyId) propertyId).getPath(), "."), StringUtils.EMPTY);
-	    if (bundle.containsKey(key)) {
-		return bundle.getString(key);
-	    }
-	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
+    public static String makeCaption(ResourceBundle bundle, Container container, Object propertyId, Component uiContext) {
+	if (container instanceof AbstractBufferedContainer) {
+	    return makeCaption(bundle, ((AbstractBufferedContainer<?, ?, ?>) container).getElementType(), propertyId, uiContext);
 	}
 	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
     }
 
+    public static String makeCaption(ResourceBundle bundle, Item item, Object propertyId, Component uiContext) {
+	if (item instanceof Property) {
+	    return makeCaption(bundle, ((Property) item).getType(), propertyId, uiContext);
+	}
+	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
+    }
+
+    private static String makeCaption(ResourceBundle bundle, Class<?> type, Object propertyId, Component uiContext) {
+	String key = getBundleKey(bundle, type, propertyId, StringUtils.EMPTY);
+	if (bundle.containsKey(key)) {
+	    return bundle.getString(key);
+	}
+	VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
+	return DefaultFieldFactory.createCaptionByPropertyId(propertyId);
+    }
+
+    public static String makeDescription(ResourceBundle bundle, Container container, Object propertyId, Component uiContext) {
+	if (container instanceof AbstractBufferedContainer) {
+	    return makeDescription(bundle, ((AbstractBufferedContainer<?, ?, ?>) container).getElementType(), propertyId,
+		    uiContext);
+	}
+	return makeCaption(bundle, container, propertyId, uiContext);
+    }
+
     public static String makeDescription(ResourceBundle bundle, Item item, Object propertyId, Component uiContext) {
-	if (item instanceof Property && propertyId instanceof PropertyId) {
-	    String key = getBundleKey(bundle, ((Property) item).getType(),
-		    StringUtils.join(((PropertyId) propertyId).getPath(), "."), ".description");
-	    if (bundle.containsKey(key)) {
-		return bundle.getString(key);
-	    }
-	    VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
+	if (item instanceof Property) {
+	    return makeDescription(bundle, ((Property) item).getType(), propertyId, uiContext);
 	}
 	return makeCaption(bundle, item, propertyId, uiContext);
+    }
+
+    public static String makeDescription(ResourceBundle bundle, Class<?> type, Object propertyId, Component uiContext) {
+	String key = getBundleKey(bundle, type, propertyId, ".description");
+	if (bundle.containsKey(key)) {
+	    return bundle.getString(key);
+	}
+	VaadinFrameworkLogger.getLogger().warn("i18n opportunity missed: " + key);
+	return makeCaption(bundle, type, propertyId, uiContext);
     }
 
     private static String getBundleKey(ResourceBundle bundle, Class<?> clazz, Object propertyId, String suffix) {
