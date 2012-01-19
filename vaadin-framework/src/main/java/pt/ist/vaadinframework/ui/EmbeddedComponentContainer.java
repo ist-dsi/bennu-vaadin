@@ -21,6 +21,8 @@
  */
 package pt.ist.vaadinframework.ui;
 
+import java.util.Map;
+
 import pt.ist.vaadinframework.EmbeddedApplication;
 
 import com.vaadin.ui.ComponentContainer;
@@ -38,8 +40,19 @@ public interface EmbeddedComponentContainer extends ComponentContainer {
      * You can assume that this configuration method will be called before the
      * component is attached to the window.
      * 
-     * @param arguments the parsed arguments passed to the container including
-     *            the full parameter text.
+     * @param arguments
+     *            the parsed arguments passed to the container including the
+     *            full parameter text.
      */
     public void setArguments(java.util.Map<String, String> arguments);
+
+    /**
+     * Access control method.
+     * 
+     * @param parameters
+     *            parameters of the page.
+     * 
+     * @return true if in the current user is allowed to view this page.
+     */
+    public boolean isAllowedToOpen(Map<String, String> parameters);
 }

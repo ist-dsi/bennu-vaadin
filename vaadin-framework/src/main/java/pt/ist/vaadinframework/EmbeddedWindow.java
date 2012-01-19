@@ -21,21 +21,17 @@
  */
 package pt.ist.vaadinframework;
 
-import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotation;
-import static pt.ist.vaadinframework.annotation.EmbeddedComponentUtils.getAnnotationPath;
-
 import java.util.EmptyStackException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
-import pt.ist.vaadinframework.annotation.EmbeddedComponent;
+import org.apache.commons.lang.StringUtils;
+
 import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.VerticalLayout;
@@ -48,27 +44,9 @@ import com.vaadin.ui.Window;
 public class EmbeddedWindow extends Window {
     final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
 
-    private Component current;
-
-    private Class<? extends EmbeddedComponentContainer> currentType;
-
     private final Stack<String> history = new Stack<String>();
 
-    private FragmentQuery currentQuery;
-
-    private final Set<Class<? extends EmbeddedComponentContainer>> pages;
-
-    public void setTypeForQuery() {
-	for (Class<? extends EmbeddedComponentContainer> page : pages) {
-	    final EmbeddedComponent annotation = getAnnotation(page);
-	    final String annotationPath = getAnnotationPath(annotation);
-	    if (currentQuery.getPath().equals(annotationPath)) {
-		currentType = page;
-		return;
-	    }
-	}
-	currentType = null;
-    }
+    private final Map<String, EmbeddedComponentContainer> pageCache = new HashMap<String, EmbeddedComponentContainer>();
 
     public void open(String fragment) {
 	fragmentUtility.setFragment(fragment);
@@ -83,50 +61,49 @@ public class EmbeddedWindow extends Window {
 	}
     }
 
-    private void setFragment(String fragment) {
-	try {
-	    currentQuery = new FragmentQuery(fragment);
-	    setTypeForQuery();
-	} catch (Exception ife) {
-	    VaadinFrameworkLogger.getLogger().error("Fragment: " + fragment + " did not match any known page.");
-	    currentQuery = null;
-	}
-    }
-
-    public EmbeddedWindow(Set<Class<? extends EmbeddedComponentContainer>> pages) {
+    public EmbeddedWindow() {
 	setImmediate(true);
-	this.pages = pages;
 	final VerticalLayout layout = new VerticalLayout();
 	layout.addComponent(fragmentUtility);
 	fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
 	    @Override
 	    public void fragmentChanged(FragmentChangedEvent source) {
 		String fragment = source.getUriFragmentUtility().getFragment();
-		history.push(fragment);
-		setFragment("#" + fragment);
-		refreshContent();
+		FragmentQuery query = new FragmentQuery("#" + fragment);
+		if (!pageCache.containsKey(fragment)) {
+		    try {
+			Class<? extends EmbeddedComponentContainer> requestedType = EmbeddedApplication.getPage(query.getPath());
+			if (requestedType == null) {
+			    showNotification("Página não encontrada", "A página pedida não foi encontrada no servidor",
+				    Notification.TYPE_ERROR_MESSAGE);
+			    VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não foi encontrado");
+			} else {
+			    EmbeddedComponentContainer container = requestedType.newInstance();
+			    if (container.isAllowedToOpen(query.getParams())) {
+				container.setArguments(query.getParams());
+				pageCache.put(fragment, container);
+			    } else {
+				showNotification("Acesso negado", "Não tem permissões para aceder a esta página",
+					Notification.TYPE_ERROR_MESSAGE);
+				VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não pode ser acedido");
+			    }
+			}
+		    } catch (InstantiationException e) {
+			throw new PageLoadingError(e);
+		    } catch (IllegalAccessException e) {
+			throw new PageLoadingError(e);
+		    }
+		}
+		if (pageCache.containsKey(fragment)) {
+		    getContent().removeAllComponents();
+		    getContent().addComponent(fragmentUtility);
+		    getContent().addComponent(pageCache.get(fragment));
+		    history.push(fragment);
+		    VaadinFrameworkLogger.getLogger().info("history: " + StringUtils.join(history, " > "));
+		}
 	    }
 	});
 	setContent(layout);
-    }
-
-    public void refreshContent() {
-	try {
-	    getContent().removeAllComponents();
-	    getContent().addComponent(fragmentUtility);
-	    if (currentType != null && currentQuery != null) {
-		EmbeddedComponentContainer container = currentType.newInstance();
-		final Map<String, String> params = currentQuery.getParams();
-		container.setArguments(params);
-		getContent().addComponent(container);
-	    } else {
-		getContent().addComponent(new NoMatchingPatternFoundComponent());
-	    }
-	} catch (InstantiationException e) {
-	    VaadinFrameworkLogger.getLogger().error("Failed to load page: " + currentType.getName());
-	} catch (IllegalAccessException e) {
-	    VaadinFrameworkLogger.getLogger().error("Failed to load page: " + currentType.getName());
-	}
     }
 
     @Override
@@ -134,25 +111,4 @@ public class EmbeddedWindow extends Window {
 	setLocale(Language.getLocale());
 	super.attach();
     }
-
-    private class NoMatchingPatternFoundComponent extends VerticalLayout implements EmbeddedComponentContainer {
-	@Override
-	public void attach() {
-	    super.attach();
-	    addComponent(new Label("No matching component found"));
-	}
-
-	@Override
-	public void setArguments(Map<String, String> arguments) {
-	    // Not expecting any arguments
-	}
-    }
-
-    /**
-     * @return the current
-     */
-    public Component getCurrent() {
-	return current;
-    }
-
 }

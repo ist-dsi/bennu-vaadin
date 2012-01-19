@@ -24,12 +24,11 @@ package pt.ist.vaadinframework;
 import java.lang.reflect.Field;
 import java.net.SocketException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import pt.ist.fenixframework.FFDomainException;
+import pt.ist.vaadinframework.annotation.EmbeddedComponentUtils;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.terminal.DefaultSystemErrorWindow;
 import pt.ist.vaadinframework.terminal.DomainExceptionErrorMessage;
@@ -124,15 +123,13 @@ import com.vaadin.ui.Window;
  */
 @SuppressWarnings("serial")
 public class EmbeddedApplication extends Application implements VaadinResourceConstants {
-    private static final Map<Pattern, Class<? extends EmbeddedComponentContainer>> resolver = new HashMap<Pattern, Class<? extends EmbeddedComponentContainer>>();
-    private static final Set<Class<? extends EmbeddedComponentContainer>> pages = new HashSet<Class<? extends EmbeddedComponentContainer>>();
+    private static final Map<String, Class<? extends EmbeddedComponentContainer>> pages = new HashMap<String, Class<? extends EmbeddedComponentContainer>>();
 
     private static SystemErrorWindow errorWindow = new DefaultSystemErrorWindow();
 
     @Override
     public void init() {
-	setTheme("reindeer");
-	setMainWindow(new EmbeddedWindow(pages));
+	setMainWindow(new EmbeddedWindow());
     }
 
     public static void open(Application application, Class<? extends EmbeddedComponentContainer> clazz, String... args) {
@@ -170,7 +167,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 
 	// If not, we must create a new window for this new browser window/tab
 	if (window == null) {
-	    window = new EmbeddedWindow(pages);
+	    window = new EmbeddedWindow();
 	    // Use the random name given by the framework to identify this
 	    // window in future
 	    window.setName(name);
@@ -180,13 +177,6 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 	    // window.open(new ExternalResource(window.getURL()));
 	}
 	return window;
-    }
-
-    /**
-     * Reloads current page with current arguments.
-     */
-    public void refresh() {
-	((EmbeddedWindow) getMainWindow()).refreshContent();
     }
 
     /**
@@ -201,12 +191,12 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
      *            The container that will be instantiated if the pattern matches
      *            the {@link EmbeddedApplication#VAADIN_PARAM}.
      */
-    public static void addResolutionPattern(Pattern pattern, Class<? extends EmbeddedComponentContainer> type) {
-	resolver.put(pattern, type);
+    public static void addPage(Class<? extends EmbeddedComponentContainer> page) {
+	pages.put(EmbeddedComponentUtils.getAnnotationPath(EmbeddedComponentUtils.getAnnotation(page)), page);
     }
 
-    public static void addPage(Class<? extends EmbeddedComponentContainer> type) {
-	pages.add(type);
+    public static Class<? extends EmbeddedComponentContainer> getPage(String path) {
+	return pages.get(path);
     }
 
     public static SystemMessages getSystemMessages() {
