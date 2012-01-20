@@ -4745,13 +4745,9 @@ body .v-filterselect-suggestpopup-big td {
 		text-shadow:0px -1px 0px #3e9ccc;
 	}
 
-/*
-.v-button-wraps,
-.v-button-wraps .v-button-wrap,
-.v-button-wraps .v-button-caption {
-	white-space: normal;
+.v-button-caption {
+	/* white-space:normal; */
 }
-*/
 
 /* Inset box */
 /* Inset box & big */
@@ -4823,6 +4819,13 @@ body .v-filterselect-suggestpopup-big td {
 }
 
 
+/* Records */
+
+.v-gridlayout-big .v-gridlayout-spacing-on {
+	padding-left: 10px;
+	padding-top: 12px;
+}
+
 
 
 /* Panels */
@@ -4877,19 +4880,19 @@ body .v-filterselect-suggestpopup-big td {
 }
 
 .section .v-caption-section .v-captiontext {
-	font-size:1.6em;
+	font-size:1.5em;
 }
 
 .section .section .v-caption-section .v-captiontext {
-	font-size:1.4em;
+	font-size:1.3em;
 }
 
 .section .section .section .v-caption-section .v-captiontext {
-	font-size:1.1em;
+	font-size:1em;
 }
 
 .section .v-panel-light .v-panel-caption {
-	font-size:1.6em;
+	font-size:1.5em;
 }
 
 	
@@ -4903,6 +4906,73 @@ body .v-filterselect-suggestpopup-big td {
 
 
 /* Buttons */
+/* Button */
+
+.v-button {
+	margin-bottom:3px;
+	
+	border-color:#7a746b;
+	
+	background-color: #d3cbbb;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(211, 203, 187)), to(rgb(174, 164, 148)));
+	background-image: -webkit-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -moz-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -o-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -ms-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#d3cbbb', EndColorStr='#aea494');
+	
+	box-shadow:0px 1px 0px #e7e2d9 inset, 0px 1px 3px rgba(0,0,0,0.25);
+}
+
+.v-button:hover,
+.v-button:active,
+.v-ie7 .v-button .v-pressed.v-button,
+.v-ie8 .v-button .v-pressed.v-button {
+	background-color: #e0dbd0;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(224, 219, 208)), to(rgb(198, 191, 180)));
+	background-image: -webkit-linear-gradient(top, rgb(224, 219, 208), rgb(198, 191, 180));
+	background-image: -moz-linear-gradient(top, rgb(224, 219, 208), rgb(198, 191, 180));
+	background-image: -o-linear-gradient(top, rgb(224, 219, 208), rgb(198, 191, 180));
+	background-image: -ms-linear-gradient(top, rgb(224, 219, 208), rgb(198, 191, 180));
+	background-image: linear-gradient(top, rgb(224, 219, 208), rgb(198, 191, 180));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0dbd0', EndColorStr='#c6bfb4');
+	
+	box-shadow:0px 1px 0px #eeebe4 inset, 0px 1px 3px rgba(0,0,0,0.35);
+}
+.v-button.v-button-down,
+.v-button.v-pressed {
+	text-shadow:0px -1px 1px #a9a296;
+	
+	background-color: #a9a296;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(169, 162, 150)), to(rgb(139, 131, 118)));
+	background-image: -webkit-linear-gradient(top, rgb(169, 162, 150), rgb(139, 131, 118));
+	background-image: -moz-linear-gradient(top, rgb(169, 162, 150), rgb(139, 131, 118));
+	background-image: -o-linear-gradient(top, rgb(169, 162, 150), rgb(139, 131, 118));
+	background-image: -ms-linear-gradient(top, rgb(169, 162, 150), rgb(139, 131, 118));
+	background-image: linear-gradient(top, rgb(169, 162, 150), rgb(139, 131, 118));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#a9a296', EndColorStr='#8b8376');
+	
+	box-shadow:0px 1px 2px rgba(0,0,0,0.25) inset, 0px 1px 2px rgba(0,0,0,0.25);
+}
+
+	.v-button .v-button-caption {
+		color:#fff;
+		text-shadow:0px -1px 0px #8b8376;
+	}
+	
+	.v-button:active .v-button-wrap,
+	div.v-button.v-button-down .v-button-wrap,
+	.v-button .v-button-wrap,
+	.v-button .v-button-wrap,
+	.v-button.v-pressed .v-button-wrap,
+	.v-button.v-pressed .v-button-wrap,
+	.v-button-down .v-button-wrap,
+	.v-button-down .v-button-wrap {
+		background:none;
+	}
+
+
 /* Default */
 .v-button-default {
 	margin-bottom:3px;
@@ -5129,7 +5199,60 @@ div.v-button-default.v-button-down {
 	div.submit.v-button-down .v-button-caption {
 		text-shadow:0px -1px 1px #636d6e;
 	}
+
+
+	/* Button link override */
+	.v-button.v-button-link .v-button-caption {
+		color:#4F7E7F;
+		text-shadow:none;
+	}
+	.v-button.v-button-link:hover {
+		background:none;
+		box-shadow:none;
+	}
+	.v-button.v-button-link:hover .v-button-caption {
+		color:#68b0b2;
+	}
+
 	
+	
+/* Table Stripes */
+.v-table-striped .v-table-row-odd {
+	background-color:rgba(179, 172, 157, 0.18) !important;
+}
+
+/* Tabs */
+.v-tabsheet-content {
+	background:transparent;
+	border:1px solid #7a746b !important;
+}
+
+.v-tabsheet-tabitem-selected {
+	color:#fff;
+	font-weight:bold;
+	border:1px solid #7a746b !important;
+	
+	background-color: #d3cbbb;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(211, 203, 187)), to(rgb(174, 164, 148)));
+	background-image: -webkit-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -moz-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -o-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: -ms-linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	background-image: linear-gradient(top, rgb(211, 203, 187), rgb(174, 164, 148));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#d3cbbb', EndColorStr='#aea494');
+	
+	box-shadow:0px 1px 0px #e7e2d9 inset, 0px 1px 3px rgba(0,0,0,0.25);
+}
+.v-tabsheet-tabitem-selected .v-caption {
+	background:none;
+	text-shadow:0px -1px 1px #8b8376 !important;
+}
+
+/* Opaque window */
+
+.v-window.v-window-opaque {
+	background-color:#F9F9F9;
+}
 
 /* Select Input */
 
@@ -5153,8 +5276,8 @@ div.v-button-default.v-button-down {
 
 .v-label hr {
 	border:0px;
-	color:#817868;
-	background-color:#817868;
+	color:#a9a69f;
+	background-color:#a9a69f;
 	height:1px;
 }
 
@@ -5481,7 +5604,6 @@ td.v-datefield-calendarpanel-month,
 .v-ie8 .v-button-default.v-pressed,
 .v-panel-bubble .v-panel-caption,
 .v-datefield-calendarpanel-day-selected,
-.v-table tr.v-selected,
 .v-contextmenu .gwt-MenuItem-selected,
 .v-contextmenu .gwt-MenuItem-selected div,
 .v-filterselect-suggestpopup .gwt-MenuItem-selected,
@@ -5489,13 +5611,17 @@ td.v-datefield-calendarpanel-month,
 .v-tree-node-selected span,
 .sidebar-menu .tab-selected,
 .sidebar-menu .selected,
-.v-horizontallayout-segment-alternate .v-button-down,
-.v-menubar .v-menubar-menuitem-selected,
-.v-menubar-submenu .v-menubar-menuitem-selected {
+.v-horizontallayout-segment-alternate .v-button-down {
 	background-color: rgb(109,177,178);
 	color: rgb(255,254,255);
 	text-shadow: 0 -1px 0 rgb(67,121,123);
 	}
+	
+.v-menubar .v-menubar-menuitem-selected,
+.v-menubar-submenu .v-menubar-menuitem-selected,
+.v-table tr.v-selected {
+	background-color: rgb(109,177,178) !important;
+}
 
 .v-ie6 .v-progressindicator-indicator {
 	background-color: rgb(255,107,245);
