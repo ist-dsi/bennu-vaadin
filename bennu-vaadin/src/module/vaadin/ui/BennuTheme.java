@@ -70,6 +70,12 @@ public class BennuTheme extends BaseTheme {
     public static final String LABEL_WRAP = "wrap";
 
     /***************************************************************************
+     * Form styles
+     **************************************************************************/
+
+    public static final String FORM_INLINE = "inline";
+
+    /***************************************************************************
      * Button styles
      **************************************************************************/
 
@@ -130,6 +136,11 @@ public class BennuTheme extends BaseTheme {
      * toggle button.
      */
     public static final String BUTTON_DOWN = "down";
+
+    /**
+     * Caption of buttons wraps normally.
+     */
+    public static final String BUTTON_WRAP = "wraps";
 
     /***************************************************************************
      * Link styles
@@ -265,6 +276,8 @@ public class BennuTheme extends BaseTheme {
      * Adds a light alternate background color to even rows in the table.
      */
     public static final String TABLE_STRIPED = "striped";
+
+    public static final String TABLE_STRONG = "strong";
 
     /***************************************************************************
      * ProgressIndicator styles
