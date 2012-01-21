@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.data.HintedProperty;
 import pt.ist.vaadinframework.data.HintedProperty.Hint;
+import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -35,10 +36,19 @@ import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.TableFieldFactory;
 
 public abstract class AbstractFieldFactory implements FormFieldFactory, TableFieldFactory, VaadinResourceConstants {
-    protected final ResourceBundle bundle;
+    protected final String bundlename;
 
-    public AbstractFieldFactory(ResourceBundle bundle) {
-	this.bundle = bundle;
+    private transient ResourceBundle bundle;
+
+    public AbstractFieldFactory(String bundlename) {
+	this.bundlename = bundlename;
+    }
+
+    protected ResourceBundle getBundle() {
+	if (bundle == null) {
+	    bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
+	}
+	return bundle;
     }
 
     @Override
@@ -71,10 +81,10 @@ public abstract class AbstractFieldFactory implements FormFieldFactory, TableFie
     protected abstract Field makeField(Item item, Object propertyId, Component uiContext);
 
     protected String makeCaption(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeCaption(bundle, item, propertyId, uiContext);
+	return CaptionUtils.makeCaption(getBundle(), item, propertyId, uiContext);
     }
 
     protected String makeDescription(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeDescription(bundle, item, propertyId, uiContext);
+	return CaptionUtils.makeDescription(getBundle(), item, propertyId, uiContext);
     }
 }

@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -67,11 +66,8 @@ import com.vaadin.ui.TextField;
  * 
  */
 public class DefaultFieldFactory extends AbstractFieldFactory {
-    /**
-     * @param bundle
-     */
-    public DefaultFieldFactory(ResourceBundle bundle) {
-	super(bundle);
+    public DefaultFieldFactory(String bundlename) {
+	super(bundlename);
     }
 
     /**
@@ -88,7 +84,7 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    return field;
 	}
 	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof AbstractBufferedContainer) {
-	    return new ContainerEditor<Object>(this, bundle,
+	    return new ContainerEditor<Object>(this, bundlename,
 		    ((AbstractBufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
 	}
 	if (AbstractDomainObject.class.isAssignableFrom(type)) {
@@ -144,7 +140,7 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    return form;
 	}
 	if (MultiLanguageString.class.isAssignableFrom(type)) {
-	    return new MultiLanguageStringField(bundle, Language.pt, Language.en);
+	    return new MultiLanguageStringField(bundlename, Language.pt, Language.en);
 	}
 	if (DateTime.class.isAssignableFrom(type)) {
 	    PopupDateTimeField field = new PopupDateTimeField();

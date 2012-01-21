@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import com.vaadin.data.Property;
@@ -29,7 +30,7 @@ import com.vaadin.data.Property.ValueChangeNotifier;
 import com.vaadin.ui.Field;
 
 public interface HintedProperty<Type> extends Property, ValueChangeNotifier, ReadOnlyStatusChangeNotifier {
-    public interface Hint {
+    public interface Hint extends Serializable {
 	public Field applyHint(Field field);
 
 	public boolean appliesTo(Field field);

@@ -22,7 +22,6 @@
 package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,9 +39,9 @@ import dml.Role;
 public class RolePropertyDescriptor implements PropertyDescriptor {
     private final String propertyId;
 
-    private Method reader;
+    private transient Method reader;
 
-    private Method writer;
+    private transient Method writer;
 
     private final boolean required;
 
@@ -50,9 +49,23 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     // of this type.
     private Class<? extends AbstractDomainObject> elementType;
 
+    private final Role role;
+
+    private final Class<? extends AbstractDomainObject> type;
+
+    private final Class<? extends AbstractDomainObject> returnType;
+
     public RolePropertyDescriptor(Role role, Class<? extends AbstractDomainObject> type) throws IntrospectionException,
 	    SecurityException, NoSuchMethodException, ClassNotFoundException {
 	this.propertyId = role.getName();
+	required = role.getMultiplicityLower() > 0;
+	this.role = role;
+	this.type = type;
+	calc();
+	returnType = (Class<? extends AbstractDomainObject>) reader.getReturnType();
+    }
+
+    private void calc() throws IntrospectionException, SecurityException, NoSuchMethodException, ClassNotFoundException {
 	if (role.getMultiplicityUpper() == 1) {
 	    java.beans.PropertyDescriptor property = new java.beans.PropertyDescriptor(role.getName(), type);
 	    reader = property.getReadMethod();
@@ -61,7 +74,6 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 	    reader = type.getMethod("get" + WordUtils.capitalize(role.getName()) + "Set");
 	    elementType = (Class<? extends AbstractDomainObject>) Class.forName(role.getType().getFullName());
 	}
-	required = role.getMultiplicityLower() > 0;
     }
 
     /**
@@ -77,7 +89,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
      */
     @Override
     public Class<? extends AbstractDomainObject> getPropertyType() {
-	return (Class<? extends AbstractDomainObject>) reader.getReturnType();
+	return returnType;
     }
 
     @Override
@@ -121,12 +133,11 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     @Override
     public Object read(Object host) throws ModelIntroscpectionException {
 	try {
+	    if (reader == null) {
+		calc();
+	    }
 	    return reader.invoke(host);
-	} catch (IllegalArgumentException e) {
-	    throw new ModelIntroscpectionException(e);
-	} catch (IllegalAccessException e) {
-	    throw new ModelIntroscpectionException(e);
-	} catch (InvocationTargetException e) {
+	} catch (Throwable e) {
 	    throw new ModelIntroscpectionException(e);
 	}
     }
@@ -138,6 +149,9 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
     @Override
     public void write(Object host, Object newValue) throws ModelIntroscpectionException {
 	try {
+	    if (reader == null) {
+		calc();
+	    }
 	    if (writer != null) {
 		writer.invoke(host, newValue);
 	    } else {
@@ -145,11 +159,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 		set.clear();
 		set.addAll((Collection) newValue);
 	    }
-	} catch (IllegalArgumentException e) {
-	    throw new ModelIntroscpectionException(e);
-	} catch (IllegalAccessException e) {
-	    throw new ModelIntroscpectionException(e);
-	} catch (InvocationTargetException e) {
+	} catch (Throwable e) {
 	    throw new ModelIntroscpectionException(e);
 	}
     }

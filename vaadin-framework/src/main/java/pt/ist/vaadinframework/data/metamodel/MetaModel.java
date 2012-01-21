@@ -22,6 +22,7 @@
 package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +42,7 @@ import dml.Slot;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public class MetaModel {
+public class MetaModel implements Serializable {
     private static final Map<Class<? extends AbstractDomainObject>, MetaModel> modelCache = new HashMap<Class<? extends AbstractDomainObject>, MetaModel>();
 
     private final Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();

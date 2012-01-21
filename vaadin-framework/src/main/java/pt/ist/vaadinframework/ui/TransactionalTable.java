@@ -24,6 +24,7 @@ package pt.ist.vaadinframework.ui;
 import java.util.ResourceBundle;
 
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
+import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.PropertySetChangeEvent;
@@ -33,7 +34,9 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Table;
 
 public class TransactionalTable extends Table {
-    private final ResourceBundle bundle;
+    private final String bundlename;
+
+    private transient ResourceBundle bundle;
 
     private final PropertySetChangeListener headerUpdater = new PropertySetChangeListener() {
 	@Override
@@ -46,9 +49,16 @@ public class TransactionalTable extends Table {
 	}
     };
 
-    public TransactionalTable(ResourceBundle bundle) {
+    public TransactionalTable(String bundlename) {
 	super();
-	this.bundle = bundle;
+	this.bundlename = bundlename;
+    }
+
+    protected ResourceBundle getBundle() {
+	if (bundle == null) {
+	    bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
+	}
+	return bundle;
     }
 
     @Override
@@ -86,6 +96,6 @@ public class TransactionalTable extends Table {
     }
 
     private void computeHeader(AbstractBufferedContainer<?, ?, ?> container, Object propertyId) {
-	setColumnHeader(propertyId, CaptionUtils.makeCaption(bundle, container, propertyId, this));
+	setColumnHeader(propertyId, CaptionUtils.makeCaption(getBundle(), container, propertyId, this));
     }
 }

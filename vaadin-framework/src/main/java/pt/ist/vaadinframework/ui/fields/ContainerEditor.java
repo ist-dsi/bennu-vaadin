@@ -22,7 +22,6 @@
 package pt.ist.vaadinframework.ui.fields;
 
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -90,8 +89,8 @@ public class ContainerEditor<PC> extends FieldWrapper<PC> {
     }
 
     public static class ContainerEditorTable extends TransactionalTable {
-	public ContainerEditorTable(TableFieldFactory factory, ResourceBundle bundle) {
-	    super(bundle);
+	public ContainerEditorTable(TableFieldFactory factory, String bundlename) {
+	    super(bundlename);
 	    setWidth(100, UNITS_PERCENTAGE);
 	    setPageLength(0);
 	    setTableFieldFactory(factory);
@@ -146,8 +145,8 @@ public class ContainerEditor<PC> extends FieldWrapper<PC> {
 	}
     }
 
-    public ContainerEditor(TableFieldFactory factory, ResourceBundle bundle, Class<? extends PC> type) {
-	super(new ContainerEditorTable(factory, bundle), null, type);
+    public ContainerEditor(TableFieldFactory factory, String bundlename, Class<? extends PC> type) {
+	super(new ContainerEditorTable(factory, bundlename), null, type);
 
 	final VerticalLayout layout = new VerticalLayout();
 	layout.setSpacing(true);

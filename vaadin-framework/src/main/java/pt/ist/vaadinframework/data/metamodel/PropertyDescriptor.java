@@ -21,13 +21,15 @@
  */
 package pt.ist.vaadinframework.data.metamodel;
 
+import java.io.Serializable;
+
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
-public interface PropertyDescriptor {
+public interface PropertyDescriptor extends Serializable {
     public String getPropertyId();
 
     public Class<? extends AbstractDomainObject> getPropertyType();

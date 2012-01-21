@@ -21,6 +21,7 @@
  */
 package pt.ist.vaadinframework.ui;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,11 +65,11 @@ import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.Reindeer;
 
 public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinResourceConstants {
-    interface PageChangeListener {
+    interface PageChangeListener extends Serializable {
 	public void pageChanged(PageChangeEvent event);
     }
 
-    public class PageChangeEvent {
+    public class PageChangeEvent implements Serializable {
 
 	final PaginatedSorterViewer viewer;
 
@@ -299,7 +300,7 @@ public class PaginatedSorterViewer extends GridLayout implements Viewer, VaadinR
 	}
     }
 
-    public static interface ContentViewerFactory {
+    public static interface ContentViewerFactory extends Serializable {
 	public Viewer makeViewer();
     }
 

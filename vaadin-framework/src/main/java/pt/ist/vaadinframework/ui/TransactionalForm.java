@@ -23,7 +23,6 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ResourceBundle;
 
 import pt.ist.fenixWebFramework.services.Service;
 import pt.ist.vaadinframework.VaadinResourceConstants;
@@ -45,8 +44,8 @@ import com.vaadin.ui.OptionGroup;
 public class TransactionalForm extends Form implements VaadinResourceConstants {
     private final HorizontalLayout controls = new HorizontalLayout();
 
-    public TransactionalForm(ResourceBundle bundle) {
-	setFormFieldFactory(new DefaultFieldFactory(bundle));
+    public TransactionalForm(String bundlename) {
+	setFormFieldFactory(new DefaultFieldFactory(bundlename));
 	controls.setSpacing(true);
 	setFooter(controls);
     }

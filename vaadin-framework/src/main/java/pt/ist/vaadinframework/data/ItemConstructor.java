@@ -21,6 +21,8 @@
  */
 package pt.ist.vaadinframework.data;
 
+import java.io.Serializable;
+
 /**
  * Custom constructor strategy. Implementors must provide a method with a
  * signature that has the types of the properties corresponding to the ids
@@ -28,8 +30,9 @@ package pt.ist.vaadinframework.data;
  * 
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
- * @param <PropertyId> Type of the Ids of the properties
+ * @param <PropertyId>
+ *            Type of the Ids of the properties
  */
-public interface ItemConstructor<PropertyId> {
+public interface ItemConstructor<PropertyId> extends Serializable {
     public PropertyId[] getOrderedArguments();
 }
