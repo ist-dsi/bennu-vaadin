@@ -4712,13 +4712,28 @@ body .v-filterselect-suggestpopup-big td {
 
 .v-gridlayout-page {
 	background:url(img/bg_creme.png);
-	padding:20px 0px;
 	border-radius:3px;
 	box-shadow:0px 1px 4px rgba(0, 0, 0, 0.2);
 	-webkit-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.2);
 	-moz-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.2);
-	-o-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.2);
+	-o-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.2);	
 }
+
+
+.v-gridlayout-page .v-gridlayout-margin-top {
+    padding-top:20px;
+}
+.v-gridlayout-page .v-gridlayout-margin-right {
+	padding-right:20px;
+}
+.v-gridlayout-page .v-gridlayout-margin-bottom {
+	padding-bottom:20px;
+}
+.v-gridlayout-page .v-gridlayout-margin-left {
+	padding-left:20px;
+}
+
+
 
 /* Labels */
 
@@ -4981,6 +4996,15 @@ body .v-filterselect-suggestpopup-big td {
 	.v-button-down .v-button-wrap {
 		background:none;
 	}
+	
+	
+	.v-button-big .v-button-wrap,
+	.v-button-big .v-button-down .v-button-wrap,
+	.v-button-big .v-pressed .v-button-wrap {
+		padding:7px 16px;	
+	}
+	
+	
 
 
 /* Default */
