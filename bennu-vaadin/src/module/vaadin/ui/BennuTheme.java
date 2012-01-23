@@ -321,6 +321,11 @@ public class BennuTheme extends BaseTheme {
      */
     public static final String LAYOUT_SECTION = "section";
 
+    /**
+     * Layout to be applied to the container of a page body
+     */
+    public static final String LAYOUT_PAGE = "page";
+
     /***************************************************************************
      * Window styles
      **************************************************************************/
