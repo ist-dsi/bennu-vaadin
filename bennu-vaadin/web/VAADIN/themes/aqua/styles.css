@@ -4996,14 +4996,7 @@ body .v-filterselect-suggestpopup-big td {
 	.v-button-down .v-button-wrap {
 		background:none;
 	}
-	
-	
-	.v-button-big .v-button-wrap,
-	.v-button-big .v-button-down .v-button-wrap,
-	.v-button-big .v-pressed .v-button-wrap {
-		padding:7px 16px;	
-	}
-	
+		
 	
 
 
@@ -5248,7 +5241,16 @@ div.v-button-default.v-button-down {
 		color:#68b0b2;
 	}
 
+	/* Button Big */
 	
+	.v-button-big .v-button-wrap {
+		padding:7px 16px;	
+	}
+	.v-button-big:active .v-button-wrap,
+	.v-ie7 .v-button-big.v-pressed .v-button-wrap,
+	.v-ie8 .v-button-big.v-pressed .v-button-wrap {
+		padding:6px 15px;
+	}
 	
 /* Table Stripes */
 .v-table-striped .v-table-row-odd {
