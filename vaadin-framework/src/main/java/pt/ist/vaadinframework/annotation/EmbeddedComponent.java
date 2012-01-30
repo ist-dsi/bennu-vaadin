@@ -32,4 +32,6 @@ public @interface EmbeddedComponent {
     String[] path();
 
     String[] args() default {};
+
+    boolean persistent() default false;
 }

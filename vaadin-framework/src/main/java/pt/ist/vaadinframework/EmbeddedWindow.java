@@ -28,6 +28,7 @@ import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 
+import pt.ist.vaadinframework.annotation.EmbeddedComponentUtils;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
@@ -70,7 +71,11 @@ public class EmbeddedWindow extends Window {
 	    public void fragmentChanged(FragmentChangedEvent source) {
 		String fragment = source.getUriFragmentUtility().getFragment();
 		FragmentQuery query = new FragmentQuery("#" + fragment);
-		if (!pageCache.containsKey(fragment)) {
+
+		EmbeddedComponentContainer page = null;
+		if (pageCache.containsKey(fragment)) {
+		    page = pageCache.get(fragment);
+		} else {
 		    try {
 			Class<? extends EmbeddedComponentContainer> requestedType = EmbeddedApplication.getPage(query.getPath());
 			if (requestedType == null) {
@@ -81,7 +86,10 @@ public class EmbeddedWindow extends Window {
 			    EmbeddedComponentContainer container = requestedType.newInstance();
 			    if (container.isAllowedToOpen(query.getParams())) {
 				container.setArguments(query.getParams());
-				pageCache.put(fragment, container);
+				if (EmbeddedComponentUtils.getAnnotation(requestedType).persistent()) {
+				    pageCache.put(fragment, container);
+				}
+				page = container;
 			    } else {
 				showNotification("Acesso negado", "Não tem permissões para aceder a esta página",
 					Notification.TYPE_ERROR_MESSAGE);
@@ -94,10 +102,10 @@ public class EmbeddedWindow extends Window {
 			throw new PageLoadingError(e);
 		    }
 		}
-		if (pageCache.containsKey(fragment)) {
+		if (page != null) {
 		    getContent().removeAllComponents();
 		    getContent().addComponent(fragmentUtility);
-		    getContent().addComponent(pageCache.get(fragment));
+		    getContent().addComponent(page);
 		    history.push(fragment);
 		    VaadinFrameworkLogger.getLogger().info("history: " + StringUtils.join(history, " > "));
 		}
