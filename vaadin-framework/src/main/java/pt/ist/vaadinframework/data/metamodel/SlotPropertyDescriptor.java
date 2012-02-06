@@ -25,6 +25,9 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+
+import com.vaadin.data.Property.ConversionException;
+
 import dml.Slot;
 import dml.Slot.Option;
 
@@ -116,15 +119,15 @@ public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implem
      *      java.lang.Object)
      */
     @Override
-    public void write(Object host, Object newValue) throws ModelIntroscpectionException {
+    public void write(Object host, Object newValue) throws ConversionException {
 	try {
 	    getWriteMethod().invoke(host, newValue);
 	} catch (IllegalArgumentException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	} catch (IllegalAccessException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	} catch (InvocationTargetException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	}
     }
 

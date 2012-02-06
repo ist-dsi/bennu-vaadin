@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
+import com.vaadin.data.Property.ConversionException;
+
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
@@ -112,18 +114,18 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
      *      java.lang.Object)
      */
     @Override
-    public void write(Object host, Object newValue) throws ModelIntroscpectionException {
+    public void write(Object host, Object newValue) throws ConversionException {
 	try {
 	    final Method writeMethod = getWriteMethod();
 	    if (writeMethod != null) {
 		writeMethod.invoke(host, newValue);
 	    }
 	} catch (IllegalArgumentException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	} catch (IllegalAccessException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	} catch (InvocationTargetException e) {
-	    throw new ModelIntroscpectionException(e);
+	    throw new ConversionException(e);
 	}
     }
 

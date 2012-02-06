@@ -25,6 +25,8 @@ import java.io.Serializable;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
+import com.vaadin.data.Property.ConversionException;
+
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
@@ -44,6 +46,6 @@ public interface PropertyDescriptor extends Serializable {
 
     public Object read(Object host) throws ModelIntroscpectionException;
 
-    public void write(Object host, Object newValue) throws ModelIntroscpectionException;
+    public void write(Object host, Object newValue) throws ConversionException;
 
 }

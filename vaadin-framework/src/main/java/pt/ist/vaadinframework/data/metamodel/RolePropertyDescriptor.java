@@ -22,6 +22,7 @@
 package pt.ist.vaadinframework.data.metamodel;
 
 import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +31,9 @@ import java.util.Set;
 import org.apache.commons.lang.WordUtils;
 
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
+
+import com.vaadin.data.Property.ConversionException;
+
 import dml.Role;
 
 /**
@@ -147,7 +151,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
      *      java.lang.Object)
      */
     @Override
-    public void write(Object host, Object newValue) throws ModelIntroscpectionException {
+    public void write(Object host, Object newValue) throws ConversionException {
 	try {
 	    if (reader == null) {
 		calc();
@@ -159,8 +163,20 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 		set.clear();
 		set.addAll((Collection) newValue);
 	    }
-	} catch (Throwable e) {
-	    throw new ModelIntroscpectionException(e);
+	} catch (IllegalArgumentException e) {
+	    throw new ConversionException(e);
+	} catch (IllegalAccessException e) {
+	    throw new ConversionException(e);
+	} catch (InvocationTargetException e) {
+	    throw new ConversionException(e);
+	} catch (SecurityException e) {
+	    throw new ConversionException(e);
+	} catch (IntrospectionException e) {
+	    throw new ConversionException(e);
+	} catch (NoSuchMethodException e) {
+	    throw new ConversionException(e);
+	} catch (ClassNotFoundException e) {
+	    throw new ConversionException(e);
 	}
     }
 
