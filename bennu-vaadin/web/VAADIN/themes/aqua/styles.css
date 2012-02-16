@@ -4702,7 +4702,7 @@ body .v-filterselect-suggestpopup-big td {
  ******************************************************************************/
 
 .v-app.v-theme-aqua {
-	color:#817868;
+	color:#615C54;
 }
 
 .v-label-big {
@@ -4951,7 +4951,7 @@ body .v-filterselect-suggestpopup-big td {
 }
 
 .v-button:hover,
-.v-button:active,
+
 .v-ie7 .v-button .v-pressed.v-button,
 .v-ie8 .v-button .v-pressed.v-button {
 	background-color: #e0dbd0;
@@ -4965,6 +4965,7 @@ body .v-filterselect-suggestpopup-big td {
 	
 	box-shadow:0px 1px 0px #eeebe4 inset, 0px 1px 3px rgba(0,0,0,0.35);
 }
+.v-button:active,
 .v-button.v-button-down,
 .v-button.v-pressed {
 	text-shadow:0px -1px 1px #a9a296;
@@ -5019,7 +5020,6 @@ body .v-filterselect-suggestpopup-big td {
 }
 
 .v-button-default:hover,
-.v-button.v-button-default:active,
 .v-ie7 .v-button-default .v-pressed.v-button,
 .v-ie8 .v-button-default .v-pressed.v-button,
 div.v-button-default.v-button-down {
@@ -5034,6 +5034,7 @@ div.v-button-default.v-button-down {
 	
 	box-shadow:0px 1px 0px #addcdd inset, 0px 1px 3px rgba(0,0,0,0.35);
 }
+.v-button.v-button-default:active,
 .v-button-default.v-button-down,
 .v-button-default.v-pressed {
 	text-shadow:0px -1px 1px #43797b;
@@ -5803,3 +5804,8 @@ td.v-datefield-calendarpanel-month,
 .v-csslayout-toolbar .segment .v-button {
 	margin-right: 0;
 	}
+
+	
+.v-label-wrap {
+	white-space: normal;
+}
