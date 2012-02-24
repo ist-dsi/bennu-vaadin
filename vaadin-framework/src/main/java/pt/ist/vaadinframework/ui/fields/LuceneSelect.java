@@ -21,8 +21,8 @@
  */
 package pt.ist.vaadinframework.ui.fields;
 
-import pt.ist.bennu.ui.TimeoutSelect;
 import pt.ist.vaadinframework.data.LuceneContainer;
+import pt.ist.vaadinframework.ui.TimeoutSelect;
 
 import com.vaadin.data.Container;
 import com.vaadin.event.FieldEvents.TextChangeEvent;

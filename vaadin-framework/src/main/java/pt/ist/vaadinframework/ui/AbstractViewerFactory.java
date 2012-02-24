@@ -23,7 +23,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.ResourceBundle;
 
-import pt.ist.bennu.ui.viewers.ViewerFactory;
+import pt.ist.vaadinframework.ui.viewers.ViewerFactory;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.Viewer;
