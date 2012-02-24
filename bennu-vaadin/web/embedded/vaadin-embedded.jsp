@@ -12,7 +12,7 @@ if(!vaadin || !vaadin.vaadinConfigurations) {
 	vaadin.vaadinConfigurations = {};
 	if (!vaadin.themesLoaded) { vaadin.themesLoaded = {}; }
 	document.write('<iframe tabIndex="-1" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0;overflow:hidden;" src="javascript:false"></iframe>');
-	document.write("<script language='javascript' src='<%= request.getContextPath()%>/VAADIN/widgetsets/pt.ist.bennu.widgetset.BennuWidgetSet/pt.ist.bennu.widgetset.BennuWidgetSet.nocache.js'><\/script>");
+	document.write("<script language='javascript' src='<%= request.getContextPath()%>/VAADIN/widgetsets/pt.ist.vaadinframework.widgetset.BennuWidgetSet/pt.ist.vaadinframework.widgetset.BennuWidgetSet.nocache.js'><\/script>");
 }
 vaadin.vaadinConfigurations["vaadin"] = {appUri:'<%= request.getContextPath() + "/vaadin"%>', standalone: true, themeUri:"<%= request.getContextPath() + "/VAADIN/themes/" + theme %>", versionInfo : {vaadinVersion:"6.7.2",applicationVersion:"NONVERSIONED"}};
 //]]>
@@ -31,7 +31,7 @@ if(!vaadin.themesLoaded['<%= theme %>']) {
 </script>
 <script type="text/javascript">
 //<![CDATA[
-setTimeout('if (typeof pt_ist_bennu_widgetset_BennuWidgetSet == "undefined") {alert("Failed to load the widgetset: <%= request.getContextPath() %>/VAADIN/widgetsets/pt_ist_bennu_widgetset_BennuWidgetSet/pt_ist_bennu_widgetset_BennuWidgetSet.nocache.js")};',15000);
+setTimeout('if (typeof pt_ist_vaadinframework_widgetset_BennuWidgetSet == "undefined") {alert("Failed to load the widgetset: <%= request.getContextPath() %>/VAADIN/widgetsets/pt_ist_vaadinframework_widgetset_BennuWidgetSet/pt_ist_vaadinframework_widgetset_BennuWidgetSet.nocache.js")};',15000);
 //]]>
 </script>
 
