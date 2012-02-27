@@ -59,7 +59,7 @@ public class DomainContainer<Type extends AbstractDomainObject> extends Abstract
 
     @Override
     protected DomainItem<Type> makeItem(Type itemId) {
-	return new DomainItem<Type>(itemId);
+	return new DomainItem<Type>(itemId, elementType);
     }
 
     @Override
