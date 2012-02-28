@@ -18,7 +18,7 @@ public class MultilanguageStringEditor extends CustomField {
     public static class MLSProperty extends AbstractProperty {
 	private final Language lang;
 
-	private final MultiLanguageString mls;
+	private MultiLanguageString mls;
 
 	public MLSProperty(Language lang, MultiLanguageString mls) {
 	    this.lang = lang;
@@ -32,7 +32,7 @@ public class MultilanguageStringEditor extends CustomField {
 
 	@Override
 	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	    mls.setContent(lang, (String) newValue);
+	    mls = mls.with(lang, (String) newValue);
 	    fireValueChange();
 	}
 
