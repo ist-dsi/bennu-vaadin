@@ -2530,7 +2530,7 @@ div.v-window-header {
 .v-menubar-submenu,
 .v-drag-element {
 	font-family: Arial, Helvetica, "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, sans-serif;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 1.4;
 	color: #222;
 	}
@@ -5402,14 +5402,14 @@ div.v-button-default.v-button-down {
 .v-table-header-drag,
 .v-filterselect-select-button .v-filterselect-input,
 .v-drag-element {
-	font-size: 13px;
+	font-size: 12px;
 	}
 
 .v-app select,
 .v-window select,
 .v-popupview-popup select,
 .v-datefield-popup select {
-	font-size: 13px;
+	font-size: 12px;
 	}
 
 .v-label,
