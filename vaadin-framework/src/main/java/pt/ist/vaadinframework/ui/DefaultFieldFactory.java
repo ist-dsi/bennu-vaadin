@@ -58,6 +58,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Select;
 import com.vaadin.ui.TextField;
 
@@ -92,6 +93,13 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 	    select.setImmediate(true);
 	    return select;
+	}
+	if (Collection.class.isAssignableFrom(type)) {
+	    OptionGroup group = new OptionGroup();
+	    group.setMultiSelect(true);
+	    group.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+	    group.setImmediate(true);
+	    return group;
 	}
 	if (Byte.class.isAssignableFrom(type)) {
 	    return new PrimitiveField(new ByteValidator(), Byte.toString(Byte.MAX_VALUE).length() + 1);
@@ -159,6 +167,9 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
 	    field.addValidator(new URLValidator());
 	    return field;
 	}
-	return new TextField();
+	Select select = new Select();
+	select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+	select.setImmediate(true);
+	return select;
     }
 }
