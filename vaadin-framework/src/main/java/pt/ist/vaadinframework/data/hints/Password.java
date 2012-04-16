@@ -11,7 +11,7 @@ public class Password implements Hint {
     public Field applyHint(Field field) {
 	PasswordField password = new PasswordField();
 	HintTools.copyConfiguration(field, password);
-	return field;
+	return password;
     }
 
     @Override

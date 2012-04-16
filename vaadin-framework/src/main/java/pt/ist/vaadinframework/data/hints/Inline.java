@@ -11,7 +11,7 @@ public class Inline implements Hint {
     public Field applyHint(Field field) {
 	InlineDateField inlined = new InlineDateField();
 	HintTools.copyConfiguration(field, inlined);
-	return field;
+	return inlined;
     }
 
     @Override
