@@ -21,9 +21,13 @@
  */
 package pt.ist.vaadinframework.ui.fields;
 
+import java.lang.reflect.Constructor;
+
 import org.apache.commons.lang.StringUtils;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
+import com.vaadin.data.util.PropertyFormatter;
 import com.vaadin.ui.TextField;
 
 /**
@@ -36,5 +40,21 @@ public class PrimitiveField extends TextField {
 	setNullRepresentation(StringUtils.EMPTY);
 	setMaxLength(maxLength);
 	addValidator(validator);
+    }
+
+    @Override
+    public void setPropertyDataSource(final Property newDataSource) {
+	super.setPropertyDataSource(new PropertyFormatter(newDataSource) {
+	    @Override
+	    public Object parse(String formattedValue) throws Exception {
+		Constructor<?> constructor = newDataSource.getType().getConstructor(String.class);
+		return constructor.newInstance(formattedValue);
+	    }
+
+	    @Override
+	    public String format(Object value) {
+		return value.toString();
+	    }
+	});
     }
 }
