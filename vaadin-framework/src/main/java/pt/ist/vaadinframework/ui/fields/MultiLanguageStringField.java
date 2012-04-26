@@ -21,115 +21,152 @@
  */
 package pt.ist.vaadinframework.ui.fields;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import pt.ist.vaadinframework.ui.DefaultFieldFactory;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Form;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.PropertyFormatter;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CustomField;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
 @SuppressWarnings("serial")
-public class MultiLanguageStringField extends Form {
-    public static class MultiLanguageStringItem implements Item {
-	private final Property source;
-
-	private final Map<Language, MultiLanguageStringItemProperty> properties = new HashMap<Language, MultiLanguageStringItemProperty>();
-
-	public MultiLanguageStringItem(Property source, Language... languages) {
-	    this.source = source;
-	    for (Language language : languages) {
-		properties.put(language, new MultiLanguageStringItemProperty(language));
-	    }
-	}
-
-	@Override
-	public Property getItemProperty(Object id) {
-	    return properties.get(id);
-	}
-
-	@Override
-	public Collection<Language> getItemPropertyIds() {
-	    return properties.keySet();
-	}
-
-	@Override
-	public boolean addItemProperty(Object id, Property property) throws UnsupportedOperationException {
-	    throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeItemProperty(Object id) throws UnsupportedOperationException {
-	    throw new UnsupportedOperationException();
-	}
-
-	public class MultiLanguageStringItemProperty implements Property {
-	    private final Language language;
-
-	    public MultiLanguageStringItemProperty(Language language) {
-		this.language = language;
-	    }
-
-	    @Override
-	    public Object getValue() {
-		if (source.getValue() == null) {
-		    return null;
-		} else {
-		    return ((MultiLanguageString) source.getValue()).getContent(language);
-		}
-	    }
-
-	    @Override
-	    public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-		if (source.isReadOnly()) {
-		    throw new ReadOnlyException();
-		}
-		if (source.getValue() == null) {
-		    source.setValue(new MultiLanguageString());
-		}
-		((MultiLanguageString) source.getValue()).setContent(language, newValue.toString());
-	    }
-
-	    @Override
-	    public Class<?> getType() {
-		return String.class;
-	    }
-
-	    @Override
-	    public boolean isReadOnly() {
-		return source.isReadOnly();
-	    }
-
-	    @Override
-	    public void setReadOnly(boolean newStatus) {
-		source.setReadOnly(newStatus);
-	    }
-	}
-    }
+public class MultiLanguageStringField extends CustomField {
 
     private final Language[] languages;
 
+    private final Map<Language, TextField> fields = new HashMap<Language, TextField>();
+
     public MultiLanguageStringField(String bundlename, Language... languages) {
 	this.languages = languages;
-	setFormFieldFactory(new DefaultFieldFactory(bundlename));
-	setWriteThrough(true);
-	setImmediate(true);
+	GridLayout languagesLayout = new GridLayout(3, languages.length);
+	languagesLayout.setSpacing(true);
+	for (int i = 0; i < languages.length; ++i) {
+	    fields.put(languages[i], new TextField());
+	    languagesLayout.addComponent(fields.get(languages[i]), 0, i);
+
+	    Embedded languageIcon = new Embedded(null, new ThemeResource("../icons/flags/" + languages[i].toString() + ".gif"));
+	    languagesLayout.addComponent(languageIcon, 1, i);
+	    languagesLayout.setComponentAlignment(languageIcon, Alignment.MIDDLE_RIGHT);
+
+	    Label languageLabel = new Label(languages[i].toString());
+	    languagesLayout.addComponent(languageLabel, 2, i);
+	    languagesLayout.setComponentAlignment(languageLabel, Alignment.MIDDLE_LEFT);
+	}
+	setCompositionRoot(languagesLayout);
     }
 
     @Override
-    public void setPropertyDataSource(Property newDataSource) {
+    public void setPropertyDataSource(final Property newDataSource) {
 	super.setPropertyDataSource(newDataSource);
-	if (!MultiLanguageString.class.isAssignableFrom(newDataSource.getType())) {
-	    throw new UnsupportedOperationException("Property must be a MultiLanguageString");
+	for (final Language language : languages) {
+	    fields.get(language).setPropertyDataSource(new PropertyFormatter(newDataSource) {
+		@Override
+		public Object parse(String formattedValue) throws Exception {
+		    MultiLanguageString current = (MultiLanguageString) newDataSource.getValue();
+		    if (current == null) {
+			current = new MultiLanguageString();
+		    }
+		    return current.with(language, formattedValue);
+		}
+
+		@Override
+		public String format(Object value) {
+		    String content = ((MultiLanguageString) value).getContent(language);
+		    if (content == null) {
+			return "";
+		    }
+		    return content;
+		}
+	    });
 	}
-	setItemDataSource(new MultiLanguageStringItem(newDataSource, languages));
+    }
+
+    @Override
+    public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
+	for (TextField childField : fields.values()) {
+	    childField.setWriteThrough(writeThrough);
+	}
+	super.setWriteThrough(writeThrough);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+	for (TextField childField : fields.values()) {
+	    childField.setEnabled(enabled);
+	}
+	super.setEnabled(enabled);
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+	for (TextField childField : fields.values()) {
+	    childField.setReadOnly(readOnly);
+	}
+	super.setReadOnly(readOnly);
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+	for (TextField childField : fields.values()) {
+	    childField.setVisible(visible);
+	}
+	super.setVisible(visible);
+    }
+
+    @Override
+    public void setImmediate(boolean immediate) {
+	for (TextField childField : fields.values()) {
+	    childField.setImmediate(immediate);
+	}
+	super.setImmediate(immediate);
+    }
+
+    @Override
+    public void setReadThrough(boolean readThrough) throws SourceException {
+	for (TextField childField : fields.values()) {
+	    childField.setReadThrough(readThrough);
+	}
+	super.setReadThrough(readThrough);
+    }
+
+    @Override
+    protected boolean isEmpty() {
+	for (TextField childField : fields.values()) {
+	    if (((String) childField.getValue()).length() > 0) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    public TextField getTextField(Language language) {
+	return fields.get(language);
+    }
+
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+	for (Field field : fields.values()) {
+	    field.commit();
+	}
+	super.commit();
+    }
+
+    @Override
+    public Class<?> getType() {
+	return MultiLanguageString.class;
     }
 }
