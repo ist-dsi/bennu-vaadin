@@ -114,14 +114,14 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 	public void discard() throws SourceException {
 	    super.discard();
 	    for (Object itemId : getAllItemIds()) {
-		getItem(itemId).discard();
+		getUnfilteredItem(itemId).discard();
 	    }
 	}
 
 	@Override
 	public boolean isValid() {
 	    for (Object itemId : getAllItemIds()) {
-		if (!getItem(itemId).isValid()) {
+		if (!getUnfilteredItem(itemId).isValid()) {
 		    return false;
 		}
 	    }

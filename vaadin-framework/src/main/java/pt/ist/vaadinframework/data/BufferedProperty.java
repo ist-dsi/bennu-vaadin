@@ -123,6 +123,9 @@ public class BufferedProperty<Type> extends AbstractHintedProperty<Type> impleme
 
     @Override
     public Class<? extends Type> getType() {
+	if (getValue() != null) {
+	    return (Class<? extends Type>) getValue().getClass();
+	}
 	return (Class<? extends Type>) wrapped.getType();
     }
 

@@ -45,6 +45,10 @@ public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
 
 	@Override
 	public Class<?> getType() {
+	    final Object value = getValue();
+	    if (value != null) {
+		return value.getClass();
+	    }
 	    return descriptor.getPropertyType();
 	}
 
@@ -137,11 +141,13 @@ public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
 
     private PropertyDescriptor getDescriptor(String propertyId) {
 	if (!descriptorCache.containsKey(propertyId)) {
-	    if (AbstractDomainObject.class.isAssignableFrom(getType())) {
-		MetaModel model = MetaModel.findMetaModelForType((Class<? extends AbstractDomainObject>) getType());
+	    Class<? extends AbstractDomainObject> type = (Class<? extends AbstractDomainObject>) getType();
+	    if (AbstractDomainObject.class.isAssignableFrom(type)) {
+		MetaModel model = MetaModel.findMetaModelForType(type);
 		descriptorCache.put(propertyId, model.getPropertyDescriptor(propertyId));
 	    }
 	}
 	return descriptorCache.get(propertyId);
     }
+
 }
