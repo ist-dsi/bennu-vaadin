@@ -102,7 +102,9 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
 				.loadClass(classname);
 			embeddedComponentClasses.add(type);
 		    } catch (final ClassNotFoundException e) {
-			e.printStackTrace();
+			System.err.printf(
+				"WARN: EmbeddedComponentContainer %s is not available in this installation. ignored. \n",
+				classname);
 		    }
 		}
 	    } catch (final IOException e) {
