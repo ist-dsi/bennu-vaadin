@@ -1,3 +1,5 @@
+/* vaadin commons styles */
+
 .v-panel-caption {
     white-space: normal;
 }
@@ -103,4 +105,33 @@
 /* Reindeer.TABLE_BORDERLESS */
 .v-table-borderless .v-table-cell-content {
 	border-right: none;
+}
+
+.v-upload-link .v-button {
+	height: auto;
+	padding: 0;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-image: none;
+	background-image: none;
+	border: none;
+	cursor: pointer;
+}
+.v-upload-link .v-button .v-button-wrap {
+	display: block;
+	height: auto;
+	padding: 0;
+	background-color: transparent;
+	background-image: none;
+	background-image: none;
+	cursor: pointer;
+}
+.v-upload-link .v-button .v-button-wrap .v-button-caption {
+	color: #1b699f;
+	text-shadow: none;
+	font-weight: normal;
+	font-size: 12px;
+	line-height: normal;
+	text-decoration: underline;
+	cursor: pointer;
 }
