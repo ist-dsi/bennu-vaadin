@@ -24,8 +24,10 @@ package pt.ist.vaadinframework.ui.fields;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.vaadin.customfield.PropertyConverter;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.ui.PopupDateField;
 
 /**
@@ -33,7 +35,37 @@ import com.vaadin.ui.PopupDateField;
  */
 @SuppressWarnings("serial")
 public class PopupDateTimeField extends PopupDateField {
-    public static class DateTimeProperty implements Property {
+
+    public static class DateTimeConverter extends PropertyConverter<DateTime, Date> {
+
+	public DateTimeConverter(Property propertyDataSource) {
+	    super(propertyDataSource);
+	}
+
+	protected DateTimeConverter(Class<? extends DateTime> propertyClass) {
+	    super(propertyClass);
+	}
+
+	@Override
+	public Date format(DateTime propertyValue) {
+	    return propertyValue == null ? null : propertyValue.toDate();
+	}
+
+	@Override
+	public DateTime parse(Date fieldValue) throws ConversionException {
+	    Date date = (Date) fieldValue;
+	    return date != null ? new DateTime(date.getTime()) : null;
+	}
+
+	@Override
+	public Class getType() {
+	    return Date.class;
+	}
+
+    }
+
+    @Deprecated
+    public static class DateTimeProperty extends AbstractProperty {
 	private final Property property;
 
 	public DateTimeProperty(Property dataSource) {
@@ -74,6 +106,7 @@ public class PopupDateTimeField extends PopupDateField {
 	public void setReadOnly(boolean newStatus) {
 	    property.setReadOnly(newStatus);
 	}
+
     }
 
     public PopupDateTimeField() {
@@ -81,11 +114,11 @@ public class PopupDateTimeField extends PopupDateField {
     }
 
     public PopupDateTimeField(Property dataSource) throws IllegalArgumentException {
-	super(new DateTimeProperty(dataSource));
+	super(new DateTimeConverter(dataSource));
     }
 
     public PopupDateTimeField(String caption, Property dataSource) {
-	super(caption, new DateTimeProperty(dataSource));
+	super(caption, new DateTimeConverter(dataSource));
     }
 
     public PopupDateTimeField(String caption) {
@@ -94,6 +127,6 @@ public class PopupDateTimeField extends PopupDateField {
 
     @Override
     public void setPropertyDataSource(Property dataSource) {
-	super.setPropertyDataSource(new DateTimeProperty(dataSource));
+	super.setPropertyDataSource(new DateTimeConverter(dataSource));
     }
 }
