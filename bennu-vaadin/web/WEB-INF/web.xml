@@ -37,8 +37,4 @@
 		<url-pattern>/VAADIN/*</url-pattern>
 	</servlet-mapping>
 	
-	<session-config>
-			<session-timeout>120</session-timeout>
-	</session-config>
-	
 </web-app>
