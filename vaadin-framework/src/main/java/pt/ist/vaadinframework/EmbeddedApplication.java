@@ -284,7 +284,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 
 	FFDomainException de = findDomainExceptionCause(t);
 	Buffered source = findSource(t);
-	if (de != null) {
+	if (de != null && source != null) {
 	    setErrorsOn(source, de);
 	} else {
 	    setErrorsOn(source, null);
