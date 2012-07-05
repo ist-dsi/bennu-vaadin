@@ -47,7 +47,7 @@ public class GridSystemLayout extends GridLayout {
 	if (component != null) {
 	    replaceComponent(component, sl);
 	} else {
-	    addComponent(prefix, cols, suffix, sub);
+	    addComponent(prefix, cols, suffix, sl);
 	}
 
 	layout.put(id, sl);
