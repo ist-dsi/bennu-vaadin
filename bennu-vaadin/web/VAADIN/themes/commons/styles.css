@@ -135,3 +135,9 @@
 	text-decoration: underline;
 	cursor: pointer;
 }
+
+.v-label-small {
+	font-style: italic;
+	color: #222;
+	font-size: 11px;
+}
