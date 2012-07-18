@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd"
+    version="3.0">
+    <name>bennu-vaadin</name>
+
+    <ordering>
+        <after>
+            <!-- [START OF BENNU GENERATED FRAGMENT] -->
+            <name>bennu-core</name>
+            <name>fenix-web-framework</name>
+            <name>lucene-indexing-plugin</name>
+            <name>file-support-plugin</name>
+            <!-- [END OF BENNU GENERATED FRAGMENT] -->
+        </after>
+        <before>
+            <others />
+        </before>
+    </ordering>
+
+    <context-param>
+        <description>Vaadin production mode</description>
+        <param-name>productionMode</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>EmbeddedApplicationInitializer</servlet-name>
+        <servlet-class>pt.ist.bennu.vaadin.EmbeddedApplicationInitializer</servlet-class>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>VaadinEmbedded</servlet-name>
+        <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+        <init-param>
+            <description>Vaadin application class to start</description>
+            <param-name>application</param-name>
+            <param-value>pt.ist.vaadinframework.EmbeddedApplication</param-value>
+        </init-param>
+        <init-param>
+            <param-name>widgetset</param-name>
+            <param-value>pt.ist.bennu.widgetset.BennuWidgetSet</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VaadinEmbedded</servlet-name>
+        <url-pattern>/vaadin/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VaadinEmbedded</servlet-name>
+        <url-pattern>/VAADIN/*</url-pattern>
+    </servlet-mapping>
+</web-fragment>
