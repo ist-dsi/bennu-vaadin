@@ -24,12 +24,12 @@ import com.vaadin.ui.Select;
 @ClientWidget(VTimeoutSelect.class)
 public class TimeoutSelect extends Select implements TextChangeNotifier {
 
-private String curText = null;
-    
+    private String curText = null;
+
     private int timeout = 1000;
-    
-//    private Object selected;
-    
+
+    // private Object selected;
+
     public TimeoutSelect() {
 	super();
 	setImmediate(true);
@@ -51,25 +51,24 @@ private String curText = null;
     @Override
     public void changeVariables(Object source, Map<String, Object> variables) {
 
-//	if (variables.containsKey("selected")) {
-//	    final String[] keys = (String[]) variables.get("selected");
-//	    if (!isMultiSelect()) {
-//		 if (keys.length > 0) {
-//		     selected = itemIdMapper.get(keys[0]);
-//		 }
-//	    }
-//	}
-	    
+	// if (variables.containsKey("selected")) {
+	// final String[] keys = (String[]) variables.get("selected");
+	// if (!isMultiSelect()) {
+	// if (keys.length > 0) {
+	// selected = itemIdMapper.get(keys[0]);
+	// }
+	// }
+	// }
+
 	if (variables.containsKey("filter")) {
 	    final String newText = (String) variables.get("filter");
 	    if (!newText.equals(curText)) {
-		curText = newText;
-		fireEvent(new TextChangeEventImpl(this));
+		setText(newText);
 	    } else {
-//		variables.remove("filter");
+		// variables.remove("filter");
 	    }
 	}
-	
+
 	super.changeVariables(source, variables);
     }
 
@@ -92,73 +91,68 @@ private String curText = null;
     }
 
     public void setContainerDataSource(Container newDataSource) {
-        if (newDataSource == null) {
-            newDataSource = new IndexedContainer();
-        }
+	if (newDataSource == null) {
+	    newDataSource = new IndexedContainer();
+	}
 
-        getCaptionChangeListener().clear();
+	getCaptionChangeListener().clear();
 
-        if (items != newDataSource) {
+	if (items != newDataSource) {
 
-            // Removes listeners from the old datasource
-            if (items != null) {
-                if (items instanceof Container.ItemSetChangeNotifier) {
-                    ((Container.ItemSetChangeNotifier) items)
-                            .removeListener(this);
-                }
-                if (items instanceof Container.PropertySetChangeNotifier) {
-                    ((Container.PropertySetChangeNotifier) items)
-                            .removeListener(this);
-                }
-            }
+	    // Removes listeners from the old datasource
+	    if (items != null) {
+		if (items instanceof Container.ItemSetChangeNotifier) {
+		    ((Container.ItemSetChangeNotifier) items).removeListener(this);
+		}
+		if (items instanceof Container.PropertySetChangeNotifier) {
+		    ((Container.PropertySetChangeNotifier) items).removeListener(this);
+		}
+	    }
 
-            // Assigns new data source
-            items = newDataSource;
+	    // Assigns new data source
+	    items = newDataSource;
 
-            // Clears itemIdMapper also
-            itemIdMapper.removeAll();
+	    // Clears itemIdMapper also
+	    itemIdMapper.removeAll();
 
-            // Adds listeners
-            if (items != null) {
-                if (items instanceof Container.ItemSetChangeNotifier) {
-                    ((Container.ItemSetChangeNotifier) items).addListener(this);
-                }
-                if (items instanceof Container.PropertySetChangeNotifier) {
-                    ((Container.PropertySetChangeNotifier) items)
-                            .addListener(this);
-                }
-            }
+	    // Adds listeners
+	    if (items != null) {
+		if (items instanceof Container.ItemSetChangeNotifier) {
+		    ((Container.ItemSetChangeNotifier) items).addListener(this);
+		}
+		if (items instanceof Container.PropertySetChangeNotifier) {
+		    ((Container.PropertySetChangeNotifier) items).addListener(this);
+		}
+	    }
 
-            /*
-             * We expect changing the data source should also clean value. See
-             * #810, #4607, #5281
-             */
-//            if (selected != null && !items.containsId(selected)) {
-//        	setValue(null);
-//            }
-            
-            requestRepaint();
+	    /*
+	     * We expect changing the data source should also clean value. See
+	     * #810, #4607, #5281
+	     */
+	    // if (selected != null && !items.containsId(selected)) {
+	    // setValue(null);
+	    // }
 
-        }
+	    requestRepaint();
+
+	}
     }
-    
-    
-    
+
     @Override
     public void paintContent(PaintTarget target) throws PaintException {
 	super.paintContent(target);
-	
+
 	if (hasListeners(TextChangeEvent.class)) {
 	    target.addAttribute(VTextField.ATTR_TEXTCHANGE_EVENTMODE, AbstractTextField.TextChangeEventMode.TIMEOUT.toString());
 	    target.addAttribute(VTextField.ATTR_TEXTCHANGE_TIMEOUT, getTimeout());
 	}
-	
+
     }
 
     private int getTimeout() {
 	return timeout;
     }
-    
+
     public void setTimeout(int timeout) {
 	this.timeout = timeout;
 	requestRepaint();
@@ -171,9 +165,14 @@ private String curText = null;
     public void removeListener(TextChangeListener listener) {
 	removeListener(listener);
     }
-    
+
     @Override
     public void setFilteringMode(int filteringMode) {
+    }
+
+    public void setText(String newText) {
+	curText = newText;
+	fireEvent(new TextChangeEventImpl(this));
     }
 
 }
