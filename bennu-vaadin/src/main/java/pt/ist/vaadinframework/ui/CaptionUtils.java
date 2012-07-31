@@ -21,12 +21,18 @@
  */
 package pt.ist.vaadinframework.ui;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
+import pt.ist.fenixframework.FenixFramework;
+import pt.ist.fenixframework.pstm.OneBoxDomainObject;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 
@@ -36,12 +42,42 @@ import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 
+import dml.DomainClass;
+
 /**
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
  * 
  */
 
 public class CaptionUtils {
+
+    static class CaptionUtilsWriter {
+	private static List<String> keys;
+	private static File file;
+
+	static {
+	    file = new File("/tmp/CaptionResources.properties");
+	    keys = new ArrayList<String>();
+	    try {
+		keys.addAll(FileUtils.readLines(file));
+	    } catch (IOException e) {
+		VaadinFrameworkLogger.getLogger().error("Can't read from auto vaadin resources");
+	    }
+	}
+
+	public static void addKey(String key) {
+	    if (!keys.contains(key)) {
+		keys.add(key);
+		Collections.sort(keys);
+		try {
+		    FileUtils.writeLines(file, keys);
+		} catch (IOException e) {
+		    VaadinFrameworkLogger.getLogger().error("Can't write to auto vaadin resources");
+		}
+	    }
+	}
+    }
+
     public static String makeCaption(ResourceBundle bundle, Container container, Object propertyId, Component uiContext) {
 	if (container instanceof AbstractBufferedContainer) {
 	    return makeCaption(bundle, ((AbstractBufferedContainer<?, ?, ?>) container).getElementType(), propertyId, uiContext);
@@ -95,14 +131,24 @@ public class CaptionUtils {
 
     private static String getBundleKey(ResourceBundle bundle, List<String> missed, Class<?> clazz, Object propertyId,
 	    String suffix) {
+
 	String key = clazz.getName() + "." + propertyId + suffix;
 	if (bundle.containsKey(key)) {
 	    return key;
 	}
-	missed.add(clazz.getName() + "." + propertyId + suffix);
-	if (clazz.getSuperclass() == null) {
+	missed.add(key);
+	CaptionUtilsWriter.addKey(key);
+	if (!hasMoreClassesInHierarchy(clazz)) {
 	    return StringUtils.join(missed, " or ");
 	}
 	return getBundleKey(bundle, missed, clazz.getSuperclass(), propertyId, suffix);
+    }
+
+    private static boolean hasMoreClassesInHierarchy(Class<?> clazz) {
+	if (clazz.equals(OneBoxDomainObject.class)) {
+	    return false;
+	}
+	final DomainClass findClass = FenixFramework.getDomainModel().findClass(clazz.getName());
+	return findClass.hasSuperclass();
     }
 }
