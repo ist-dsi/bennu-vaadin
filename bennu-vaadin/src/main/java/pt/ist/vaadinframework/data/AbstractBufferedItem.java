@@ -179,6 +179,7 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
 		    if (isModified()) {
 			wrapped.setValue(cache);
 		    }
+		    discard();
 		    modified = false;
 		} catch (Throwable e) {
 		    ServiceUtils.handleException(e);
@@ -189,33 +190,25 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
     }
 
     private void construct(boolean taint) {
+	Object value; 
 	if (constructor != null) {
 	    try {
 		Method method = findMethod(constructor.getClass(), getArgumentTypes(constructor.getOrderedArguments()));
 		Object[] argumentValues = readArguments(constructor.getOrderedArguments());
-		// VaadinFrameworkLogger.getLogger().debug(
-		// "persisting item with constructor with properties: ["
-		// + StringUtils.join(constructor.getOrderedArguments(), ", ") +
-		// "] with values: ["
-		// + StringUtils.join(argumentValues, ", ") + "]");
-		cache = convertValue(method.invoke(constructor, argumentValues));
-		for (Id id : constructor.getOrderedArguments()) {
-		    if (getItemProperty(id) instanceof Buffered) {
-			((Buffered) getItemProperty(id)).discard();
-		    }
-		}
+		value = method.invoke(constructor, argumentValues);
 	    } catch (Throwable e) {
 		ServiceUtils.handleException(e);
 		throw new SourceException(this, e);
 	    }
 	} else {
 	    try {
-		cache = convertValue(getType().newInstance());
+		value = getType().newInstance();
 	    } catch (Throwable e) {
 		ServiceUtils.handleException(e);
 		throw new SourceException(this, e);
 	    }
 	}
+	cache = convertValue(value);
 	modified = taint;
     }
 
