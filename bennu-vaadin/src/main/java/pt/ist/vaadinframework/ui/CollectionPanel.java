@@ -2,6 +2,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.lang.reflect.Method;
 
+import com.vaadin.data.Buffered;
 import com.vaadin.data.Container;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -14,9 +15,11 @@ import com.vaadin.ui.themes.BaseTheme;
 
 /**
  * Creates a panel that view and manage a collection of items.
+ * 
  * @author David Martinho (davidmartinho@ist.utl.pt)
  */
-public abstract class CollectionPanel extends CustomComponent implements Container.Viewer, Container.Editor, Container.ItemSetChangeListener, Container.ItemSetChangeNotifier {
+public abstract class CollectionPanel extends CustomComponent implements Container.Viewer, Container.Editor,
+	Container.ItemSetChangeListener, Container.ItemSetChangeNotifier {
 
     private static final long serialVersionUID = -8342680039386201881L;
 
@@ -24,65 +27,70 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
     private static final String CSS_COLLECTION_LABEL = "v-collectionpanel-label";
     private static final String CSS_COLLECTION_ADD_BUTTON = "v-collectionpanel-add-button";
     private static final String CSS_COLLECTION_CONTAINER = "v-collectionpanel-container";
-    
+
     private GridLayout container;
 
     private Button addButton;
     private Label nameLabel;
     private Panel itemLayoutContainer;
-    
+
     private Container itemContainer;
-    
+
     public CollectionPanel() {
 	bindUi();
     }
-    
+
     private void bindUi() {
-	container = new GridLayout(2,2);
+	container = new GridLayout(2, 2);
 	container.addStyleName(CSS_COLLECTION_PANEL);
 	container.setSizeFull();
-        bindAddButton();
-        bindCollectionNameLabel();
-        bindContainer();
-        setCompositionRoot(container);
+	bindAddButton();
+	bindCollectionNameLabel();
+	bindContainer();
+	setCompositionRoot(container);
     }
-    
+
     private void bindAddButton() {
 	addButton = new Button("+");
-        addButton.addStyleName(BaseTheme.BUTTON_LINK);
-        addButton.addStyleName(CSS_COLLECTION_ADD_BUTTON);
-        addButton.setSizeUndefined();
-        container.addComponent(addButton, 0, 1, 0, 1);
-        container.setComponentAlignment(addButton, Alignment.TOP_RIGHT);
+	addButton.addStyleName(BaseTheme.BUTTON_LINK);
+	addButton.addStyleName(CSS_COLLECTION_ADD_BUTTON);
+	addButton.setSizeUndefined();
+	container.addComponent(addButton, 0, 1, 0, 1);
+	container.setComponentAlignment(addButton, Alignment.TOP_RIGHT);
     }
-    
+
     private void bindCollectionNameLabel() {
 	nameLabel = new Label();
 	nameLabel.addStyleName(CSS_COLLECTION_LABEL);
 	nameLabel.setSizeUndefined();
-        container.addComponent(nameLabel, 1, 0, 1, 0);
-        container.setComponentAlignment(nameLabel, Alignment.BOTTOM_LEFT);
+	container.addComponent(nameLabel, 1, 0, 1, 0);
+	container.setComponentAlignment(nameLabel, Alignment.BOTTOM_LEFT);
     }
-    
+
     private void bindContainer() {
 	itemLayoutContainer = new Panel();
 	itemLayoutContainer.addStyleName(CSS_COLLECTION_CONTAINER);
-        container.addComponent(itemLayoutContainer, 1, 1, 1, 1);
-        container.setColumnExpandRatio(1, 1f);
+	container.addComponent(itemLayoutContainer, 1, 1, 1, 1);
+	container.setColumnExpandRatio(1, 1f);
     }
-    
+
     public Label getNameLabel() {
 	return nameLabel;
     }
-    
+
     public Button getAddButton() {
 	return addButton;
     }
-    
+
     public Panel getItemLayoutContainer() {
 	return itemLayoutContainer;
     }
-    
+
+    public void setWriteThrough(boolean state) {
+	if (itemContainer != null)
+	    ((Buffered) itemContainer).setWriteThrough(state);
+    }
+
     public void setContainerDataSource(Container newDataSource) {
 	if (itemContainer != newDataSource) {
 	    if (itemContainer != null) {
@@ -105,12 +113,12 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
     }
 
     protected abstract void refreshComponents(Container itemContainer);
-    
+
     @Override
     public Container getContainerDataSource() {
 	return itemContainer;
     }
-    
+
     public void setNameLabel(String newValue) {
 	this.nameLabel.setValue(newValue);
     }
@@ -119,12 +127,12 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
     public void containerItemSetChange(com.vaadin.data.Container.ItemSetChangeEvent event) {
 	fireItemSetChangeEvent();
     }
-    
+
     private void fireItemSetChangeEvent() {
-        fireEvent(new CollectionPanel.ItemSetChangeEvent(this));
-        requestRepaint();
+	fireEvent(new CollectionPanel.ItemSetChangeEvent(this));
+	requestRepaint();
     }
-    
+
     public class ItemSetChangeEvent extends Component.Event implements Container.ItemSetChangeEvent {
 
 	private static final long serialVersionUID = -6054196818392240334L;
@@ -138,7 +146,7 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
 	    return (Container) getSource();
 	}
     }
-    
+
     @Override
     public void addListener(Container.ItemSetChangeListener listener) {
 	addListener(CollectionPanel.ItemSetChangeEvent.class, listener, ITEM_SET_CHANGE_METHOD);
@@ -148,18 +156,16 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
     public void removeListener(Container.ItemSetChangeListener listener) {
 	removeListener(CollectionPanel.ItemSetChangeEvent.class, listener, ITEM_SET_CHANGE_METHOD);
     }
-    
+
     private static final Method ITEM_SET_CHANGE_METHOD;
 
     static {
-        try {
-            ITEM_SET_CHANGE_METHOD = Container.ItemSetChangeListener.class
-                    .getDeclaredMethod("containerItemSetChange",
-                            new Class[] { Container.ItemSetChangeEvent.class });
-        } catch (final java.lang.NoSuchMethodException e) {
-            // This should never happen
-            throw new java.lang.RuntimeException(
-                    "Internal error finding methods in CollectionPanel");
-        }
+	try {
+	    ITEM_SET_CHANGE_METHOD = Container.ItemSetChangeListener.class.getDeclaredMethod("containerItemSetChange",
+		    new Class[] { Container.ItemSetChangeEvent.class });
+	} catch (final java.lang.NoSuchMethodException e) {
+	    // This should never happen
+	    throw new java.lang.RuntimeException("Internal error finding methods in CollectionPanel");
+	}
     }
 }

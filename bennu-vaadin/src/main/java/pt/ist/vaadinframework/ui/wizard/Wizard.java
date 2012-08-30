@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 /**
  * @author David Martinho (davidmartinho@ist.utl.pt)
@@ -71,10 +72,11 @@ public abstract class Wizard extends CustomComponent {
     }
     
     public final void close() {
-        System.out.println("Adding Listener");
         for(CloseListener closeListener : closeListenerSet) {
             closeListener.onWizardClose(this);
         }
+        Window subwindow = getWindow();
+        (subwindow.getParent()).removeWindow(subwindow);
     }
     
     public void commit() {
