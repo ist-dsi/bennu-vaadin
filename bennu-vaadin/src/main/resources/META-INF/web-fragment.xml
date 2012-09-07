@@ -40,7 +40,7 @@
         </init-param>
         <init-param>
             <param-name>widgetset</param-name>
-            <param-value>pt.ist.bennu.widgetset.BennuWidgetSet</param-value>
+            <param-value>pt.ist.vaadinframework.widgetset.BennuWidgetSet</param-value>
         </init-param>
     </servlet>
 
