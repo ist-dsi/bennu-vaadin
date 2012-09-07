@@ -21,40 +21,16 @@
  */
 package pt.ist.vaadinframework;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import pt.utl.ist.fenix.tools.util.i18n.Language;
+import pt.ist.bennu.core.util.BundleUtil;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
 public class VaadinResources {
-    private static final String BUNDLE_NAME = "resources/VaadinResources"; //$NON-NLS-1$
-
-    private static final Map<Locale, ResourceBundle> bundleMap = new HashMap<Locale, ResourceBundle>();
-
-    private VaadinResources() {
-    }
+    private static final String BUNDLE_NAME = "resources/VaadinResources";
 
     public static String getString(String key, String... args) {
-	try {
-	    if (!bundleMap.containsKey(Language.getLanguage())) {
-		bundleMap.put(Language.getLocale(), ResourceBundle.getBundle(BUNDLE_NAME, Language.getLocale()));
-	    }
-	    String message = bundleMap.get(Language.getLocale()).getString(key);
-	    for (int i = 0; i < args.length; i++) {
-		message = message.replaceAll("\\{" + i + "\\}", args[i]);
-	    }
-	    return message;
-	} catch (MissingResourceException e) {
-	    VaadinFrameworkLogger.getLogger().warn(e.getMessage());
-	    return '!' + key + '!';
-	}
+	return BundleUtil.getFormattedStringFromResourceBundle(BUNDLE_NAME, key, args);
     }
-
 }
