@@ -1,4 +1,0 @@
-<antlib>
-	<typedef name="vaadin-generator" classname="pt.ist.vaadinframework.codegeneration.VaadinProxiesCodeGeneratorTask" />
-</antlib>
-		

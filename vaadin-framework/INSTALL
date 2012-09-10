@@ -1,4 +1,0 @@
-mvn clean install
-mvn dependency:copy-dependencies
-
-copy target/*.jar to <bennu>/modules/bennu-vaadin/web/WEB-INF/lib/
