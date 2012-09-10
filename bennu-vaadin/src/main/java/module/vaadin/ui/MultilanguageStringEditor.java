@@ -25,9 +25,6 @@
 package module.vaadin.ui;
 
 import pt.ist.bennu.core.domain.VirtualHost;
-
-import org.apache.commons.lang.StringUtils;
-
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
@@ -72,19 +69,12 @@ public class MultilanguageStringEditor extends CustomField {
     }
 
     public static class MLSItem extends PropertysetItem {
-	private final MultiLanguageString mls;
-
 	public MLSItem(MultiLanguageString mls) {
-	    this.mls = mls;
 	    if (mls == null) {
 		mls = new MultiLanguageString();
 	    }
-	    String langs = VirtualHost.getVirtualHostForThread().getSupportedLanguages();
-	    if (StringUtils.isNotBlank(langs)) {
-		for (String langString : langs.split(":")) {
-		    Language lang = Language.valueOf(langString);
-		    addItemProperty(lang, new MLSProperty(lang, mls));
-		}
+	    for (Language language : VirtualHost.getVirtualHostForThread().getSupportedLanguagesSet()) {
+		addItemProperty(language, new MLSProperty(language, mls));
 	    }
 	}
     }
