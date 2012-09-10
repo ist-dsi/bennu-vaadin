@@ -32,7 +32,7 @@
 
     <servlet>
         <servlet-name>VaadinEmbedded</servlet-name>
-        <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+        <servlet-class>pt.ist.vaadinframework.BennuVaadinApplicationServlet</servlet-class>
         <init-param>
             <description>Vaadin application class to start</description>
             <param-name>application</param-name>
