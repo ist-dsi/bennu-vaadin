@@ -67,9 +67,9 @@ public class FragmentQuery implements Serializable {
 	// params = new HashMap<String, String>();
     }
 
-    private void put(String key, String value) {
+    public void put(String key, String value) {
 	if (params == null) {
-	    params = new HashMap<String, String>();
+	    params = new HashMap<>();
 	}
 	params.put(key, value);
     }

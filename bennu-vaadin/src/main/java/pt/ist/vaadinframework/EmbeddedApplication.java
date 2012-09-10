@@ -25,8 +25,19 @@ import java.lang.reflect.Field;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+
+import pt.ist.bennu.core.applicationTier.Authenticate.UserView;
+import pt.ist.bennu.core.domain.VirtualHost;
+import pt.ist.bennu.core.domain.contents.Node;
+import pt.ist.bennu.vaadin.domain.contents.VaadinNode;
+import pt.ist.fenixWebFramework.servlets.filters.SetUserViewFilter;
 import pt.ist.fenixframework.FFDomainException;
 import pt.ist.vaadinframework.annotation.EmbeddedComponentUtils;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
@@ -34,11 +45,14 @@ import pt.ist.vaadinframework.terminal.DefaultSystemErrorWindow;
 import pt.ist.vaadinframework.terminal.DomainExceptionErrorMessage;
 import pt.ist.vaadinframework.terminal.SystemErrorWindow;
 import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
+import pt.utl.ist.fenix.tools.util.i18n.Language;
 
 import com.vaadin.Application;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.service.ApplicationContext.TransactionListener;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Window;
@@ -123,12 +137,24 @@ import com.vaadin.ui.Window;
  */
 @SuppressWarnings("serial")
 public class EmbeddedApplication extends Application implements VaadinResourceConstants {
-    private static final Map<String, Class<? extends EmbeddedComponentContainer>> pages = new HashMap<String, Class<? extends EmbeddedComponentContainer>>();
+    private static final Map<String, Class<? extends EmbeddedComponentContainer>> pages = new HashMap<>();
 
     private static SystemErrorWindow errorWindow = new DefaultSystemErrorWindow();
 
     @Override
     public void init() {
+	getContext().addTransactionListener(new TransactionListener() {
+	    @Override
+	    public void transactionStart(Application application, Object transactionData) {
+		application.setLocale(Language.getLocale());
+	    }
+
+	    @Override
+	    public void transactionEnd(Application application, Object transactionData) {
+		application.setLocale(null);
+	    }
+	});
+	setTheme(VirtualHost.getVirtualHostForThread().getTheme().getName());
 	setMainWindow(new EmbeddedWindow());
     }
 
@@ -155,6 +181,29 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
 
     public static void back(Application application) {
 	((EmbeddedApplication) application).back();
+    }
+
+    public void refresh() {
+	((EmbeddedWindow) getMainWindow()).refresh();
+    }
+
+    public static void refresh(Application application) {
+	((EmbeddedApplication) application).refresh();
+    }
+
+    @Override
+    public void close() {
+	HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
+	final UserView userView = (UserView) session.getAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
+
+	if (userView != null) {
+	    userView.getUser().setLastLogoutDateTime(new DateTime());
+	}
+
+	pt.ist.fenixWebFramework.security.UserView.setUser(null);
+	session.removeAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
+	session.invalidate();
+	super.close();
     }
 
     /**
@@ -196,6 +245,15 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
     }
 
     public static Class<? extends EmbeddedComponentContainer> getPage(String path) {
+	if (path == null || StringUtils.isEmpty(path)) {
+	    final VirtualHost virtualHost = VirtualHost.getVirtualHostForThread();
+	    final SortedSet<Node> nodes = virtualHost.getOrderedTopLevelNodes();
+	    for (final Node node : nodes) {
+		if (node.isAccessible() && node instanceof VaadinNode) {
+		    return pages.get(((VaadinNode) node).getArgument());
+		}
+	    }
+	}
 	return pages.get(path);
     }
 
