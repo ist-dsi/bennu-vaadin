@@ -32,6 +32,8 @@ import com.vaadin.ui.themes.BaseTheme;
  * 
  */
 public class BennuTheme extends BaseTheme {
+    public static final String THEME_ALTERNATE_COLOR = "alternate-color";
+
     /***************************************************************************
      * Label styles
      **************************************************************************/
@@ -171,9 +173,16 @@ public class BennuTheme extends BaseTheme {
      */
     public static final String BUTTON_WRAP = "wraps";
 
+    /**
+     * No button appearance, only content
+     */
+    public static final String BUTTON_LIGHT = "light";
+
     /***************************************************************************
      * Link styles
      **************************************************************************/
+
+    public static final String LINK_BIG = "big";
 
     public static final String LINK_WRAP = "wrap";
 
@@ -354,6 +363,11 @@ public class BennuTheme extends BaseTheme {
      * Layout to be applied to the container of a page body
      */
     public static final String LAYOUT_PAGE = "page";
+
+    /**
+     * Layout that spans its contents horizontally with line wrapping.
+     */
+    public static final String LAYOUT_FLOW = "flow";
 
     /***************************************************************************
      * Window styles
