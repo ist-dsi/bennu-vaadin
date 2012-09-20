@@ -145,10 +145,10 @@ public class CaptionUtils {
     }
 
     private static boolean hasMoreClassesInHierarchy(Class<?> clazz) {
-	if (clazz.equals(OneBoxDomainObject.class)) {
+	if (clazz == null || clazz.equals(OneBoxDomainObject.class)) {
 	    return false;
 	}
 	final DomainClass findClass = FenixFramework.getDomainModel().findClass(clazz.getName());
-	return findClass.hasSuperclass();
+	return findClass == null ? false : findClass.hasSuperclass();
     }
 }
