@@ -11,6 +11,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 
 /**
@@ -26,25 +27,31 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
     private static final String CSS_COLLECTION_PANEL = "v-collectionpanel";
     private static final String CSS_COLLECTION_LABEL = "v-collectionpanel-label";
     private static final String CSS_COLLECTION_ADD_BUTTON = "v-collectionpanel-add-button";
+    private static final String CSS_COLLECTION_REMOVE_BUTTON = "v-collectionpanel-remove-button";
     private static final String CSS_COLLECTION_CONTAINER = "v-collectionpanel-container";
 
     private GridLayout container;
 
+    private boolean isRemovable = false;
+
     private Button addButton;
+    private Button removeButton;
     private Label nameLabel;
     private Panel itemLayoutContainer;
 
     private Container itemContainer;
 
-    public CollectionPanel() {
+    public CollectionPanel(boolean isRemovable) {
+	this.isRemovable = isRemovable;
 	bindUi();
     }
 
     private void bindUi() {
-	container = new GridLayout(2, 2);
+	container = new GridLayout(3, 3);
 	container.addStyleName(CSS_COLLECTION_PANEL);
 	container.setSizeFull();
 	bindAddButton();
+	bindRemoveButton();
 	bindCollectionNameLabel();
 	bindContainer();
 	setCompositionRoot(container);
@@ -59,6 +66,16 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
 	container.setComponentAlignment(addButton, Alignment.TOP_RIGHT);
     }
 
+    private void bindRemoveButton() {
+	if (isRemovable) {
+	    removeButton = new Button("X");
+	    removeButton.addStyleName(BaseTheme.BUTTON_LINK);
+	    removeButton.addStyleName(CSS_COLLECTION_REMOVE_BUTTON);
+	    removeButton.setSizeUndefined();
+	    container.addComponent(removeButton, 2, 0, 2, 0);
+	}
+    }
+
     private void bindCollectionNameLabel() {
 	nameLabel = new Label();
 	nameLabel.addStyleName(CSS_COLLECTION_LABEL);
@@ -69,8 +86,12 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
 
     private void bindContainer() {
 	itemLayoutContainer = new Panel();
+	VerticalLayout wrapper = new VerticalLayout();
+	wrapper.setMargin(true);
+	wrapper.setSpacing(true);
+	itemLayoutContainer.setContent(wrapper);
 	itemLayoutContainer.addStyleName(CSS_COLLECTION_CONTAINER);
-	container.addComponent(itemLayoutContainer, 1, 1, 1, 1);
+	container.addComponent(itemLayoutContainer, 1, 1, 2, 2);
 	container.setColumnExpandRatio(1, 1f);
     }
 
@@ -80,6 +101,10 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
 
     public Button getAddButton() {
 	return addButton;
+    }
+
+    public Button getRemoveButton() {
+	return removeButton;
     }
 
     public Panel getItemLayoutContainer() {
@@ -110,6 +135,10 @@ public abstract class CollectionPanel extends CustomComponent implements Contain
 		}
 	    }
 	}
+    }
+
+    public void refreshComponents() {
+	refreshComponents(getContainerDataSource());
     }
 
     protected abstract void refreshComponents(Container itemContainer);

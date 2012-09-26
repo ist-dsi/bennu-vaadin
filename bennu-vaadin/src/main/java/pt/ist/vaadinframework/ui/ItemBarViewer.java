@@ -13,7 +13,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.BaseTheme;
@@ -38,7 +38,7 @@ public abstract class ItemBarViewer extends CustomComponent implements Item.View
     private static final String CSS_ITEMBAR_REMOVE_BUTTON = "v-itembar-remove-button";
 
     private Panel container;
-    private HorizontalLayout itemBar;
+    private GridLayout itemBar;
     private Embedded avatar;
     private Label nameLabel;
     private Button removeButton;
@@ -58,10 +58,10 @@ public abstract class ItemBarViewer extends CustomComponent implements Item.View
     }
 
     private void bindItemBar() {
-	itemBar = new HorizontalLayout();
+	itemBar = new GridLayout(3, 1);
 	itemBar.addStyleName(CSS_ITEMBAR_WRAPPER);
+	container.setContent(itemBar);
 	itemBar.setSizeFull();
-	container.addComponent(itemBar);
 	bindAvatar();
 	bindNameLabel();
 	bindRemoveButton();
@@ -72,14 +72,14 @@ public abstract class ItemBarViewer extends CustomComponent implements Item.View
 	avatar.setWidth(AVATAR_SIZE);
 	avatar.setHeight(AVATAR_SIZE);
 	avatar.addStyleName(CSS_ITEMBAR_AVATAR);
-	itemBar.addComponent(avatar);
+	itemBar.addComponent(avatar, 0, 0, 0, 0);
 	itemBar.setComponentAlignment(avatar, Alignment.MIDDLE_LEFT);
     }
 
     private void bindNameLabel() {
 	nameLabel = new Label();
 	nameLabel.addStyleName(CSS_ITEMBAR_NAME_LABEL);
-	itemBar.addComponent(nameLabel);
+	itemBar.addComponent(nameLabel, 1, 0, 1, 0);
 	itemBar.setComponentAlignment(nameLabel, Alignment.MIDDLE_LEFT);
     }
 
@@ -87,7 +87,7 @@ public abstract class ItemBarViewer extends CustomComponent implements Item.View
 	removeButton = new Button("x");
 	removeButton.addStyleName(BaseTheme.BUTTON_LINK);
 	removeButton.addStyleName(CSS_ITEMBAR_REMOVE_BUTTON);
-	itemBar.addComponent(removeButton);
+	itemBar.addComponent(removeButton, 2, 0, 2, 0);
 	itemBar.setComponentAlignment(removeButton, Alignment.MIDDLE_RIGHT);
     }
 
