@@ -34,4 +34,6 @@
     <inherits name="com.vaadin.incubator.dashlayout.DashLayoutWidgetSet" />
 
     <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+
+    <inherits name="org.vaadin.rpc.WidgetRPC" />
 </module>
