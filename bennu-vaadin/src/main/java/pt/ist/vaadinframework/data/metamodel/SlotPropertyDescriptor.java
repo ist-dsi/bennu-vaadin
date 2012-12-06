@@ -24,6 +24,8 @@ package pt.ist.vaadinframework.data.metamodel;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.commons.lang.StringUtils;
+
 import pt.ist.fenixframework.pstm.AbstractDomainObject;
 
 import com.vaadin.data.Property.ConversionException;
@@ -40,8 +42,9 @@ import dml.Slot.Option;
 public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implements PropertyDescriptor {
     private final boolean required;
 
-    public SlotPropertyDescriptor(Slot slot, Class<? extends AbstractDomainObject> type) throws IntrospectionException {
-	super(slot.getName(), type);
+    SlotPropertyDescriptor(Slot slot, Class<? extends AbstractDomainObject> type) throws IntrospectionException {
+	super(slot.getName(), type, "get" + StringUtils.capitalize(slot.getName()), "set"
+		+ StringUtils.capitalize(slot.getName()));
 	this.required = slot.getOptions().contains(Option.REQUIRED);
     }
 
