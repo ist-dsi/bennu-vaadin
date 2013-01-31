@@ -41,85 +41,85 @@ import com.vaadin.ui.Form;
  * 
  */
 public class MultilanguageStringEditor extends CustomField {
-    public static class MLSProperty extends AbstractProperty {
-	private final Language lang;
+	public static class MLSProperty extends AbstractProperty {
+		private final Language lang;
 
-	private MultiLanguageString mls;
+		private MultiLanguageString mls;
 
-	public MLSProperty(Language lang, MultiLanguageString mls) {
-	    this.lang = lang;
-	    this.mls = mls;
+		public MLSProperty(Language lang, MultiLanguageString mls) {
+			this.lang = lang;
+			this.mls = mls;
+		}
+
+		@Override
+		public Object getValue() {
+			return mls.getContent(lang);
+		}
+
+		@Override
+		public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+			mls = mls.with(lang, (String) newValue);
+			fireValueChange();
+		}
+
+		@Override
+		public Class<?> getType() {
+			return String.class;
+		}
+	}
+
+	public static class MLSItem extends PropertysetItem {
+		public MLSItem(MultiLanguageString mls) {
+			if (mls == null) {
+				mls = new MultiLanguageString();
+			}
+			for (Language language : VirtualHost.getVirtualHostForThread().getSupportedLanguagesSet()) {
+				addItemProperty(language, new MLSProperty(language, mls));
+			}
+		}
+	}
+
+	private final Form innerForm;
+
+	public MultilanguageStringEditor(Form parentForm) {
+		innerForm = new Form();
+		innerForm.setWriteThrough(parentForm.isWriteThrough());
+		innerForm.setFormFieldFactory(parentForm.getFormFieldFactory());
+		setCompositionRoot(innerForm);
 	}
 
 	@Override
-	public Object getValue() {
-	    return mls.getContent(lang);
+	public void setCaption(String caption) {
+		super.setCaption(caption);
+		innerForm.setCaption(caption);
 	}
 
 	@Override
-	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	    mls = mls.with(lang, (String) newValue);
-	    fireValueChange();
+	public void setInternalValue(Object newValue) throws ReadOnlyException, ConversionException {
+		MultiLanguageString mls =
+				(newValue instanceof MultiLanguageString) ? (MultiLanguageString) newValue : new MultiLanguageString();
+
+		super.setInternalValue(mls);
+
+		// set item data source and visible properties in a single operation to
+		// avoid creating fields multiple times
+		innerForm.setItemDataSource(new MLSItem(mls));
+	}
+
+	@Override
+	public void commit() throws Buffered.SourceException, InvalidValueException {
+		super.commit();
+		innerForm.commit();
+	}
+
+	@Override
+	public void discard() throws Buffered.SourceException {
+		super.discard();
+		innerForm.discard();
 	}
 
 	@Override
 	public Class<?> getType() {
-	    return String.class;
+		return MultiLanguageString.class;
 	}
-    }
-
-    public static class MLSItem extends PropertysetItem {
-	public MLSItem(MultiLanguageString mls) {
-	    if (mls == null) {
-		mls = new MultiLanguageString();
-	    }
-	    for (Language language : VirtualHost.getVirtualHostForThread().getSupportedLanguagesSet()) {
-		addItemProperty(language, new MLSProperty(language, mls));
-	    }
-	}
-    }
-
-    private final Form innerForm;
-
-    public MultilanguageStringEditor(Form parentForm) {
-	innerForm = new Form();
-	innerForm.setWriteThrough(parentForm.isWriteThrough());
-	innerForm.setFormFieldFactory(parentForm.getFormFieldFactory());
-	setCompositionRoot(innerForm);
-    }
-
-    @Override
-    public void setCaption(String caption) {
-	super.setCaption(caption);
-	innerForm.setCaption(caption);
-    }
-
-    @Override
-    public void setInternalValue(Object newValue) throws ReadOnlyException, ConversionException {
-	MultiLanguageString mls = (newValue instanceof MultiLanguageString) ? (MultiLanguageString) newValue
-		: new MultiLanguageString();
-
-	super.setInternalValue(mls);
-
-	// set item data source and visible properties in a single operation to
-	// avoid creating fields multiple times
-	innerForm.setItemDataSource(new MLSItem(mls));
-    }
-
-    @Override
-    public void commit() throws Buffered.SourceException, InvalidValueException {
-	super.commit();
-	innerForm.commit();
-    }
-
-    @Override
-    public void discard() throws Buffered.SourceException {
-	super.discard();
-	innerForm.discard();
-    }
-
-    @Override
-    public Class<?> getType() {
-	return MultiLanguageString.class;
-    }
 }

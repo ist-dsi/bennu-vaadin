@@ -34,69 +34,69 @@ import com.vaadin.ui.PopupDateField;
  */
 @SuppressWarnings("serial")
 public class PopupLocalDateField extends PopupDateField {
-    public static class LocalDateProperty implements Property {
-	private final Property property;
+	public static class LocalDateProperty implements Property {
+		private final Property property;
 
-	public LocalDateProperty(Property dataSource) {
-	    this.property = dataSource;
-	    if (!LocalDate.class.isAssignableFrom(dataSource.getType())) {
-		throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
-			+ " typed property as datasource");
-	    }
+		public LocalDateProperty(Property dataSource) {
+			this.property = dataSource;
+			if (!LocalDate.class.isAssignableFrom(dataSource.getType())) {
+				throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
+						+ " typed property as datasource");
+			}
+		}
+
+		@Override
+		public Object getValue() {
+			LocalDate date = (LocalDate) property.getValue();
+			return date == null ? null : date.toDateTimeAtStartOfDay().toDate();
+		}
+
+		@Override
+		public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+			Date date = (Date) newValue;
+			if (date != null) {
+				DateTime dateTime = new DateTime(date.getTime());
+				property.setValue(new LocalDate().withYear(dateTime.getYear()).withMonthOfYear(dateTime.getMonthOfYear())
+						.withDayOfMonth(dateTime.getDayOfMonth()));
+			} else {
+				property.setValue(null);
+			}
+		}
+
+		@Override
+		public Class<?> getType() {
+			return Date.class;
+		}
+
+		@Override
+		public boolean isReadOnly() {
+			return property.isReadOnly();
+		}
+
+		@Override
+		public void setReadOnly(boolean newStatus) {
+			property.setReadOnly(newStatus);
+		}
+	}
+
+	public PopupLocalDateField() {
+		super();
+	}
+
+	public PopupLocalDateField(Property dataSource) throws IllegalArgumentException {
+		super(new LocalDateProperty(dataSource));
+	}
+
+	public PopupLocalDateField(String caption, Property dataSource) {
+		super(caption, new LocalDateProperty(dataSource));
+	}
+
+	public PopupLocalDateField(String caption) {
+		super(caption);
 	}
 
 	@Override
-	public Object getValue() {
-	    LocalDate date = (LocalDate) property.getValue();
-	    return date == null ? null : date.toDateTimeAtStartOfDay().toDate();
+	public void setPropertyDataSource(Property dataSource) {
+		super.setPropertyDataSource(new LocalDateProperty(dataSource));
 	}
-
-	@Override
-	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	    Date date = (Date) newValue;
-	    if (date != null) {
-		DateTime dateTime = new DateTime(date.getTime());
-		property.setValue(new LocalDate().withYear(dateTime.getYear()).withMonthOfYear(dateTime.getMonthOfYear())
-			.withDayOfMonth(dateTime.getDayOfMonth()));
-	    } else {
-		property.setValue(null);
-	    }
-	}
-
-	@Override
-	public Class<?> getType() {
-	    return Date.class;
-	}
-
-	@Override
-	public boolean isReadOnly() {
-	    return property.isReadOnly();
-	}
-
-	@Override
-	public void setReadOnly(boolean newStatus) {
-	    property.setReadOnly(newStatus);
-	}
-    }
-
-    public PopupLocalDateField() {
-	super();
-    }
-
-    public PopupLocalDateField(Property dataSource) throws IllegalArgumentException {
-	super(new LocalDateProperty(dataSource));
-    }
-
-    public PopupLocalDateField(String caption, Property dataSource) {
-	super(caption, new LocalDateProperty(dataSource));
-    }
-
-    public PopupLocalDateField(String caption) {
-	super(caption);
-    }
-
-    @Override
-    public void setPropertyDataSource(Property dataSource) {
-	super.setPropertyDataSource(new LocalDateProperty(dataSource));
-    }
 }

@@ -52,41 +52,41 @@ import com.vaadin.ui.VerticalLayout;
  * 
  */
 public class SystemInfoPage extends VerticalLayout implements EmbeddedComponentContainer {
-    public SystemInfoPage() {
-	setSpacing(true);
+	public SystemInfoPage() {
+		setSpacing(true);
 
-	final Label status = new Label((String) null, Label.CONTENT_PREFORMATTED);
-	addComponent(status);
+		final Label status = new Label((String) null, Label.CONTENT_PREFORMATTED);
+		addComponent(status);
 
-	Button serialize = new Button("serialize session", new ClickListener() {
-	    @Override
-	    public void buttonClick(ClickEvent event) {
-		try {
-		    StringBuilder result = new StringBuilder();
-		    HttpSession session = ((WebApplicationContext) getApplication().getContext()).getHttpSession();
-		    for (Enumeration att = session.getAttributeNames(); att.hasMoreElements();) {
-			String key = (String) att.nextElement();
-			ByteArrayOutputStream array = new ByteArrayOutputStream();
-			ObjectOutputStream stream = new ObjectOutputStream(array);
-			stream.writeObject(session.getAttribute(key));
-			result.append(key + ":" + array.size() + " bytes\n");
-		    }
-		    status.setValue(result.toString());
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-	    }
-	});
-	addComponent(serialize);
-    }
+		Button serialize = new Button("serialize session", new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				try {
+					StringBuilder result = new StringBuilder();
+					HttpSession session = ((WebApplicationContext) getApplication().getContext()).getHttpSession();
+					for (Enumeration att = session.getAttributeNames(); att.hasMoreElements();) {
+						String key = (String) att.nextElement();
+						ByteArrayOutputStream array = new ByteArrayOutputStream();
+						ObjectOutputStream stream = new ObjectOutputStream(array);
+						stream.writeObject(session.getAttribute(key));
+						result.append(key + ":" + array.size() + " bytes\n");
+					}
+					status.setValue(result.toString());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		addComponent(serialize);
+	}
 
-    @Override
-    public boolean isAllowedToOpen(Map<String, String> arguments) {
-	return UserView.getCurrentUser() != null && Role.getRole(RoleType.MANAGER).isMember(UserView.getCurrentUser());
-    }
+	@Override
+	public boolean isAllowedToOpen(Map<String, String> arguments) {
+		return UserView.getCurrentUser() != null && Role.getRole(RoleType.MANAGER).isMember(UserView.getCurrentUser());
+	}
 
-    @Override
-    public void setArguments(Map<String, String> arguments) {
-    }
+	@Override
+	public void setArguments(Map<String, String> arguments) {
+	}
 
 }

@@ -49,149 +49,149 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 
 public class ContainerEditor<PC> extends FieldWrapper<PC> {
-    public static class OrderChanger extends CustomComponent {
-	private final Button up = new Button();
+	public static class OrderChanger extends CustomComponent {
+		private final Button up = new Button();
 
-	private final Button down = new Button();
+		private final Button down = new Button();
 
-	public OrderChanger(final Indexed container, final Object itemId) {
-	    HorizontalLayout layout = new HorizontalLayout();
-	    layout.addComponent(up);
-	    up.setIcon(new ThemeResource("../runo/icons/32/arrow-up.png"));
-	    up.addStyleName(BaseTheme.BUTTON_LINK);
-	    up.addListener(new ClickListener() {
-		@Override
-		public void buttonClick(ClickEvent event) {
-		    int newIndex = container.indexOfId(itemId) - 1;
-		    container.removeItem(itemId);
-		    container.addItemAt(newIndex, itemId);
-		    up.setEnabled(newIndex > 0);
+		public OrderChanger(final Indexed container, final Object itemId) {
+			HorizontalLayout layout = new HorizontalLayout();
+			layout.addComponent(up);
+			up.setIcon(new ThemeResource("../runo/icons/32/arrow-up.png"));
+			up.addStyleName(BaseTheme.BUTTON_LINK);
+			up.addListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					int newIndex = container.indexOfId(itemId) - 1;
+					container.removeItem(itemId);
+					container.addItemAt(newIndex, itemId);
+					up.setEnabled(newIndex > 0);
+				}
+			});
+			up.setEnabled(container.indexOfId(itemId) > 0);
+
+			layout.addComponent(down);
+			down.setIcon(new ThemeResource("../runo/icons/32/arrow-down.png"));
+			down.addStyleName(BaseTheme.BUTTON_LINK);
+			down.addListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					int newIndex = container.indexOfId(itemId) + 1;
+					container.removeItem(itemId);
+					container.addItemAt(newIndex, itemId);
+					down.setEnabled(newIndex < container.size() - 1);
+				}
+			});
+			down.setEnabled(container.indexOfId(itemId) < container.size() - 1);
+
+			setCompositionRoot(layout);
 		}
-	    });
-	    up.setEnabled(container.indexOfId(itemId) > 0);
-
-	    layout.addComponent(down);
-	    down.setIcon(new ThemeResource("../runo/icons/32/arrow-down.png"));
-	    down.addStyleName(BaseTheme.BUTTON_LINK);
-	    down.addListener(new ClickListener() {
-		@Override
-		public void buttonClick(ClickEvent event) {
-		    int newIndex = container.indexOfId(itemId) + 1;
-		    container.removeItem(itemId);
-		    container.addItemAt(newIndex, itemId);
-		    down.setEnabled(newIndex < container.size() - 1);
-		}
-	    });
-	    down.setEnabled(container.indexOfId(itemId) < container.size() - 1);
-
-	    setCompositionRoot(layout);
 	}
-    }
 
-    public static class ContainerEditorTable extends TransactionalTable {
-	public ContainerEditorTable(TableFieldFactory factory, String bundlename) {
-	    super(bundlename);
-	    setWidth(100, UNITS_PERCENTAGE);
-	    setPageLength(0);
-	    setTableFieldFactory(factory);
-	    setEditable(true);
-	    addGeneratedColumn("index", new ColumnGenerator() {
-		@Override
-		public Component generateCell(Table source, Object itemId, Object columnId) {
-		    return new OrderChanger((Indexed) getContainerDataSource(), itemId);
+	public static class ContainerEditorTable extends TransactionalTable {
+		public ContainerEditorTable(TableFieldFactory factory, String bundlename) {
+			super(bundlename);
+			setWidth(100, UNITS_PERCENTAGE);
+			setPageLength(0);
+			setTableFieldFactory(factory);
+			setEditable(true);
+			addGeneratedColumn("index", new ColumnGenerator() {
+				@Override
+				public Component generateCell(Table source, Object itemId, Object columnId) {
+					return new OrderChanger((Indexed) getContainerDataSource(), itemId);
+				}
+			});
+			addGeneratedColumn(StringUtils.EMPTY, new ColumnGenerator() {
+				@Override
+				public Component generateCell(final Table source, final Object itemId, Object columnId) {
+					Button delete = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_ACTION_DELETE));
+					delete.addStyleName(BaseTheme.BUTTON_LINK);
+					delete.addListener(new ClickListener() {
+						@Override
+						public void buttonClick(ClickEvent event) {
+							source.getContainerDataSource().removeItem(itemId);
+						}
+					});
+					return delete;
+				}
+			});
+			// setVisible(size() > 0);
+			addListener(new ItemSetChangeListener() {
+				@Override
+				public void containerItemSetChange(ItemSetChangeEvent event) {
+					setVisible(event.getContainer().size() > 0);
+				}
+			});
 		}
-	    });
-	    addGeneratedColumn(StringUtils.EMPTY, new ColumnGenerator() {
+
 		@Override
-		public Component generateCell(final Table source, final Object itemId, Object columnId) {
-		    Button delete = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_ACTION_DELETE));
-		    delete.addStyleName(BaseTheme.BUTTON_LINK);
-		    delete.addListener(new ClickListener() {
+		protected boolean isEmpty() {
+			return getContainerDataSource().size() == 0;
+		}
+
+		@Override
+		public void setPropertyDataSource(Property newDataSource) {
+			if (newDataSource instanceof Container) {
+				super.setContainerDataSource((Container) newDataSource);
+				ArrayList<Object> columns = new ArrayList<Object>();
+				if (newDataSource instanceof Indexed) {
+					columns.add("index");
+					setColumnWidth("index", 77);
+				}
+				columns.addAll(((Container) newDataSource).getContainerPropertyIds());
+				columns.add(StringUtils.EMPTY);
+				setVisibleColumns(columns.toArray(new Object[0]));
+			}
+		}
+	}
+
+	public ContainerEditor(TableFieldFactory factory, String bundlename, Class<? extends PC> type) {
+		super(new ContainerEditorTable(factory, bundlename), null, type);
+
+		final VerticalLayout layout = new VerticalLayout();
+		layout.setSpacing(true);
+		layout.addComponent(getWrappedField());
+		Button add = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_ACTION_ADD));
+		add.addStyleName(BaseTheme.BUTTON_LINK);
+		layout.addComponent(add);
+		add.addListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-			    source.getContainerDataSource().removeItem(itemId);
+				if (getWrappedField().getContainerDataSource() instanceof AbstractBufferedContainer) {
+					AbstractBufferedContainer<PC, ?, ?> container =
+							(AbstractBufferedContainer<PC, ?, ?>) getWrappedField().getContainerDataSource();
+					container.addItem(container.getElementType());
+				} else {
+					getWrappedField().getContainerDataSource().addItem();
+				}
 			}
-		    });
-		    return delete;
-		}
-	    });
-	    // setVisible(size() > 0);
-	    addListener(new ItemSetChangeListener() {
-		@Override
-		public void containerItemSetChange(ItemSetChangeEvent event) {
-		    setVisible(event.getContainer().size() > 0);
-		}
-	    });
+		});
+		setCompositionRoot(layout);
 	}
 
 	@Override
 	protected boolean isEmpty() {
-	    return getContainerDataSource().size() == 0;
+		return getWrappedField().getContainerDataSource().size() == 0;
 	}
 
 	@Override
-	public void setPropertyDataSource(Property newDataSource) {
-	    if (newDataSource instanceof Container) {
-		super.setContainerDataSource((Container) newDataSource);
-		ArrayList<Object> columns = new ArrayList<Object>();
-		if (newDataSource instanceof Indexed) {
-		    columns.add("index");
-		    setColumnWidth("index", 77);
-		}
-		columns.addAll(((Container) newDataSource).getContainerPropertyIds());
-		columns.add(StringUtils.EMPTY);
-		setVisibleColumns(columns.toArray(new Object[0]));
-	    }
+	protected ContainerEditorTable getWrappedField() {
+		return (ContainerEditorTable) super.getWrappedField();
 	}
-    }
 
-    public ContainerEditor(TableFieldFactory factory, String bundlename, Class<? extends PC> type) {
-	super(new ContainerEditorTable(factory, bundlename), null, type);
+	public void setColumnHeaderMode(int columnHeaderMode) {
+		getWrappedField().setColumnHeaderMode(columnHeaderMode);
+	}
 
-	final VerticalLayout layout = new VerticalLayout();
-	layout.setSpacing(true);
-	layout.addComponent(getWrappedField());
-	Button add = new Button(VaadinResources.getString(VaadinResourceConstants.COMMONS_ACTION_ADD));
-	add.addStyleName(BaseTheme.BUTTON_LINK);
-	layout.addComponent(add);
-	add.addListener(new ClickListener() {
-	    @Override
-	    public void buttonClick(ClickEvent event) {
-		if (getWrappedField().getContainerDataSource() instanceof AbstractBufferedContainer) {
-		    AbstractBufferedContainer<PC, ?, ?> container = (AbstractBufferedContainer<PC, ?, ?>) getWrappedField()
-			    .getContainerDataSource();
-		    container.addItem(container.getElementType());
-		} else {
-		    getWrappedField().getContainerDataSource().addItem();
-		}
-	    }
-	});
-	setCompositionRoot(layout);
-    }
+	public void setColumnExpandRatio(Object propertyId, float expandRatio) {
+		getWrappedField().setColumnExpandRatio(propertyId, expandRatio);
+	}
 
-    @Override
-    protected boolean isEmpty() {
-	return getWrappedField().getContainerDataSource().size() == 0;
-    }
+	public void setColumnWidth(Object propertyId, int width) {
+		getWrappedField().setColumnWidth(propertyId, width);
+	}
 
-    @Override
-    protected ContainerEditorTable getWrappedField() {
-	return (ContainerEditorTable) super.getWrappedField();
-    }
-
-    public void setColumnHeaderMode(int columnHeaderMode) {
-	getWrappedField().setColumnHeaderMode(columnHeaderMode);
-    }
-
-    public void setColumnExpandRatio(Object propertyId, float expandRatio) {
-	getWrappedField().setColumnExpandRatio(propertyId, expandRatio);
-    }
-
-    public void setColumnWidth(Object propertyId, int width) {
-	getWrappedField().setColumnWidth(propertyId, width);
-    }
-
-    public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn) {
-	getWrappedField().addGeneratedColumn(id, generatedColumn);
-    }
+	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn) {
+		getWrappedField().addGeneratedColumn(id, generatedColumn);
+	}
 }

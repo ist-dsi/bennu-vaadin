@@ -24,5 +24,5 @@ package pt.ist.vaadinframework.data;
 import java.io.Serializable;
 
 public interface ItemRemover<Type> extends Serializable {
-    public void remove(Type type);
+	public void remove(Type type);
 }

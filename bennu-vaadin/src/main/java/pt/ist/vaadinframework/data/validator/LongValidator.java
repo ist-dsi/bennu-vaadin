@@ -27,25 +27,24 @@ import pt.ist.vaadinframework.VaadinResources;
 import com.vaadin.data.validator.AbstractStringValidator;
 
 /**
- * String validator for long. See
- * {@link com.vaadin.data.validator.AbstractStringValidator} for more
+ * String validator for long. See {@link com.vaadin.data.validator.AbstractStringValidator} for more
  * information.
  * 
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 @SuppressWarnings("serial")
 public class LongValidator extends AbstractStringValidator implements VaadinResourceConstants {
-    public LongValidator() {
-	super(VaadinResources.getString(LONG_VALIDATOR_ERROR));
-    }
-
-    @Override
-    protected boolean isValidString(String value) {
-	try {
-	    Long.parseLong(value);
-	    return true;
-	} catch (Exception e) {
-	    return false;
+	public LongValidator() {
+		super(VaadinResources.getString(LONG_VALIDATOR_ERROR));
 	}
-    }
+
+	@Override
+	protected boolean isValidString(String value) {
+		try {
+			Long.parseLong(value);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

@@ -38,12 +38,12 @@ import pt.ist.bennu.vaadin.domain.contents.VaadinNodeType;
  */
 @WebListener
 public class ModuleInitializer implements ServletContextListener {
-    @Override
-    public void contextInitialized(ServletContextEvent event) {
-	NodeBean.registerNodeType(new VaadinNodeType());
-    }
+	@Override
+	public void contextInitialized(ServletContextEvent event) {
+		NodeBean.registerNodeType(new VaadinNodeType());
+	}
 
-    @Override
-    public void contextDestroyed(ServletContextEvent event) {
-    }
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+	}
 }

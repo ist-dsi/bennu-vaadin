@@ -42,59 +42,59 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.ItemSorter;
 
 public class DomainContainer<Type extends AbstractDomainObject> extends AbstractBufferedContainer<Type, Object, DomainItem<Type>>
-	implements LuceneContainer {
-    private final int maxHits = 1000000;
+		implements LuceneContainer {
+	private final int maxHits = 1000000;
 
-    public DomainContainer(Property wrapped, Class<? extends Type> elementType, Hint... hints) {
-	super(wrapped, elementType, hints);
-    }
-
-    public DomainContainer(Class<? extends Type> elementType, Hint... hints) {
-	super(elementType, hints);
-    }
-
-    public DomainContainer(Collection<Type> elements, Class<? extends Type> elementType, Hint... hints) {
-	super(new ArrayList<Type>(elements), elementType, hints);
-    }
-
-    @Override
-    protected DomainItem<Type> makeItem(Type itemId) {
-	return new DomainItem<Type>(itemId, elementType);
-    }
-
-    @Override
-    protected DomainItem<Type> makeItem(Class<? extends Type> type) {
-	return new DomainItem<Type>(type);
-    }
-
-    public void setContainerProperties(String... propertyIds) {
-	for (String propertyId : propertyIds) {
-	    PropertyDescriptor propertyDescriptor = MetaModel.findMetaModelForType(getElementType()).getPropertyDescriptor(
-		    propertyId);
-	    addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
+	public DomainContainer(Property wrapped, Class<? extends Type> elementType, Hint... hints) {
+		super(wrapped, elementType, hints);
 	}
-    }
 
-    @Override
-    public void setItemSorter(ItemSorter itemSorter) {
-	super.setItemSorter(itemSorter);
-    }
+	public DomainContainer(Class<? extends Type> elementType, Hint... hints) {
+		super(elementType, hints);
+	}
 
-    @Override
-    public void search(String filterText) {
-	removeAllItems();
-	final DSLState expr = createFilterExpression(filterText);
-	DateTime start = new DateTime();
-	final List<Type> searchResult = (List<Type>) DomainIndexer.getInstance().search(getElementType(), expr, maxHits);
-	DateTime check1 = new DateTime();
-	addItemBatch(searchResult);
-	DateTime check2 = new DateTime();
-	VaadinFrameworkLogger.getLogger().debug(
-		"container search: " + expr.toString() + " took: " + new Interval(start, check1).toDuration() + " "
-			+ new Interval(check1, check2).toDuration() + "(" + new Interval(start, check2).toDuration() + ")");
-    }
+	public DomainContainer(Collection<Type> elements, Class<? extends Type> elementType, Hint... hints) {
+		super(new ArrayList<Type>(elements), elementType, hints);
+	}
 
-    protected DSLState createFilterExpression(String filterText) {
-	return new BuildingState().matches(filterText);
-    }
+	@Override
+	protected DomainItem<Type> makeItem(Type itemId) {
+		return new DomainItem<Type>(itemId, elementType);
+	}
+
+	@Override
+	protected DomainItem<Type> makeItem(Class<? extends Type> type) {
+		return new DomainItem<Type>(type);
+	}
+
+	public void setContainerProperties(String... propertyIds) {
+		for (String propertyId : propertyIds) {
+			PropertyDescriptor propertyDescriptor =
+					MetaModel.findMetaModelForType(getElementType()).getPropertyDescriptor(propertyId);
+			addContainerProperty(propertyId, propertyDescriptor.getPropertyType(), propertyDescriptor.getDefaultValue());
+		}
+	}
+
+	@Override
+	public void setItemSorter(ItemSorter itemSorter) {
+		super.setItemSorter(itemSorter);
+	}
+
+	@Override
+	public void search(String filterText) {
+		removeAllItems();
+		final DSLState expr = createFilterExpression(filterText);
+		DateTime start = new DateTime();
+		final List<Type> searchResult = (List<Type>) DomainIndexer.getInstance().search(getElementType(), expr, maxHits);
+		DateTime check1 = new DateTime();
+		addItemBatch(searchResult);
+		DateTime check2 = new DateTime();
+		VaadinFrameworkLogger.getLogger().debug(
+				"container search: " + expr.toString() + " took: " + new Interval(start, check1).toDuration() + " "
+						+ new Interval(check1, check2).toDuration() + "(" + new Interval(start, check2).toDuration() + ")");
+	}
+
+	protected DSLState createFilterExpression(String filterText) {
+		return new BuildingState().matches(filterText);
+	}
 }

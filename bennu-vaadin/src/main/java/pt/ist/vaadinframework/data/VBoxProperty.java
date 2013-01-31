@@ -33,63 +33,63 @@ import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import com.vaadin.data.util.AbstractProperty;
 
 public class VBoxProperty extends AbstractProperty implements HintedProperty {
-    private VBox<Object> instance;
+	private VBox<Object> instance;
 
-    private final Class<?> type;
+	private final Class<?> type;
 
-    private Collection<Hint> hints;
+	private Collection<Hint> hints;
 
-    public VBoxProperty(Object instance, Hint... hints) {
-	writeVBox(instance);
-	this.type = instance.getClass();
-	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
-    }
-
-    public VBoxProperty(Class<?> type, Hint... hints) {
-	writeVBox(null);
-	this.type = type;
-	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
-    }
-
-    @Service
-    private void writeVBox(Object instance) {
-	this.instance = new VBox<Object>(instance);
-    }
-
-    @Override
-    public Object getValue() {
-	return instance.get();
-    }
-
-    @Override
-    public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	if (isReadOnly()) {
-	    throw new ReadOnlyException();
+	public VBoxProperty(Object instance, Hint... hints) {
+		writeVBox(instance);
+		this.type = instance.getClass();
+		this.hints = new ArrayList<Hint>(Arrays.asList(hints));
 	}
-	VaadinFrameworkLogger.getLogger().debug("writting vbox property with value: " + newValue);
-	writeVBox(newValue);
-	fireValueChange();
-    }
 
-    @Override
-    public void addHint(Hint hint) {
-	if (hints == null) {
-	    hints = new ArrayList<Hint>();
+	public VBoxProperty(Class<?> type, Hint... hints) {
+		writeVBox(null);
+		this.type = type;
+		this.hints = new ArrayList<Hint>(Arrays.asList(hints));
 	}
-	hints.add(hint);
-    }
 
-    @Override
-    public Collection<Hint> getHints() {
-	if (hints != null) {
-	    return Collections.unmodifiableCollection(hints);
+	@Service
+	private void writeVBox(Object instance) {
+		this.instance = new VBox<Object>(instance);
 	}
-	return Collections.emptyList();
-    }
 
-    @Override
-    public Class<?> getType() {
-	return type;
-    }
+	@Override
+	public Object getValue() {
+		return instance.get();
+	}
+
+	@Override
+	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+		if (isReadOnly()) {
+			throw new ReadOnlyException();
+		}
+		VaadinFrameworkLogger.getLogger().debug("writting vbox property with value: " + newValue);
+		writeVBox(newValue);
+		fireValueChange();
+	}
+
+	@Override
+	public void addHint(Hint hint) {
+		if (hints == null) {
+			hints = new ArrayList<Hint>();
+		}
+		hints.add(hint);
+	}
+
+	@Override
+	public Collection<Hint> getHints() {
+		if (hints != null) {
+			return Collections.unmodifiableCollection(hints);
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Class<?> getType() {
+		return type;
+	}
 
 }

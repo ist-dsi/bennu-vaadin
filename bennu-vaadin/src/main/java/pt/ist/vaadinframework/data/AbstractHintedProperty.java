@@ -33,25 +33,25 @@ import com.vaadin.data.util.AbstractProperty;
  * 
  */
 public abstract class AbstractHintedProperty<Type> extends AbstractProperty implements HintedProperty<Type> {
-    private Collection<Hint> hints;
+	private Collection<Hint> hints;
 
-    public AbstractHintedProperty(Hint... hints) {
-	this.hints = new ArrayList<Hint>(Arrays.asList(hints));
-    }
-
-    @Override
-    public void addHint(Hint hint) {
-	if (hints == null) {
-	    hints = new ArrayList<Hint>();
+	public AbstractHintedProperty(Hint... hints) {
+		this.hints = new ArrayList<Hint>(Arrays.asList(hints));
 	}
-	hints.add(hint);
-    }
 
-    @Override
-    public Collection<Hint> getHints() {
-	if (hints != null) {
-	    return Collections.unmodifiableCollection(hints);
+	@Override
+	public void addHint(Hint hint) {
+		if (hints == null) {
+			hints = new ArrayList<Hint>();
+		}
+		hints.add(hint);
 	}
-	return Collections.emptyList();
-    }
+
+	@Override
+	public Collection<Hint> getHints() {
+		if (hints != null) {
+			return Collections.unmodifiableCollection(hints);
+		}
+		return Collections.emptyList();
+	}
 }

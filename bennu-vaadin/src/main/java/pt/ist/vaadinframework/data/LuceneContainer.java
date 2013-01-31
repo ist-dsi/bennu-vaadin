@@ -29,5 +29,5 @@ import pt.ist.vaadinframework.ui.fields.LuceneSelect;
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
  */
 public interface LuceneContainer {
-    public void search(String filterText);
+	public void search(String filterText);
 }

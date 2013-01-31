@@ -6,15 +6,15 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.RichTextArea;
 
 public class RichText implements Hint {
-    @Override
-    public Field applyHint(Field field) {
-	RichTextArea area = new RichTextArea();
-	HintTools.copyConfiguration(field, area);
-	return area;
-    }
+	@Override
+	public Field applyHint(Field field) {
+		RichTextArea area = new RichTextArea();
+		HintTools.copyConfiguration(field, area);
+		return area;
+	}
 
-    @Override
-    public boolean appliesTo(Field field) {
-	return true;
-    }
+	@Override
+	public boolean appliesTo(Field field) {
+		return true;
+	}
 }

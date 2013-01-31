@@ -35,24 +35,24 @@ import com.vaadin.ui.ComponentContainer;
  * @version 1.0
  */
 public interface EmbeddedComponentContainer extends ComponentContainer {
-    /**
-     * Method that will be called with the parsed parameters by the resolver.
-     * You can assume that this configuration method will be called before the
-     * component is attached to the window.
-     * 
-     * @param arguments
-     *            the parsed arguments passed to the container including the
-     *            full parameter text.
-     */
-    public void setArguments(java.util.Map<String, String> arguments);
+	/**
+	 * Method that will be called with the parsed parameters by the resolver.
+	 * You can assume that this configuration method will be called before the
+	 * component is attached to the window.
+	 * 
+	 * @param arguments
+	 *            the parsed arguments passed to the container including the
+	 *            full parameter text.
+	 */
+	public void setArguments(java.util.Map<String, String> arguments);
 
-    /**
-     * Access control method.
-     * 
-     * @param parameters
-     *            parameters of the page.
-     * 
-     * @return true if in the current user is allowed to view this page.
-     */
-    public boolean isAllowedToOpen(Map<String, String> parameters);
+	/**
+	 * Access control method.
+	 * 
+	 * @param parameters
+	 *            parameters of the page.
+	 * 
+	 * @return true if in the current user is allowed to view this page.
+	 */
+	public boolean isAllowedToOpen(Map<String, String> parameters);
 }

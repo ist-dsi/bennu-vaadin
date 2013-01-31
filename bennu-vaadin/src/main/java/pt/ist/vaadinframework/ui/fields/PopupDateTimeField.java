@@ -36,97 +36,97 @@ import com.vaadin.ui.PopupDateField;
 @SuppressWarnings("serial")
 public class PopupDateTimeField extends PopupDateField {
 
-    public static class DateTimeConverter extends PropertyConverter<DateTime, Date> {
+	public static class DateTimeConverter extends PropertyConverter<DateTime, Date> {
 
-	public DateTimeConverter(Property propertyDataSource) {
-	    super(propertyDataSource);
+		public DateTimeConverter(Property propertyDataSource) {
+			super(propertyDataSource);
+		}
+
+		protected DateTimeConverter(Class<? extends DateTime> propertyClass) {
+			super(propertyClass);
+		}
+
+		@Override
+		public Date format(DateTime propertyValue) {
+			return propertyValue == null ? null : propertyValue.toDate();
+		}
+
+		@Override
+		public DateTime parse(Date fieldValue) throws ConversionException {
+			Date date = fieldValue;
+			return date != null ? new DateTime(date.getTime()) : null;
+		}
+
+		@Override
+		public Class getType() {
+			return Date.class;
+		}
+
 	}
 
-	protected DateTimeConverter(Class<? extends DateTime> propertyClass) {
-	    super(propertyClass);
+	@Deprecated
+	public static class DateTimeProperty extends AbstractProperty {
+		private final Property property;
+
+		public DateTimeProperty(Property dataSource) {
+			this.property = dataSource;
+			if (!DateTime.class.isAssignableFrom(dataSource.getType())) {
+				throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
+						+ " typed property as datasource");
+			}
+		}
+
+		@Override
+		public Object getValue() {
+			DateTime date = (DateTime) property.getValue();
+			return date == null ? null : date.toDate();
+		}
+
+		@Override
+		public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+			Date date = (Date) newValue;
+			if (date != null) {
+				property.setValue(new DateTime(date.getTime()));
+			} else {
+				property.setValue(null);
+			}
+		}
+
+		@Override
+		public Class<?> getType() {
+			return Date.class;
+		}
+
+		@Override
+		public boolean isReadOnly() {
+			return property.isReadOnly();
+		}
+
+		@Override
+		public void setReadOnly(boolean newStatus) {
+			property.setReadOnly(newStatus);
+		}
+
+	}
+
+	public PopupDateTimeField() {
+		super();
+	}
+
+	public PopupDateTimeField(Property dataSource) throws IllegalArgumentException {
+		super(new DateTimeConverter(dataSource));
+	}
+
+	public PopupDateTimeField(String caption, Property dataSource) {
+		super(caption, new DateTimeConverter(dataSource));
+	}
+
+	public PopupDateTimeField(String caption) {
+		super(caption);
 	}
 
 	@Override
-	public Date format(DateTime propertyValue) {
-	    return propertyValue == null ? null : propertyValue.toDate();
+	public void setPropertyDataSource(Property dataSource) {
+		super.setPropertyDataSource(new DateTimeConverter(dataSource));
 	}
-
-	@Override
-	public DateTime parse(Date fieldValue) throws ConversionException {
-	    Date date = (Date) fieldValue;
-	    return date != null ? new DateTime(date.getTime()) : null;
-	}
-
-	@Override
-	public Class getType() {
-	    return Date.class;
-	}
-
-    }
-
-    @Deprecated
-    public static class DateTimeProperty extends AbstractProperty {
-	private final Property property;
-
-	public DateTimeProperty(Property dataSource) {
-	    this.property = dataSource;
-	    if (!DateTime.class.isAssignableFrom(dataSource.getType())) {
-		throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
-			+ " typed property as datasource");
-	    }
-	}
-
-	@Override
-	public Object getValue() {
-	    DateTime date = (DateTime) property.getValue();
-	    return date == null ? null : date.toDate();
-	}
-
-	@Override
-	public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-	    Date date = (Date) newValue;
-	    if (date != null) {
-		property.setValue(new DateTime(date.getTime()));
-	    } else {
-		property.setValue(null);
-	    }
-	}
-
-	@Override
-	public Class<?> getType() {
-	    return Date.class;
-	}
-
-	@Override
-	public boolean isReadOnly() {
-	    return property.isReadOnly();
-	}
-
-	@Override
-	public void setReadOnly(boolean newStatus) {
-	    property.setReadOnly(newStatus);
-	}
-
-    }
-
-    public PopupDateTimeField() {
-	super();
-    }
-
-    public PopupDateTimeField(Property dataSource) throws IllegalArgumentException {
-	super(new DateTimeConverter(dataSource));
-    }
-
-    public PopupDateTimeField(String caption, Property dataSource) {
-	super(caption, new DateTimeConverter(dataSource));
-    }
-
-    public PopupDateTimeField(String caption) {
-	super(caption);
-    }
-
-    @Override
-    public void setPropertyDataSource(Property dataSource) {
-	super.setPropertyDataSource(new DateTimeConverter(dataSource));
-    }
 }

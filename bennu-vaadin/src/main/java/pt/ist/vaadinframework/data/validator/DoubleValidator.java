@@ -29,7 +29,7 @@ import pt.ist.vaadinframework.VaadinResources;
  */
 @SuppressWarnings("serial")
 public class DoubleValidator extends com.vaadin.data.validator.DoubleValidator implements VaadinResourceConstants {
-    public DoubleValidator() {
-	super(VaadinResources.getString(DOUBLE_VALIDATOR_ERROR));
-    }
+	public DoubleValidator() {
+		super(VaadinResources.getString(DOUBLE_VALIDATOR_ERROR));
+	}
 }

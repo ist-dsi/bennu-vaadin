@@ -30,19 +30,19 @@ import com.vaadin.data.Property.ValueChangeNotifier;
 import com.vaadin.ui.Field;
 
 public interface HintedProperty<Type> extends Property, ValueChangeNotifier, ReadOnlyStatusChangeNotifier {
-    public interface Hint extends Serializable {
-	public Field applyHint(Field field);
+	public interface Hint extends Serializable {
+		public Field applyHint(Field field);
 
-	public boolean appliesTo(Field field);
-    }
+		public boolean appliesTo(Field field);
+	}
 
-    @Override
-    public Type getValue();
+	@Override
+	public Type getValue();
 
-    @Override
-    public Class<? extends Type> getType();
+	@Override
+	public Class<? extends Type> getType();
 
-    public void addHint(Hint hint);
+	public void addHint(Hint hint);
 
-    public Collection<Hint> getHints();
+	public Collection<Hint> getHints();
 }

@@ -52,154 +52,154 @@ import com.sun.codemodel.JClassAlreadyExistsException;
  * 
  */
 public class VaadinProxiesCodeGeneratorTask extends Task {
-    private File srcBaseDir;
+	private File srcBaseDir;
 
-    private File buildDir;
+	private File buildDir;
 
-    private File packageSourceLocations;
+	private File packageSourceLocations;
 
-    private String vaadinSrcDir;
+	private String vaadinSrcDir;
 
-    private final List<FileSet> filesets = new ArrayList<FileSet>();
+	private final List<FileSet> filesets = new ArrayList<FileSet>();
 
-    public File getSrcBaseDir() {
-	return srcBaseDir;
-    }
+	public File getSrcBaseDir() {
+		return srcBaseDir;
+	}
 
-    public void setSrcBaseDir(File srcBaseDir) {
-	this.srcBaseDir = srcBaseDir;
-    }
+	public void setSrcBaseDir(File srcBaseDir) {
+		this.srcBaseDir = srcBaseDir;
+	}
 
-    public File getBuildDir() {
-	return buildDir;
-    }
+	public File getBuildDir() {
+		return buildDir;
+	}
 
-    public void setBuildDir(File buildDir) {
-	this.buildDir = buildDir;
-    }
+	public void setBuildDir(File buildDir) {
+		this.buildDir = buildDir;
+	}
 
-    public File getPackageSourceLocations() {
-	return packageSourceLocations;
-    }
+	public File getPackageSourceLocations() {
+		return packageSourceLocations;
+	}
 
-    public void setPackageSourceLocations(File packageSourceLocations) {
-	this.packageSourceLocations = packageSourceLocations;
-    }
+	public void setPackageSourceLocations(File packageSourceLocations) {
+		this.packageSourceLocations = packageSourceLocations;
+	}
 
-    public String getVaadinSrcDir() {
-	return vaadinSrcDir;
-    }
+	public String getVaadinSrcDir() {
+		return vaadinSrcDir;
+	}
 
-    public void setVaadinSrcDir(String vaadinSrcDir) {
-	this.vaadinSrcDir = vaadinSrcDir;
-    }
+	public void setVaadinSrcDir(String vaadinSrcDir) {
+		this.vaadinSrcDir = vaadinSrcDir;
+	}
 
-    public void addFileset(FileSet fileset) {
-	filesets.add(fileset);
-    }
+	public void addFileset(FileSet fileset) {
+		filesets.add(fileset);
+	}
 
-    @Override
-    public void execute() throws BuildException {
-	super.execute();
+	@Override
+	public void execute() throws BuildException {
+		super.execute();
 
-	DateTime start = new DateTime();
-	final Properties properties = new MultiProperty();
-	try {
-	    properties.load(new FileInputStream(buildDir.getAbsolutePath() + "/WEB-INF/classes/configuration.properties"));
-	    File timestampFile = new File(srcBaseDir, "vaadin-timestamp");
-	    long latestBuildTime = srcBaseDir != null ? srcBaseDir.lastModified() : 0;
+		DateTime start = new DateTime();
+		final Properties properties = new MultiProperty();
+		try {
+			properties.load(new FileInputStream(buildDir.getAbsolutePath() + "/WEB-INF/classes/configuration.properties"));
+			File timestampFile = new File(srcBaseDir, "vaadin-timestamp");
+			long latestBuildTime = srcBaseDir != null ? srcBaseDir.lastModified() : 0;
 
-	    boolean shouldCompile = false;
+			boolean shouldCompile = false;
 
-	    // final String preInitClassnames =
-	    // properties.getProperty("pre.init.classnames");
-	    // System.out.println("Pre-init class names: " + preInitClassnames);
-	    // if (preInitClassnames != null) {
-	    // final String[] classnames = preInitClassnames.split(",");
-	    // for (final String classname : classnames) {
-	    // if (classname != null && !classname.isEmpty()) {
-	    // try {
-	    // Class.forName(classname.trim());
-	    // } catch (final ClassNotFoundException e) {
-	    // throw new Error(e);
-	    // }
-	    // }
-	    // }
-	    // }
+			// final String preInitClassnames =
+			// properties.getProperty("pre.init.classnames");
+			// System.out.println("Pre-init class names: " + preInitClassnames);
+			// if (preInitClassnames != null) {
+			// final String[] classnames = preInitClassnames.split(",");
+			// for (final String classname : classnames) {
+			// if (classname != null && !classname.isEmpty()) {
+			// try {
+			// Class.forName(classname.trim());
+			// } catch (final ClassNotFoundException e) {
+			// throw new Error(e);
+			// }
+			// }
+			// }
+			// }
 
-	    List<URL> domainModelURLs = new ArrayList<URL>();
+			List<URL> domainModelURLs = new ArrayList<URL>();
 
-	    // whereToInject keeps track where the DMLs for the plugin should
-	    // be injected, so they are sequential injected and before the
-	    // application DMLs
+			// whereToInject keeps track where the DMLs for the plugin should
+			// be injected, so they are sequential injected and before the
+			// application DMLs
 
-	    FenixFrameworkPlugin[] plugins = getPluginArray(properties);
-	    if (plugins != null) {
-		for (FenixFrameworkPlugin plugin : plugins) {
-		    List<URL> pluginDomainModel = plugin.getDomainModel();
-		    domainModelURLs.addAll(pluginDomainModel);
+			FenixFrameworkPlugin[] plugins = getPluginArray(properties);
+			if (plugins != null) {
+				for (FenixFrameworkPlugin plugin : plugins) {
+					List<URL> pluginDomainModel = plugin.getDomainModel();
+					domainModelURLs.addAll(pluginDomainModel);
+				}
+			}
+
+			for (FileSet fileset : filesets) {
+				if (fileset.getDir().exists()) {
+					DirectoryScanner scanner = fileset.getDirectoryScanner(getProject());
+					String[] includedFiles = scanner.getIncludedFiles();
+					for (String includedFile : includedFiles) {
+						String filePath = fileset.getDir().getAbsolutePath() + "/" + includedFile;
+						File file = new File(filePath);
+						boolean isModified = file.lastModified() > latestBuildTime;
+						// System.out.println(includedFile + " : " + (isModified
+						// ? "not up to date" : "up to date"));
+						domainModelURLs.add(new File(filePath).toURI().toURL());
+						shouldCompile = shouldCompile || isModified;
+					}
+				}
+			}
+
+			// first, get the domain model
+			FenixDomainModel model = DML.getDomainModelForURLs(FenixDomainModel.class, domainModelURLs, false);
+			VaadinProxiesCodeGenerator generator =
+					new VaadinProxiesCodeGenerator(model, srcBaseDir, vaadinSrcDir, packageSourceLocations);
+			generator.generate();
+			timestampFile.delete();
+			timestampFile.createNewFile();
+			// } else {
+			// System.out.println("All dml files are up to date, skipping generation");
+			// }
+		} catch (IOException e) {
+			throw new BuildException(e);
+		} catch (ANTLRException e) {
+			throw new BuildException(e);
+		} catch (JClassAlreadyExistsException e) {
+			throw new BuildException(e);
 		}
-	    }
+		Duration processingTime = new Duration(start, new DateTime());
+		PeriodFormatter formatter =
+				new PeriodFormatterBuilder().appendMinutes().appendSuffix("m").appendSeconds().appendSuffix("s").toFormatter();
+		System.out.println("Vaadin Generation Took: " + formatter.print(processingTime.toPeriod()));
+	}
 
-	    for (FileSet fileset : filesets) {
-		if (fileset.getDir().exists()) {
-		    DirectoryScanner scanner = fileset.getDirectoryScanner(getProject());
-		    String[] includedFiles = scanner.getIncludedFiles();
-		    for (String includedFile : includedFiles) {
-			String filePath = fileset.getDir().getAbsolutePath() + "/" + includedFile;
-			File file = new File(filePath);
-			boolean isModified = file.lastModified() > latestBuildTime;
-			// System.out.println(includedFile + " : " + (isModified
-			// ? "not up to date" : "up to date"));
-			domainModelURLs.add(new File(filePath).toURI().toURL());
-			shouldCompile = shouldCompile || isModified;
-		    }
+	private FenixFrameworkPlugin[] getPluginArray(Properties properties) {
+		String property = properties.getProperty("plugins");
+		if (StringUtils.isEmpty(property)) {
+			return new FenixFrameworkPlugin[0];
 		}
-	    }
+		String[] classNames = property.split("\\s*,\\s*");
 
-	    // first, get the domain model
-	    FenixDomainModel model = DML.getDomainModelForURLs(FenixDomainModel.class, domainModelURLs, false);
-	    VaadinProxiesCodeGenerator generator = new VaadinProxiesCodeGenerator(model, srcBaseDir, vaadinSrcDir,
-		    packageSourceLocations);
-	    generator.generate();
-	    timestampFile.delete();
-	    timestampFile.createNewFile();
-	    // } else {
-	    // System.out.println("All dml files are up to date, skipping generation");
-	    // }
-	} catch (IOException e) {
-	    throw new BuildException(e);
-	} catch (ANTLRException e) {
-	    throw new BuildException(e);
-	} catch (JClassAlreadyExistsException e) {
-	    throw new BuildException(e);
+		FenixFrameworkPlugin[] pluginArray = new FenixFrameworkPlugin[classNames.length];
+		for (int i = 0; i < classNames.length; i++) {
+			try {
+				pluginArray[i] = (FenixFrameworkPlugin) Class.forName(classNames[i].trim()).newInstance();
+			} catch (InstantiationException e) {
+				throw new Error(e);
+			} catch (IllegalAccessException e) {
+				throw new Error(e);
+			} catch (ClassNotFoundException e) {
+				throw new Error(e);
+			}
+		}
+		return pluginArray;
 	}
-	Duration processingTime = new Duration(start, new DateTime());
-	PeriodFormatter formatter = new PeriodFormatterBuilder().appendMinutes().appendSuffix("m").appendSeconds()
-		.appendSuffix("s").toFormatter();
-	System.out.println("Vaadin Generation Took: " + formatter.print(processingTime.toPeriod()));
-    }
-
-    private FenixFrameworkPlugin[] getPluginArray(Properties properties) {
-	String property = properties.getProperty("plugins");
-	if (StringUtils.isEmpty(property)) {
-	    return new FenixFrameworkPlugin[0];
-	}
-	String[] classNames = property.split("\\s*,\\s*");
-
-	FenixFrameworkPlugin[] pluginArray = new FenixFrameworkPlugin[classNames.length];
-	for (int i = 0; i < classNames.length; i++) {
-	    try {
-		pluginArray[i] = (FenixFrameworkPlugin) Class.forName(classNames[i].trim()).newInstance();
-	    } catch (InstantiationException e) {
-		throw new Error(e);
-	    } catch (IllegalAccessException e) {
-		throw new Error(e);
-	    } catch (ClassNotFoundException e) {
-		throw new Error(e);
-	    }
-	}
-	return pluginArray;
-    }
 
 }

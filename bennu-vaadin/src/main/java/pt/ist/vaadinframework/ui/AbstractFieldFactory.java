@@ -36,55 +36,55 @@ import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.TableFieldFactory;
 
 public abstract class AbstractFieldFactory implements FormFieldFactory, TableFieldFactory, VaadinResourceConstants {
-    protected final String bundlename;
+	protected final String bundlename;
 
-    private transient ResourceBundle bundle;
+	private transient ResourceBundle bundle;
 
-    public AbstractFieldFactory(String bundlename) {
-	this.bundlename = bundlename;
-    }
-
-    protected ResourceBundle getBundle() {
-	if (bundle == null) {
-	    bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
+	public AbstractFieldFactory(String bundlename) {
+		this.bundlename = bundlename;
 	}
-	return bundle;
-    }
 
-    @Override
-    public final Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
-	Item item = container.getItem(itemId);
-	Field field = makeField(item, propertyId, uiContext);
-	return initField(field, item, propertyId, uiContext);
-    }
-
-    @Override
-    public final Field createField(Item item, Object propertyId, Component uiContext) {
-	Field field = makeField(item, propertyId, uiContext);
-	return initField(field, item, propertyId, uiContext);
-    }
-
-    protected Field initField(Field field, Item item, Object propertyId, Component uiContext) {
-	String caption = makeCaption(item, propertyId, uiContext);
-	field.setCaption(caption);
-	field.setDescription(makeDescription(item, propertyId, uiContext));
-	if (item.getItemProperty(propertyId) instanceof HintedProperty) {
-	    for (Hint hint : ((HintedProperty<?>) item.getItemProperty(propertyId)).getHints()) {
-		if (hint.appliesTo(field)) {
-		    field = hint.applyHint(field);
+	protected ResourceBundle getBundle() {
+		if (bundle == null) {
+			bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
 		}
-	    }
+		return bundle;
 	}
-	return field;
-    }
 
-    protected abstract Field makeField(Item item, Object propertyId, Component uiContext);
+	@Override
+	public final Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
+		Item item = container.getItem(itemId);
+		Field field = makeField(item, propertyId, uiContext);
+		return initField(field, item, propertyId, uiContext);
+	}
 
-    protected String makeCaption(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeCaption(getBundle(), item, propertyId, uiContext);
-    }
+	@Override
+	public final Field createField(Item item, Object propertyId, Component uiContext) {
+		Field field = makeField(item, propertyId, uiContext);
+		return initField(field, item, propertyId, uiContext);
+	}
 
-    protected String makeDescription(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeDescription(getBundle(), item, propertyId, uiContext);
-    }
+	protected Field initField(Field field, Item item, Object propertyId, Component uiContext) {
+		String caption = makeCaption(item, propertyId, uiContext);
+		field.setCaption(caption);
+		field.setDescription(makeDescription(item, propertyId, uiContext));
+		if (item.getItemProperty(propertyId) instanceof HintedProperty) {
+			for (Hint hint : ((HintedProperty<?>) item.getItemProperty(propertyId)).getHints()) {
+				if (hint.appliesTo(field)) {
+					field = hint.applyHint(field);
+				}
+			}
+		}
+		return field;
+	}
+
+	protected abstract Field makeField(Item item, Object propertyId, Component uiContext);
+
+	protected String makeCaption(Item item, Object propertyId, Component uiContext) {
+		return CaptionUtils.makeCaption(getBundle(), item, propertyId, uiContext);
+	}
+
+	protected String makeDescription(Item item, Object propertyId, Component uiContext) {
+		return CaptionUtils.makeDescription(getBundle(), item, propertyId, uiContext);
+	}
 }

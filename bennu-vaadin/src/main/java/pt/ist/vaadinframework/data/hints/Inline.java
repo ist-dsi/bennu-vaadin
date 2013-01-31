@@ -7,15 +7,15 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.InlineDateField;
 
 public class Inline implements Hint {
-    @Override
-    public Field applyHint(Field field) {
-	InlineDateField inlined = new InlineDateField();
-	HintTools.copyConfiguration(field, inlined);
-	return inlined;
-    }
+	@Override
+	public Field applyHint(Field field) {
+		InlineDateField inlined = new InlineDateField();
+		HintTools.copyConfiguration(field, inlined);
+		return inlined;
+	}
 
-    @Override
-    public boolean appliesTo(Field field) {
-	return field instanceof DateField;
-    }
+	@Override
+	public boolean appliesTo(Field field) {
+		return field instanceof DateField;
+	}
 }

@@ -7,15 +7,15 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.PasswordField;
 
 public class Password implements Hint {
-    @Override
-    public Field applyHint(Field field) {
-	PasswordField password = new PasswordField();
-	HintTools.copyConfiguration(field, password);
-	return password;
-    }
+	@Override
+	public Field applyHint(Field field) {
+		PasswordField password = new PasswordField();
+		HintTools.copyConfiguration(field, password);
+		return password;
+	}
 
-    @Override
-    public boolean appliesTo(Field field) {
-	return field instanceof AbstractTextField;
-    }
+	@Override
+	public boolean appliesTo(Field field) {
+		return field instanceof AbstractTextField;
+	}
 }

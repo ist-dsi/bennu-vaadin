@@ -37,25 +37,25 @@ import com.sun.codemodel.writer.FilterCodeWriter;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 public class NonOverridingCodeWriter extends FilterCodeWriter {
-    private final File srcDir;
+	private final File srcDir;
 
-    public NonOverridingCodeWriter(CodeWriter core, File srcDir) {
-	super(core);
-	this.srcDir = srcDir;
-    }
-
-    @Override
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
-	return super.openBinary(pkg, fileName);
-    }
-
-    @Override
-    public Writer openSource(JPackage pkg, String fileName) throws IOException {
-	File wannaBeFile = new File(srcDir, pkg.name().replaceAll("\\.", "/") + File.separator + fileName);
-	if (wannaBeFile.exists()) {
-	    return new OutputStreamWriter(new NullOutputStream());
+	public NonOverridingCodeWriter(CodeWriter core, File srcDir) {
+		super(core);
+		this.srcDir = srcDir;
 	}
-	System.out.println("Creating Data Layer Class: " + wannaBeFile.getAbsolutePath());
-	return super.openSource(pkg, fileName);
-    }
+
+	@Override
+	public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+		return super.openBinary(pkg, fileName);
+	}
+
+	@Override
+	public Writer openSource(JPackage pkg, String fileName) throws IOException {
+		File wannaBeFile = new File(srcDir, pkg.name().replaceAll("\\.", "/") + File.separator + fileName);
+		if (wannaBeFile.exists()) {
+			return new OutputStreamWriter(new NullOutputStream());
+		}
+		System.out.println("Creating Data Layer Class: " + wannaBeFile.getAbsolutePath());
+		return super.openSource(pkg, fileName);
+	}
 }

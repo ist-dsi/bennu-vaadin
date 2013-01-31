@@ -59,61 +59,62 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
  * 
  */
 public class EmbeddedApplicationInitializer extends HttpServlet {
-    static {
-	RequestChecksumFilter.registerFilterRule(new ChecksumPredicate() {
-	    @Override
-	    public boolean shouldFilter(HttpServletRequest httpServletRequest) {
-		return !httpServletRequest.getRequestURI().endsWith("/vaadinContext.do");
-	    }
-	});
-    }
-
-    private static final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses = new HashSet<Class<? extends EmbeddedComponentContainer>>();
-
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-	super.init(config);
-
-	loadEmbeddedComponentsFromFile(embeddedComponentClasses);
-	for (Class<? extends EmbeddedComponentContainer> embeddedComponentClass : embeddedComponentClasses) {
-	    EmbeddedComponent embeddedComponent = embeddedComponentClass.getAnnotation(EmbeddedComponent.class);
-	    if (embeddedComponent == null) {
-		continue;
-	    }
-
-	    String[] paths = embeddedComponent.path();
-
-	    for (String path : paths) {
-		try {
-		    EmbeddedApplication.addPage(embeddedComponentClass);
-		} catch (PatternSyntaxException e) {
-		    throw new Error("Error interpreting pattern: " + path, e);
-		}
-	    }
-	}
-
-	EmbeddedApplication.registerErrorWindow(new ReporterErrorWindow());
-    }
-
-    private void loadEmbeddedComponentsFromFile(final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses) {
-	ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	try {
-	    for (FenixFrameworkArtifact artifact : FenixFrameworkArtifact.fromName(PropertiesManager.getProperty("app.name"))
-		    .getArtifacts()) {
-		try (InputStream stream = loader.getResourceAsStream(artifact.getName() + "/"
-			+ EmbeddedAnnotationProcessor.LOG_FILENAME)) {
-		    if (stream != null) {
-			List<String> classnames = IOUtils.readLines(stream);
-			for (String classname : classnames) {
-			    Class<? extends EmbeddedComponentContainer> type = (Class<? extends EmbeddedComponentContainer>) loader
-				    .loadClass(classname);
-			    embeddedComponentClasses.add(type);
+	static {
+		RequestChecksumFilter.registerFilterRule(new ChecksumPredicate() {
+			@Override
+			public boolean shouldFilter(HttpServletRequest httpServletRequest) {
+				return !httpServletRequest.getRequestURI().endsWith("/vaadinContext.do");
 			}
-		    }
-		}
-	    }
-	} catch (IOException | ClassNotFoundException | FenixFrameworkProjectException e) {
-	    e.printStackTrace();
+		});
 	}
-    }
+
+	private static final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses =
+			new HashSet<Class<? extends EmbeddedComponentContainer>>();
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+
+		loadEmbeddedComponentsFromFile(embeddedComponentClasses);
+		for (Class<? extends EmbeddedComponentContainer> embeddedComponentClass : embeddedComponentClasses) {
+			EmbeddedComponent embeddedComponent = embeddedComponentClass.getAnnotation(EmbeddedComponent.class);
+			if (embeddedComponent == null) {
+				continue;
+			}
+
+			String[] paths = embeddedComponent.path();
+
+			for (String path : paths) {
+				try {
+					EmbeddedApplication.addPage(embeddedComponentClass);
+				} catch (PatternSyntaxException e) {
+					throw new Error("Error interpreting pattern: " + path, e);
+				}
+			}
+		}
+
+		EmbeddedApplication.registerErrorWindow(new ReporterErrorWindow());
+	}
+
+	private void loadEmbeddedComponentsFromFile(final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses) {
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		try {
+			for (FenixFrameworkArtifact artifact : FenixFrameworkArtifact.fromName(PropertiesManager.getProperty("app.name"))
+					.getArtifacts()) {
+				try (InputStream stream =
+						loader.getResourceAsStream(artifact.getName() + "/" + EmbeddedAnnotationProcessor.LOG_FILENAME)) {
+					if (stream != null) {
+						List<String> classnames = IOUtils.readLines(stream);
+						for (String classname : classnames) {
+							Class<? extends EmbeddedComponentContainer> type =
+									(Class<? extends EmbeddedComponentContainer>) loader.loadClass(classname);
+							embeddedComponentClasses.add(type);
+						}
+					}
+				}
+			}
+		} catch (IOException | ClassNotFoundException | FenixFrameworkProjectException e) {
+			e.printStackTrace();
+		}
+	}
 }

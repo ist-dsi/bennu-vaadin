@@ -67,109 +67,109 @@ import com.vaadin.ui.TextField;
  * 
  */
 public class DefaultFieldFactory extends AbstractFieldFactory {
-    public DefaultFieldFactory(String bundlename) {
-	super(bundlename);
-    }
+	public DefaultFieldFactory(String bundlename) {
+		super(bundlename);
+	}
 
-    /**
-     * @see pt.ist.vaadinframework.ui.AbstractFieldFactory#makeField(com.vaadin.data.Item,
-     *      java.lang.Object, com.vaadin.ui.Component)
-     */
-    @Override
-    protected Field makeField(Item item, Object propertyId, Component uiContext) {
-	Class<?> type = item.getItemProperty(propertyId).getType();
-	if (String.class.isAssignableFrom(type)) {
-	    TextField field = new TextField();
-	    field.setNullSettingAllowed(true);
-	    field.setNullRepresentation(StringUtils.EMPTY);
-	    return field;
+	/**
+	 * @see pt.ist.vaadinframework.ui.AbstractFieldFactory#makeField(com.vaadin.data.Item, java.lang.Object,
+	 *      com.vaadin.ui.Component)
+	 */
+	@Override
+	protected Field makeField(Item item, Object propertyId, Component uiContext) {
+		Class<?> type = item.getItemProperty(propertyId).getType();
+		if (String.class.isAssignableFrom(type)) {
+			TextField field = new TextField();
+			field.setNullSettingAllowed(true);
+			field.setNullRepresentation(StringUtils.EMPTY);
+			return field;
+		}
+		if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof AbstractBufferedContainer) {
+			return new ContainerEditor<Object>(this, bundlename,
+					((AbstractBufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
+		}
+		if (AbstractDomainObject.class.isAssignableFrom(type)) {
+			Select select = new Select();
+			select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+			select.setImmediate(true);
+			return select;
+		}
+		if (Collection.class.isAssignableFrom(type)) {
+			OptionGroup group = new OptionGroup();
+			group.setMultiSelect(true);
+			group.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+			group.setImmediate(true);
+			return group;
+		}
+		if (Byte.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new ByteValidator(), Byte.toString(Byte.MAX_VALUE).length() + 1);
+		}
+		if (Short.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new ShortValidator(), Short.toString(Short.MAX_VALUE).length() + 1);
+		}
+		if (Integer.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new IntegerValidator(), Integer.toString(Integer.MAX_VALUE).length() + 1);
+		}
+		if (Long.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new LongValidator(), Long.toString(Long.MAX_VALUE).length() + 1);
+		}
+		if (Float.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new FloatValidator(), Float.toString(Float.MAX_VALUE).length() + 1);
+		}
+		if (Double.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new DoubleValidator(), Double.toString(Double.MAX_VALUE).length() + 1);
+		}
+		if (Boolean.class.isAssignableFrom(type)) {
+			return new CheckBox();
+		}
+		if (Character.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new CharacterValidator(), 1);
+		}
+		if (BigDecimal.class.isAssignableFrom(type)) {
+			return new PrimitiveField(new BigDecimalValidator(), -1);
+		}
+		if (Enum.class.isAssignableFrom(type)) {
+			return new EnumField((Class<? extends Enum<?>>) item.getItemProperty(propertyId).getType());
+		}
+		if (Date.class.isAssignableFrom(type)) {
+			DateField field = new DateField();
+			field.setResolution(DateField.RESOLUTION_DAY);
+			return field;
+		}
+		if (Item.class.isAssignableFrom(type)) {
+			Form form = new Form() {
+				@Override
+				public void setPropertyDataSource(Property newDataSource) {
+					setItemDataSource((Item) newDataSource);
+				};
+			};
+			form.setImmediate(true);
+			form.setFormFieldFactory(this);
+			return form;
+		}
+		if (MultiLanguageString.class.isAssignableFrom(type)) {
+			return new MultiLanguageStringField(bundlename, Language.pt, Language.en);
+		}
+		if (DateTime.class.isAssignableFrom(type)) {
+			PopupDateTimeField field = new PopupDateTimeField();
+			field.setResolution(DateField.RESOLUTION_SEC);
+			return field;
+		}
+		if (LocalDate.class.isAssignableFrom(type)) {
+			PopupLocalDateField field = new PopupLocalDateField();
+			field.setResolution(DateField.RESOLUTION_DAY);
+			return field;
+		}
+		if (URL.class.isAssignableFrom(type)) {
+			TextField field = new TextField();
+			field.setNullSettingAllowed(true);
+			field.setNullRepresentation(StringUtils.EMPTY);
+			field.addValidator(new URLValidator());
+			return field;
+		}
+		Select select = new Select();
+		select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+		select.setImmediate(true);
+		return select;
 	}
-	if (Collection.class.isAssignableFrom(type) && item.getItemProperty(propertyId) instanceof AbstractBufferedContainer) {
-	    return new ContainerEditor<Object>(this, bundlename,
-		    ((AbstractBufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
-	}
-	if (AbstractDomainObject.class.isAssignableFrom(type)) {
-	    Select select = new Select();
-	    select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-	    select.setImmediate(true);
-	    return select;
-	}
-	if (Collection.class.isAssignableFrom(type)) {
-	    OptionGroup group = new OptionGroup();
-	    group.setMultiSelect(true);
-	    group.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-	    group.setImmediate(true);
-	    return group;
-	}
-	if (Byte.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new ByteValidator(), Byte.toString(Byte.MAX_VALUE).length() + 1);
-	}
-	if (Short.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new ShortValidator(), Short.toString(Short.MAX_VALUE).length() + 1);
-	}
-	if (Integer.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new IntegerValidator(), Integer.toString(Integer.MAX_VALUE).length() + 1);
-	}
-	if (Long.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new LongValidator(), Long.toString(Long.MAX_VALUE).length() + 1);
-	}
-	if (Float.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new FloatValidator(), Float.toString(Float.MAX_VALUE).length() + 1);
-	}
-	if (Double.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new DoubleValidator(), Double.toString(Double.MAX_VALUE).length() + 1);
-	}
-	if (Boolean.class.isAssignableFrom(type)) {
-	    return new CheckBox();
-	}
-	if (Character.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new CharacterValidator(), 1);
-	}
-	if (BigDecimal.class.isAssignableFrom(type)) {
-	    return new PrimitiveField(new BigDecimalValidator(), -1);
-	}
-	if (Enum.class.isAssignableFrom(type)) {
-	    return new EnumField((Class<? extends Enum<?>>) item.getItemProperty(propertyId).getType());
-	}
-	if (Date.class.isAssignableFrom(type)) {
-	    DateField field = new DateField();
-	    field.setResolution(DateField.RESOLUTION_DAY);
-	    return field;
-	}
-	if (Item.class.isAssignableFrom(type)) {
-	    Form form = new Form() {
-		@Override
-		public void setPropertyDataSource(Property newDataSource) {
-		    setItemDataSource((Item) newDataSource);
-		};
-	    };
-	    form.setImmediate(true);
-	    form.setFormFieldFactory(this);
-	    return form;
-	}
-	if (MultiLanguageString.class.isAssignableFrom(type)) {
-	    return new MultiLanguageStringField(bundlename, Language.pt, Language.en);
-	}
-	if (DateTime.class.isAssignableFrom(type)) {
-	    PopupDateTimeField field = new PopupDateTimeField();
-	    field.setResolution(DateField.RESOLUTION_SEC);
-	    return field;
-	}
-	if (LocalDate.class.isAssignableFrom(type)) {
-	    PopupLocalDateField field = new PopupLocalDateField();
-	    field.setResolution(DateField.RESOLUTION_DAY);
-	    return field;
-	}
-	if (URL.class.isAssignableFrom(type)) {
-	    TextField field = new TextField();
-	    field.setNullSettingAllowed(true);
-	    field.setNullRepresentation(StringUtils.EMPTY);
-	    field.addValidator(new URLValidator());
-	    return field;
-	}
-	Select select = new Select();
-	select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-	select.setImmediate(true);
-	return select;
-    }
 }

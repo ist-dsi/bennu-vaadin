@@ -29,7 +29,7 @@ import pt.ist.vaadinframework.VaadinResources;
  */
 @SuppressWarnings("serial")
 public class IntegerValidator extends com.vaadin.data.validator.IntegerValidator implements VaadinResourceConstants {
-    public IntegerValidator() {
-	super(VaadinResources.getString(INTEGER_VALIDATOR_ERROR));
-    }
+	public IntegerValidator() {
+		super(VaadinResources.getString(INTEGER_VALIDATOR_ERROR));
+	}
 }

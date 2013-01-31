@@ -26,7 +26,7 @@ package pt.ist.vaadinframework.data.metamodel;
  * 
  */
 public class ModelIntroscpectionException extends RuntimeException {
-    public ModelIntroscpectionException(Throwable cause) {
-	super(cause);
-    }
+	public ModelIntroscpectionException(Throwable cause) {
+		super(cause);
+	}
 }

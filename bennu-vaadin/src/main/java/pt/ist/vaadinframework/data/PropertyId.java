@@ -29,44 +29,44 @@ import java.util.List;
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  */
 public class PropertyId implements Serializable {
-    private final List<Object> path;
+	private final List<Object> path;
 
-    public PropertyId(Object piece) {
-	path = new ArrayList<Object>();
-	path.add(piece);
-    }
-
-    protected PropertyId(PropertyId propertyId, Object piece) {
-	this(propertyId.path);
-	path.add(piece);
-    }
-
-    protected PropertyId(List<Object> path) {
-	this.path = new ArrayList<Object>(path);
-    }
-
-    public List<Object> getPath() {
-	return path;
-    }
-
-    public PropertyId first() {
-	return new PropertyId(path.get(0));
-    }
-
-    public PropertyId rest() {
-	return new PropertyId(path.subList(1, path.size()));
-    }
-
-    @Override
-    public boolean equals(Object object) {
-	if (object instanceof PropertyId) {
-	    return path.equals(((PropertyId) object).path);
+	public PropertyId(Object piece) {
+		path = new ArrayList<Object>();
+		path.add(piece);
 	}
-	return false;
-    }
 
-    @Override
-    public int hashCode() {
-	return path.hashCode();
-    }
+	protected PropertyId(PropertyId propertyId, Object piece) {
+		this(propertyId.path);
+		path.add(piece);
+	}
+
+	protected PropertyId(List<Object> path) {
+		this.path = new ArrayList<Object>(path);
+	}
+
+	public List<Object> getPath() {
+		return path;
+	}
+
+	public PropertyId first() {
+		return new PropertyId(path.get(0));
+	}
+
+	public PropertyId rest() {
+		return new PropertyId(path.subList(1, path.size()));
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof PropertyId) {
+			return path.equals(((PropertyId) object).path);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return path.hashCode();
+	}
 }

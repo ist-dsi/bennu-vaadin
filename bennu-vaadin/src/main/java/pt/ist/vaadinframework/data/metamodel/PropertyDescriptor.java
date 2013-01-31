@@ -32,20 +32,20 @@ import com.vaadin.data.Property.ConversionException;
  * 
  */
 public interface PropertyDescriptor extends Serializable {
-    public String getPropertyId();
+	public String getPropertyId();
 
-    public Class<? extends AbstractDomainObject> getPropertyType();
+	public Class<? extends AbstractDomainObject> getPropertyType();
 
-    public Class<? extends AbstractDomainObject> getCollectionElementType();
+	public Class<? extends AbstractDomainObject> getCollectionElementType();
 
-    public boolean isCollection();
+	public boolean isCollection();
 
-    public boolean isRequired();
+	public boolean isRequired();
 
-    public Object getDefaultValue();
+	public Object getDefaultValue();
 
-    public Object read(Object host) throws ModelIntroscpectionException;
+	public Object read(Object host) throws ModelIntroscpectionException;
 
-    public void write(Object host, Object newValue) throws ConversionException;
+	public void write(Object host, Object newValue) throws ConversionException;
 
 }

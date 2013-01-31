@@ -46,127 +46,127 @@ import com.vaadin.ui.TextField;
 @SuppressWarnings("serial")
 public class MultiLanguageStringField extends CustomField {
 
-    private final Language[] languages;
+	private final Language[] languages;
 
-    private final Map<Language, TextField> fields = new HashMap<Language, TextField>();
+	private final Map<Language, TextField> fields = new HashMap<Language, TextField>();
 
-    public MultiLanguageStringField(String bundlename, Language... languages) {
-	this.languages = languages;
-	GridLayout languagesLayout = new GridLayout(3, languages.length);
-	languagesLayout.setSpacing(true);
-	for (int i = 0; i < languages.length; ++i) {
-	    fields.put(languages[i], new TextField());
-	    languagesLayout.addComponent(fields.get(languages[i]), 0, i);
+	public MultiLanguageStringField(String bundlename, Language... languages) {
+		this.languages = languages;
+		GridLayout languagesLayout = new GridLayout(3, languages.length);
+		languagesLayout.setSpacing(true);
+		for (int i = 0; i < languages.length; ++i) {
+			fields.put(languages[i], new TextField());
+			languagesLayout.addComponent(fields.get(languages[i]), 0, i);
 
-	    Embedded languageIcon = new Embedded(null, new ThemeResource("../icons/flags/" + languages[i].toString() + ".gif"));
-	    languagesLayout.addComponent(languageIcon, 1, i);
-	    languagesLayout.setComponentAlignment(languageIcon, Alignment.MIDDLE_RIGHT);
+			Embedded languageIcon = new Embedded(null, new ThemeResource("../icons/flags/" + languages[i].toString() + ".gif"));
+			languagesLayout.addComponent(languageIcon, 1, i);
+			languagesLayout.setComponentAlignment(languageIcon, Alignment.MIDDLE_RIGHT);
 
-	    Label languageLabel = new Label(languages[i].toString());
-	    languagesLayout.addComponent(languageLabel, 2, i);
-	    languagesLayout.setComponentAlignment(languageLabel, Alignment.MIDDLE_LEFT);
-	}
-	setCompositionRoot(languagesLayout);
-    }
-
-    @Override
-    public void setPropertyDataSource(final Property newDataSource) {
-	super.setPropertyDataSource(newDataSource);
-	for (final Language language : languages) {
-	    fields.get(language).setPropertyDataSource(new PropertyFormatter(newDataSource) {
-		@Override
-		public Object parse(String formattedValue) throws Exception {
-		    MultiLanguageString current = (MultiLanguageString) newDataSource.getValue();
-		    if (current == null) {
-			current = new MultiLanguageString();
-		    }
-		    return current.with(language, formattedValue);
+			Label languageLabel = new Label(languages[i].toString());
+			languagesLayout.addComponent(languageLabel, 2, i);
+			languagesLayout.setComponentAlignment(languageLabel, Alignment.MIDDLE_LEFT);
 		}
+		setCompositionRoot(languagesLayout);
+	}
 
-		@Override
-		public String format(Object value) {
-		    String content = ((MultiLanguageString) value).getContent(language);
-		    if (content == null) {
-			return "";
-		    }
-		    return content;
+	@Override
+	public void setPropertyDataSource(final Property newDataSource) {
+		super.setPropertyDataSource(newDataSource);
+		for (final Language language : languages) {
+			fields.get(language).setPropertyDataSource(new PropertyFormatter(newDataSource) {
+				@Override
+				public Object parse(String formattedValue) throws Exception {
+					MultiLanguageString current = (MultiLanguageString) newDataSource.getValue();
+					if (current == null) {
+						current = new MultiLanguageString();
+					}
+					return current.with(language, formattedValue);
+				}
+
+				@Override
+				public String format(Object value) {
+					String content = ((MultiLanguageString) value).getContent(language);
+					if (content == null) {
+						return "";
+					}
+					return content;
+				}
+			});
 		}
-	    });
 	}
-    }
 
-    @Override
-    public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
-	for (TextField childField : fields.values()) {
-	    childField.setWriteThrough(writeThrough);
+	@Override
+	public void setWriteThrough(boolean writeThrough) throws SourceException, InvalidValueException {
+		for (TextField childField : fields.values()) {
+			childField.setWriteThrough(writeThrough);
+		}
+		super.setWriteThrough(writeThrough);
 	}
-	super.setWriteThrough(writeThrough);
-    }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-	for (TextField childField : fields.values()) {
-	    childField.setEnabled(enabled);
+	@Override
+	public void setEnabled(boolean enabled) {
+		for (TextField childField : fields.values()) {
+			childField.setEnabled(enabled);
+		}
+		super.setEnabled(enabled);
 	}
-	super.setEnabled(enabled);
-    }
 
-    @Override
-    public void setReadOnly(boolean readOnly) {
-	for (TextField childField : fields.values()) {
-	    childField.setReadOnly(readOnly);
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		for (TextField childField : fields.values()) {
+			childField.setReadOnly(readOnly);
+		}
+		super.setReadOnly(readOnly);
 	}
-	super.setReadOnly(readOnly);
-    }
 
-    @Override
-    public void setVisible(boolean visible) {
-	for (TextField childField : fields.values()) {
-	    childField.setVisible(visible);
+	@Override
+	public void setVisible(boolean visible) {
+		for (TextField childField : fields.values()) {
+			childField.setVisible(visible);
+		}
+		super.setVisible(visible);
 	}
-	super.setVisible(visible);
-    }
 
-    @Override
-    public void setImmediate(boolean immediate) {
-	for (TextField childField : fields.values()) {
-	    childField.setImmediate(immediate);
+	@Override
+	public void setImmediate(boolean immediate) {
+		for (TextField childField : fields.values()) {
+			childField.setImmediate(immediate);
+		}
+		super.setImmediate(immediate);
 	}
-	super.setImmediate(immediate);
-    }
 
-    @Override
-    public void setReadThrough(boolean readThrough) throws SourceException {
-	for (TextField childField : fields.values()) {
-	    childField.setReadThrough(readThrough);
+	@Override
+	public void setReadThrough(boolean readThrough) throws SourceException {
+		for (TextField childField : fields.values()) {
+			childField.setReadThrough(readThrough);
+		}
+		super.setReadThrough(readThrough);
 	}
-	super.setReadThrough(readThrough);
-    }
 
-    @Override
-    protected boolean isEmpty() {
-	for (TextField childField : fields.values()) {
-	    if (((String) childField.getValue()).length() > 0) {
-		return true;
-	    }
+	@Override
+	protected boolean isEmpty() {
+		for (TextField childField : fields.values()) {
+			if (((String) childField.getValue()).length() > 0) {
+				return true;
+			}
+		}
+		return false;
 	}
-	return false;
-    }
 
-    public TextField getTextField(Language language) {
-	return fields.get(language);
-    }
-
-    @Override
-    public void commit() throws SourceException, InvalidValueException {
-	for (Field field : fields.values()) {
-	    field.commit();
+	public TextField getTextField(Language language) {
+		return fields.get(language);
 	}
-	super.commit();
-    }
 
-    @Override
-    public Class<?> getType() {
-	return MultiLanguageString.class;
-    }
+	@Override
+	public void commit() throws SourceException, InvalidValueException {
+		for (Field field : fields.values()) {
+			field.commit();
+		}
+		super.commit();
+	}
+
+	@Override
+	public Class<?> getType() {
+		return MultiLanguageString.class;
+	}
 }

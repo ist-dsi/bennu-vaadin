@@ -32,31 +32,31 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 
 public class DefaultViewerFactory implements ViewerFactory {
-    private final ResourceBundle bundle;
+	private final ResourceBundle bundle;
 
-    public DefaultViewerFactory(ResourceBundle bundle) {
-	this.bundle = bundle;
-    }
+	public DefaultViewerFactory(ResourceBundle bundle) {
+		this.bundle = bundle;
+	}
 
-    @Override
-    public final Viewer createViewer(Item item, Object propertyId, Component uiContext) {
-	Viewer viewer = makeViewer(item, propertyId, uiContext);
-	AbstractComponent component = (AbstractComponent) viewer;
-	component.setDescription(makeDescription(item, propertyId, uiContext));
-	component.setCaption(makeCaption(item, propertyId, uiContext));
-	return viewer;
-    }
+	@Override
+	public final Viewer createViewer(Item item, Object propertyId, Component uiContext) {
+		Viewer viewer = makeViewer(item, propertyId, uiContext);
+		AbstractComponent component = (AbstractComponent) viewer;
+		component.setDescription(makeDescription(item, propertyId, uiContext));
+		component.setCaption(makeCaption(item, propertyId, uiContext));
+		return viewer;
+	}
 
-    @Override
-    public final String makeCaption(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeCaption(bundle, item, propertyId, uiContext);
-    }
+	@Override
+	public final String makeCaption(Item item, Object propertyId, Component uiContext) {
+		return CaptionUtils.makeCaption(bundle, item, propertyId, uiContext);
+	}
 
-    protected String makeDescription(Item item, Object propertyId, Component uiContext) {
-	return CaptionUtils.makeDescription(bundle, item, propertyId, uiContext);
-    }
+	protected String makeDescription(Item item, Object propertyId, Component uiContext) {
+		return CaptionUtils.makeDescription(bundle, item, propertyId, uiContext);
+	}
 
-    protected Viewer makeViewer(Item item, Object propertyId, Component uiContext) {
-	return new Label();
-    }
+	protected Viewer makeViewer(Item item, Object propertyId, Component uiContext) {
+		return new Label();
+	}
 }

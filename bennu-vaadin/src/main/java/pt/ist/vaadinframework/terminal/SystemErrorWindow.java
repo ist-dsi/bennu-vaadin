@@ -29,23 +29,23 @@ import com.vaadin.ui.Window;
  * 
  */
 public abstract class SystemErrorWindow extends Window {
-    public SystemErrorWindow() {
-	super();
-    }
+	public SystemErrorWindow() {
+		super();
+	}
 
-    public SystemErrorWindow(String caption, ComponentContainer content) {
-	super(caption, content);
-    }
+	public SystemErrorWindow(String caption, ComponentContainer content) {
+		super(caption, content);
+	}
 
-    public SystemErrorWindow(String caption) {
-	super(caption);
-    }
+	public SystemErrorWindow(String caption) {
+		super(caption);
+	}
 
-    public void showError(Window parent, final Throwable systemError) {
-	setErrorContext(systemError);
-	parent.addWindow(this);
-	focus();
-    }
+	public void showError(Window parent, final Throwable systemError) {
+		setErrorContext(systemError);
+		parent.addWindow(this);
+		focus();
+	}
 
-    protected abstract void setErrorContext(Throwable systemError);
+	protected abstract void setErrorContext(Throwable systemError);
 }

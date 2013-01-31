@@ -41,44 +41,44 @@ import com.vaadin.ui.Window;
  * 
  */
 public class DefaultSystemErrorWindow extends SystemErrorWindow implements VaadinResourceConstants {
-    private Label stacktrace;
+	private Label stacktrace;
 
-    public DefaultSystemErrorWindow() {
-    }
-
-    @Override
-    protected void setErrorContext(Throwable systemError) {
-	removeAllComponents();
-	setCaption(VaadinResources.getString(ERROR_WINDOW_TITLE));
-	getContent().setSizeUndefined();
-	setModal(true);
-	center();
-	setBorder(Window.BORDER_NONE);
-	setClosable(false);
-	setCloseShortcut(KeyCode.ESCAPE);
-	setResizable(false);
-	((MarginHandler) getContent()).setMargin(new MarginInfo(true));
-	((SpacingHandler) getContent()).setSpacing(true);
-	addComponent(new Label(VaadinResources.getString(ERROR_WINDOW_ANNOUNCEMENT_LABEL)));
-
-	Panel scroll = new Panel();
-	addComponent(scroll);
-	scroll.setWidth(450, UNITS_PIXELS);
-	scroll.setHeight(450, UNITS_PIXELS);
-	stacktrace = new Label();
-	scroll.addComponent(stacktrace);
-	ByteArrayOutputStream stream = null;
-	try {
-	    stream = new ByteArrayOutputStream();
-	    systemError.printStackTrace(new PrintStream(stream));
-	    stacktrace.setValue(stream.toString());
-	} finally {
-	    if (stream != null) {
-		try {
-		    stream.close();
-		} catch (IOException e) {
-		}
-	    }
+	public DefaultSystemErrorWindow() {
 	}
-    }
+
+	@Override
+	protected void setErrorContext(Throwable systemError) {
+		removeAllComponents();
+		setCaption(VaadinResources.getString(ERROR_WINDOW_TITLE));
+		getContent().setSizeUndefined();
+		setModal(true);
+		center();
+		setBorder(Window.BORDER_NONE);
+		setClosable(false);
+		setCloseShortcut(KeyCode.ESCAPE);
+		setResizable(false);
+		((MarginHandler) getContent()).setMargin(new MarginInfo(true));
+		((SpacingHandler) getContent()).setSpacing(true);
+		addComponent(new Label(VaadinResources.getString(ERROR_WINDOW_ANNOUNCEMENT_LABEL)));
+
+		Panel scroll = new Panel();
+		addComponent(scroll);
+		scroll.setWidth(450, UNITS_PIXELS);
+		scroll.setHeight(450, UNITS_PIXELS);
+		stacktrace = new Label();
+		scroll.addComponent(stacktrace);
+		ByteArrayOutputStream stream = null;
+		try {
+			stream = new ByteArrayOutputStream();
+			systemError.printStackTrace(new PrintStream(stream));
+			stacktrace.setValue(stream.toString());
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
 }

@@ -32,10 +32,10 @@ import com.vaadin.ui.Link;
  */
 @SuppressWarnings("serial")
 public class ControlsLayout extends HorizontalLayout {
-    public ControlsLayout() {
-	setMargin(true);
-	setSpacing(true);
-	setWidth("100%");
-	addStyleName("controls-layout");
-    }
+	public ControlsLayout() {
+		setMargin(true);
+		setSpacing(true);
+		setWidth("100%");
+		addStyleName("controls-layout");
+	}
 }

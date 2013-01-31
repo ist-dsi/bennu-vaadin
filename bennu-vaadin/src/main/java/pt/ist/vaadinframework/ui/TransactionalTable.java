@@ -34,68 +34,68 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Table;
 
 public class TransactionalTable extends Table {
-    private final String bundlename;
+	private final String bundlename;
 
-    private transient ResourceBundle bundle;
+	private transient ResourceBundle bundle;
 
-    private final PropertySetChangeListener headerUpdater = new PropertySetChangeListener() {
-	@Override
-	public void containerPropertySetChange(PropertySetChangeEvent event) {
-	    if (event.getContainer() instanceof AbstractBufferedContainer) {
-		for (Object propertyId : event.getContainer().getContainerPropertyIds()) {
-		    computeHeader((AbstractBufferedContainer<?, ?, ?>) event.getContainer(), propertyId);
+	private final PropertySetChangeListener headerUpdater = new PropertySetChangeListener() {
+		@Override
+		public void containerPropertySetChange(PropertySetChangeEvent event) {
+			if (event.getContainer() instanceof AbstractBufferedContainer) {
+				for (Object propertyId : event.getContainer().getContainerPropertyIds()) {
+					computeHeader((AbstractBufferedContainer<?, ?, ?>) event.getContainer(), propertyId);
+				}
+			}
 		}
-	    }
-	}
-    };
+	};
 
-    public TransactionalTable(String bundlename) {
-	super();
-	this.bundlename = bundlename;
-    }
-
-    protected ResourceBundle getBundle() {
-	if (bundle == null) {
-	    bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
+	public TransactionalTable(String bundlename) {
+		super();
+		this.bundlename = bundlename;
 	}
-	return bundle;
-    }
 
-    @Override
-    protected Object getPropertyValue(Object rowId, Object colId, Property property) {
-	Object v = super.getPropertyValue(rowId, colId, property);
-	if (v instanceof Field) {
-	    Field field = (Field) v;
-	    // field.setWriteThrough(isWriteThrough());
-	    // field.setReadOnly(isReadOnly());
-	    if (isImmediate() && field instanceof AbstractComponent) {
-		((AbstractComponent) field).setImmediate(true);
-	    }
+	protected ResourceBundle getBundle() {
+		if (bundle == null) {
+			bundle = ResourceBundle.getBundle(bundlename, Language.getLocale());
+		}
+		return bundle;
 	}
-	return v;
-    }
 
-    public void refresh() {
-	refreshRenderedCells();
-    }
+	@Override
+	protected Object getPropertyValue(Object rowId, Object colId, Property property) {
+		Object v = super.getPropertyValue(rowId, colId, property);
+		if (v instanceof Field) {
+			Field field = (Field) v;
+			// field.setWriteThrough(isWriteThrough());
+			// field.setReadOnly(isReadOnly());
+			if (isImmediate() && field instanceof AbstractComponent) {
+				((AbstractComponent) field).setImmediate(true);
+			}
+		}
+		return v;
+	}
 
-    @Override
-    public void setContainerDataSource(Container newDataSource) {
-	if (getContainerDataSource() != null && getContainerDataSource() instanceof PropertySetChangeNotifier) {
-	    ((PropertySetChangeNotifier) getContainerDataSource()).removeListener(headerUpdater);
+	public void refresh() {
+		refreshRenderedCells();
 	}
-	if (newDataSource instanceof AbstractBufferedContainer) {
-	    for (Object propertyId : newDataSource.getContainerPropertyIds()) {
-		computeHeader((AbstractBufferedContainer<?, ?, ?>) newDataSource, propertyId);
-	    }
-	}
-	if (newDataSource instanceof PropertySetChangeNotifier) {
-	    ((PropertySetChangeNotifier) newDataSource).addListener(headerUpdater);
-	}
-	super.setContainerDataSource(newDataSource);
-    }
 
-    private void computeHeader(AbstractBufferedContainer<?, ?, ?> container, Object propertyId) {
-	setColumnHeader(propertyId, CaptionUtils.makeCaption(getBundle(), container, propertyId, this));
-    }
+	@Override
+	public void setContainerDataSource(Container newDataSource) {
+		if (getContainerDataSource() != null && getContainerDataSource() instanceof PropertySetChangeNotifier) {
+			((PropertySetChangeNotifier) getContainerDataSource()).removeListener(headerUpdater);
+		}
+		if (newDataSource instanceof AbstractBufferedContainer) {
+			for (Object propertyId : newDataSource.getContainerPropertyIds()) {
+				computeHeader((AbstractBufferedContainer<?, ?, ?>) newDataSource, propertyId);
+			}
+		}
+		if (newDataSource instanceof PropertySetChangeNotifier) {
+			((PropertySetChangeNotifier) newDataSource).addListener(headerUpdater);
+		}
+		super.setContainerDataSource(newDataSource);
+	}
+
+	private void computeHeader(AbstractBufferedContainer<?, ?, ?> container, Object propertyId) {
+		setColumnHeader(propertyId, CaptionUtils.makeCaption(getBundle(), container, propertyId, this));
+	}
 }

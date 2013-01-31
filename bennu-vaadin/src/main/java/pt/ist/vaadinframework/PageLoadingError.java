@@ -26,11 +26,11 @@ package pt.ist.vaadinframework;
  * 
  */
 public class PageLoadingError extends RuntimeException {
-    public PageLoadingError(Throwable throwable) {
-	super(throwable);
-    }
+	public PageLoadingError(Throwable throwable) {
+		super(throwable);
+	}
 
-    public PageLoadingError(String message) {
-	super(message);
-    }
+	public PageLoadingError(String message) {
+		super(message);
+	}
 }

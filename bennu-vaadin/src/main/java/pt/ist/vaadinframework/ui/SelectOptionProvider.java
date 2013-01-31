@@ -37,25 +37,25 @@ import dml.Role;
  * 
  */
 public class SelectOptionProvider {
-    public static Set<?> provideFor(Class<?> type) {
-	DomainModel model = FenixFramework.getDomainModel();
-	DomainClass domainClass = model.findClass(type.getName());
-	Set<String> roots = getRoots();
-	for (Role role : domainClass.getRoleSlotsList()) {
-	    if (roots.contains(role.getOtherRole().getType().getFullName())) {
+	public static Set<?> provideFor(Class<?> type) {
+		DomainModel model = FenixFramework.getDomainModel();
+		DomainClass domainClass = model.findClass(type.getName());
+		Set<String> roots = getRoots();
+		for (Role role : domainClass.getRoleSlotsList()) {
+			if (roots.contains(role.getOtherRole().getType().getFullName())) {
 
-	    }
+			}
+		}
+		return Collections.emptySet();
 	}
-	return Collections.emptySet();
-    }
 
-    private static Set<String> getRoots() {
-	Set<String> roots = new HashSet<String>();
-	PersistentRoot root = AbstractDomainObject.fromOID(1L);
-	while (root != null) {
-	    roots.add(root.getRootObject().getClass().getName());
-	    root = root.hasNext() ? root.getNext() : null;
+	private static Set<String> getRoots() {
+		Set<String> roots = new HashSet<String>();
+		PersistentRoot root = AbstractDomainObject.fromOID(1L);
+		while (root != null) {
+			roots.add(root.getRootObject().getClass().getName());
+			root = root.hasNext() ? root.getNext() : null;
+		}
+		return roots;
 	}
-	return roots;
-    }
 }

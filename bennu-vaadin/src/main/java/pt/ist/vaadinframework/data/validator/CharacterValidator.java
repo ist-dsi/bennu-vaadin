@@ -31,17 +31,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class CharacterValidator extends AbstractStringValidator implements VaadinResourceConstants {
-    public CharacterValidator() {
-	super(VaadinResources.getString(CHARACTER_VALIDATOR_ERROR));
-    }
-
-    @Override
-    protected boolean isValidString(String value) {
-	try {
-	    // TODO
-	    return true;
-	} catch (Exception e) {
-	    return false;
+	public CharacterValidator() {
+		super(VaadinResources.getString(CHARACTER_VALIDATOR_ERROR));
 	}
-    }
+
+	@Override
+	protected boolean isValidString(String value) {
+		try {
+			// TODO
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
