@@ -42,88 +42,88 @@ import com.vaadin.ui.Window;
  *         (sergio.silva@ist.utl.pt)
  */
 public class EmbeddedWindow extends Window {
-	final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
+    final UriFragmentUtility fragmentUtility = new UriFragmentUtility();
 
-	private final Stack<String> history = new Stack<>();
+    private final Stack<String> history = new Stack<>();
 
-	private final Map<String, EmbeddedComponentContainer> pageCache = new HashMap<>();
+    private final Map<String, EmbeddedComponentContainer> pageCache = new HashMap<>();
 
-	public void open(String fragment) {
-		fragmentUtility.setFragment(fragment);
-	}
+    public void open(String fragment) {
+        fragmentUtility.setFragment(fragment);
+    }
 
-	public void back() {
-		try {
-			history.pop(); // consume current
-			fragmentUtility.setFragment(history.pop());
-		} catch (EmptyStackException e) {
-			// back fails quietly if no history is available
-		}
-	}
+    public void back() {
+        try {
+            history.pop(); // consume current
+            fragmentUtility.setFragment(history.pop());
+        } catch (EmptyStackException e) {
+            // back fails quietly if no history is available
+        }
+    }
 
-	public void refresh() {
-		loadFragment(history.peek(), false);
-	}
+    public void refresh() {
+        loadFragment(history.peek(), false);
+    }
 
-	public FragmentQuery getFragment() {
-		return new FragmentQuery("#" + fragmentUtility.getFragment());
-	}
+    public FragmentQuery getFragment() {
+        return new FragmentQuery("#" + fragmentUtility.getFragment());
+    }
 
-	public EmbeddedWindow() {
-		setImmediate(true);
-		final VerticalLayout layout = new VerticalLayout();
-		layout.addComponent(fragmentUtility);
-		fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
-			@Override
-			public void fragmentChanged(FragmentChangedEvent source) {
-				String fragment = source.getUriFragmentUtility().getFragment();
-				loadFragment(fragment, true);
-			}
-		});
-		setContent(layout);
-	}
+    public EmbeddedWindow() {
+        setImmediate(true);
+        final VerticalLayout layout = new VerticalLayout();
+        layout.addComponent(fragmentUtility);
+        fragmentUtility.addListener(new UriFragmentUtility.FragmentChangedListener() {
+            @Override
+            public void fragmentChanged(FragmentChangedEvent source) {
+                String fragment = source.getUriFragmentUtility().getFragment();
+                loadFragment(fragment, true);
+            }
+        });
+        setContent(layout);
+    }
 
-	private void loadFragment(String fragment, boolean logHistory) {
-		FragmentQuery query = new FragmentQuery("#" + fragment);
+    private void loadFragment(String fragment, boolean logHistory) {
+        FragmentQuery query = new FragmentQuery("#" + fragment);
 
-		EmbeddedComponentContainer page = null;
-		if (pageCache.containsKey(fragment)) {
-			page = pageCache.get(fragment);
-		} else {
-			try {
-				Class<? extends EmbeddedComponentContainer> requestedType = EmbeddedApplication.getPage(query.getPath());
-				if (requestedType == null) {
-					showNotification("Página não encontrada", "A página pedida não foi encontrada no servidor",
-							Notification.TYPE_ERROR_MESSAGE);
-					VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não foi encontrado");
-				} else {
-					EmbeddedComponentContainer container = requestedType.newInstance();
-					if (container.isAllowedToOpen(query.getParams())) {
-						container.setArguments(query.getParams());
-						if (EmbeddedComponentUtils.getAnnotation(requestedType).persistent()) {
-							pageCache.put(fragment, container);
-						}
-						page = container;
-					} else {
-						showNotification("Acesso negado", "Não tem permissões para aceder a esta página",
-								Notification.TYPE_ERROR_MESSAGE);
-						VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não pode ser acedido");
-					}
-				}
-			} catch (InstantiationException e) {
-				throw new PageLoadingError(e);
-			} catch (IllegalAccessException e) {
-				throw new PageLoadingError(e);
-			}
-		}
-		if (page != null) {
-			getContent().removeAllComponents();
-			getContent().addComponent(fragmentUtility);
-			getContent().addComponent(page);
-			if (logHistory) {
-				history.push(fragment);
-				VaadinFrameworkLogger.getLogger().info("history: " + StringUtils.join(history, " > "));
-			}
-		}
-	}
+        EmbeddedComponentContainer page = null;
+        if (pageCache.containsKey(fragment)) {
+            page = pageCache.get(fragment);
+        } else {
+            try {
+                Class<? extends EmbeddedComponentContainer> requestedType = EmbeddedApplication.getPage(query.getPath());
+                if (requestedType == null) {
+                    showNotification("Página não encontrada", "A página pedida não foi encontrada no servidor",
+                            Notification.TYPE_ERROR_MESSAGE);
+                    VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não foi encontrado");
+                } else {
+                    EmbeddedComponentContainer container = requestedType.newInstance();
+                    if (container.isAllowedToOpen(query.getParams())) {
+                        container.setArguments(query.getParams());
+                        if (EmbeddedComponentUtils.getAnnotation(requestedType).persistent()) {
+                            pageCache.put(fragment, container);
+                        }
+                        page = container;
+                    } else {
+                        showNotification("Acesso negado", "Não tem permissões para aceder a esta página",
+                                Notification.TYPE_ERROR_MESSAGE);
+                        VaadinFrameworkLogger.getLogger().info("O fragmento: " + fragment + " não pode ser acedido");
+                    }
+                }
+            } catch (InstantiationException e) {
+                throw new PageLoadingError(e);
+            } catch (IllegalAccessException e) {
+                throw new PageLoadingError(e);
+            }
+        }
+        if (page != null) {
+            getContent().removeAllComponents();
+            getContent().addComponent(fragmentUtility);
+            getContent().addComponent(page);
+            if (logHistory) {
+                history.push(fragment);
+                VaadinFrameworkLogger.getLogger().info("history: " + StringUtils.join(history, " > "));
+            }
+        }
+    }
 }

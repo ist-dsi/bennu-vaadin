@@ -28,9 +28,9 @@ import pt.ist.bennu.core.util.BundleUtil;
  * 
  */
 public class VaadinResources {
-	private static final String BUNDLE_NAME = "resources/VaadinResources";
+    private static final String BUNDLE_NAME = "resources/VaadinResources";
 
-	public static String getString(String key, String... args) {
-		return BundleUtil.getFormattedStringFromResourceBundle(BUNDLE_NAME, key, args);
-	}
+    public static String getString(String key, String... args) {
+        return BundleUtil.getFormattedStringFromResourceBundle(BUNDLE_NAME, key, args);
+    }
 }

@@ -31,17 +31,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class ShortValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public ShortValidator() {
-		super(VaadinResources.getString(SHORT_VALIDATOR_ERROR));
-	}
+    public ShortValidator() {
+        super(VaadinResources.getString(SHORT_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			Short.parseShort(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            Short.parseShort(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

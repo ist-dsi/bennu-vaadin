@@ -17,30 +17,30 @@ import com.vaadin.terminal.ThemeResource;
  */
 public class ResourceFactory {
 
-	public static Resource getPictureFor(User user) {
-		return new ExternalResource(
-				"https://fenix.ist.utl.pt/publico/retrievePersonalPhoto.do?method=retrieveByUUID&contentContextPath_PATH=/homepage&uuid="
-						+ user.getUsername(), "image/jpeg");
-	}
+    public static Resource getPictureFor(User user) {
+        return new ExternalResource(
+                "https://fenix.ist.utl.pt/publico/retrievePersonalPhoto.do?method=retrieveByUUID&contentContextPath_PATH=/homepage&uuid="
+                        + user.getUsername(), "image/jpeg");
+    }
 
-	public static Resource getPictureFor(SingleUserGroup singleUserGroup) {
-		return new ExternalResource(
-				"https://fenix.ist.utl.pt/publico/retrievePersonalPhoto.do?method=retrieveByUUID&contentContextPath_PATH=/homepage&uuid="
-						+ singleUserGroup.getUser().getUsername(), "image/jpeg");
-	}
+    public static Resource getPictureFor(SingleUserGroup singleUserGroup) {
+        return new ExternalResource(
+                "https://fenix.ist.utl.pt/publico/retrievePersonalPhoto.do?method=retrieveByUUID&contentContextPath_PATH=/homepage&uuid="
+                        + singleUserGroup.getUser().getUsername(), "image/jpeg");
+    }
 
-	public static Resource getPictureFor(PersistentGroup group) {
-		return new ThemeResource("../runo/icons/32/users.png");
-	}
+    public static Resource getPictureFor(PersistentGroup group) {
+        return new ThemeResource("../runo/icons/32/users.png");
+    }
 
-	public static Resource getAvatarFor(Object obj) {
-		if (obj instanceof User) {
-			return getPictureFor((User) obj);
-		} else if (obj instanceof SingleUserGroup) {
-			return getPictureFor((SingleUserGroup) obj);
-		} else {
-			return new ThemeResource("../runo/icons/32/users.png");
-		}
-	}
+    public static Resource getAvatarFor(Object obj) {
+        if (obj instanceof User) {
+            return getPictureFor((User) obj);
+        } else if (obj instanceof SingleUserGroup) {
+            return getPictureFor((SingleUserGroup) obj);
+        } else {
+            return new ThemeResource("../runo/icons/32/users.png");
+        }
+    }
 
 }

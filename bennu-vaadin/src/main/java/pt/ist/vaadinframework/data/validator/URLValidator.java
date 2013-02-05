@@ -34,17 +34,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class URLValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public URLValidator() {
-		super(VaadinResources.getString(URL_VALIDATOR_ERROR));
-	}
+    public URLValidator() {
+        super(VaadinResources.getString(URL_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			new URL(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            new URL(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -26,7 +26,7 @@ package pt.ist.vaadinframework;
  * 
  */
 public class UnauthorizedAccessException extends UserErrorException implements VaadinResourceConstants {
-	public UnauthorizedAccessException() {
-		super(VaadinResources.getString(ERROR_UNAUTHORIZED));
-	}
+    public UnauthorizedAccessException() {
+        super(VaadinResources.getString(ERROR_UNAUTHORIZED));
+    }
 }

@@ -7,7 +7,7 @@ import com.vaadin.data.Property.Viewer;
 import com.vaadin.ui.Component;
 
 public interface ViewerFactory extends Serializable {
-	Viewer createViewer(Item item, Object propertyId, Component uiContext);
+    Viewer createViewer(Item item, Object propertyId, Component uiContext);
 
-	String makeCaption(Item item, Object propertyId, Component uiContext);
+    String makeCaption(Item item, Object propertyId, Component uiContext);
 }

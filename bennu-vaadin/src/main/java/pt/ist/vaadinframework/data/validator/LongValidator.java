@@ -34,17 +34,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class LongValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public LongValidator() {
-		super(VaadinResources.getString(LONG_VALIDATOR_ERROR));
-	}
+    public LongValidator() {
+        super(VaadinResources.getString(LONG_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			Long.parseLong(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

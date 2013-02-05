@@ -133,273 +133,273 @@ import com.vaadin.ui.Window;
  */
 @SuppressWarnings("serial")
 public class EmbeddedApplication extends Application implements VaadinResourceConstants {
-	private static final Map<String, Class<? extends EmbeddedComponentContainer>> pages = new HashMap<>();
+    private static final Map<String, Class<? extends EmbeddedComponentContainer>> pages = new HashMap<>();
 
-	private static SystemErrorWindow errorWindow = new DefaultSystemErrorWindow();
+    private static SystemErrorWindow errorWindow = new DefaultSystemErrorWindow();
 
-	@Override
-	public void init() {
-		getContext().addTransactionListener(new TransactionListener() {
-			@Override
-			public void transactionStart(Application application, Object transactionData) {
-				application.setLocale(Language.getLocale());
-			}
+    @Override
+    public void init() {
+        getContext().addTransactionListener(new TransactionListener() {
+            @Override
+            public void transactionStart(Application application, Object transactionData) {
+                application.setLocale(Language.getLocale());
+            }
 
-			@Override
-			public void transactionEnd(Application application, Object transactionData) {
-				application.setLocale(null);
-			}
-		});
-		setTheme(VirtualHost.getVirtualHostForThread().getTheme().getName());
-		setMainWindow(new EmbeddedWindow());
-	}
+            @Override
+            public void transactionEnd(Application application, Object transactionData) {
+                application.setLocale(null);
+            }
+        });
+        setTheme(VirtualHost.getVirtualHostForThread().getTheme().getName());
+        setMainWindow(new EmbeddedWindow());
+    }
 
-	public static void open(Application application, Class<? extends EmbeddedComponentContainer> clazz, String... args) {
-		((EmbeddedApplication) application).open(clazz, args);
-	}
+    public static void open(Application application, Class<? extends EmbeddedComponentContainer> clazz, String... args) {
+        ((EmbeddedApplication) application).open(clazz, args);
+    }
 
-	public static void open(Application application, String fragment) {
-		((EmbeddedApplication) application).open(fragment);
-	}
+    public static void open(Application application, String fragment) {
+        ((EmbeddedApplication) application).open(fragment);
+    }
 
-	public void open(Class<? extends EmbeddedComponentContainer> clazz, String... args) {
-		final FragmentQuery fragmentQuery = new FragmentQuery(clazz, args);
-		open(fragmentQuery.getQueryString());
-	}
+    public void open(Class<? extends EmbeddedComponentContainer> clazz, String... args) {
+        final FragmentQuery fragmentQuery = new FragmentQuery(clazz, args);
+        open(fragmentQuery.getQueryString());
+    }
 
-	public void open(String fragment) {
-		((EmbeddedWindow) getMainWindow()).open(fragment);
-	}
+    public void open(String fragment) {
+        ((EmbeddedWindow) getMainWindow()).open(fragment);
+    }
 
-	public void back() {
-		((EmbeddedWindow) getMainWindow()).back();
-	}
+    public void back() {
+        ((EmbeddedWindow) getMainWindow()).back();
+    }
 
-	public static void back(Application application) {
-		((EmbeddedApplication) application).back();
-	}
+    public static void back(Application application) {
+        ((EmbeddedApplication) application).back();
+    }
 
-	public void refresh() {
-		((EmbeddedWindow) getMainWindow()).refresh();
-	}
+    public void refresh() {
+        ((EmbeddedWindow) getMainWindow()).refresh();
+    }
 
-	public static void refresh(Application application) {
-		((EmbeddedApplication) application).refresh();
-	}
+    public static void refresh(Application application) {
+        ((EmbeddedApplication) application).refresh();
+    }
 
-	@Override
-	public void close() {
-		HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
-		final UserView userView = (UserView) session.getAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
+    @Override
+    public void close() {
+        HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
+        final UserView userView = (UserView) session.getAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
 
-		if (userView != null) {
-			userView.getUser().setLastLogoutDateTime(new DateTime());
-		}
+        if (userView != null) {
+            userView.getUser().setLastLogoutDateTime(new DateTime());
+        }
 
-		pt.ist.fenixWebFramework.security.UserView.setUser(null);
-		session.removeAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
-		session.invalidate();
-		super.close();
-	}
+        pt.ist.fenixWebFramework.security.UserView.setUser(null);
+        session.removeAttribute(SetUserViewFilter.USER_SESSION_ATTRIBUTE);
+        session.invalidate();
+        super.close();
+    }
 
-	/**
-	 * @see com.vaadin.Application#getWindow(java.lang.String)
-	 */
-	@Override
-	public Window getWindow(String name) {
-		// If the window is identified by name, we are good to go
-		Window window = super.getWindow(name);
+    /**
+     * @see com.vaadin.Application#getWindow(java.lang.String)
+     */
+    @Override
+    public Window getWindow(String name) {
+        // If the window is identified by name, we are good to go
+        Window window = super.getWindow(name);
 
-		// If not, we must create a new window for this new browser window/tab
-		if (window == null) {
-			window = new EmbeddedWindow();
-			// Use the random name given by the framework to identify this
-			// window in future
-			window.setName(name);
-			addWindow(window);
+        // If not, we must create a new window for this new browser window/tab
+        if (window == null) {
+            window = new EmbeddedWindow();
+            // Use the random name given by the framework to identify this
+            // window in future
+            window.setName(name);
+            addWindow(window);
 
-			// Move to the url to remember the name in the future
-			// window.open(new ExternalResource(window.getURL()));
-		}
-		return window;
-	}
+            // Move to the url to remember the name in the future
+            // window.open(new ExternalResource(window.getURL()));
+        }
+        return window;
+    }
 
-	/**
-	 * Adds a new pattern to the resolver, the pattern can have groups that when
-	 * captured will be supplied to the corresponding {@link EmbeddedComponentContainer} using
-	 * {@link EmbeddedComponentContainer#setArguments(String...)}.
-	 * 
-	 * @param pattern
-	 *            The compiled {@link Pattern} instance.
-	 * @param type
-	 *            The container that will be instantiated if the pattern matches
-	 *            the {@link EmbeddedApplication#VAADIN_PARAM}.
-	 */
-	public static void addPage(Class<? extends EmbeddedComponentContainer> page) {
-		pages.put(EmbeddedComponentUtils.getAnnotationPath(EmbeddedComponentUtils.getAnnotation(page)), page);
-	}
+    /**
+     * Adds a new pattern to the resolver, the pattern can have groups that when
+     * captured will be supplied to the corresponding {@link EmbeddedComponentContainer} using
+     * {@link EmbeddedComponentContainer#setArguments(String...)}.
+     * 
+     * @param pattern
+     *            The compiled {@link Pattern} instance.
+     * @param type
+     *            The container that will be instantiated if the pattern matches
+     *            the {@link EmbeddedApplication#VAADIN_PARAM}.
+     */
+    public static void addPage(Class<? extends EmbeddedComponentContainer> page) {
+        pages.put(EmbeddedComponentUtils.getAnnotationPath(EmbeddedComponentUtils.getAnnotation(page)), page);
+    }
 
-	public static Class<? extends EmbeddedComponentContainer> getPage(String path) {
-		if (path == null || StringUtils.isEmpty(path)) {
-			final VirtualHost virtualHost = VirtualHost.getVirtualHostForThread();
-			final SortedSet<Node> nodes = virtualHost.getOrderedTopLevelNodes();
-			for (final Node node : nodes) {
-				if (node.isAccessible() && node instanceof VaadinNode) {
-					return pages.get(((VaadinNode) node).getArgument());
-				}
-			}
-		}
-		return pages.get(path);
-	}
+    public static Class<? extends EmbeddedComponentContainer> getPage(String path) {
+        if (path == null || StringUtils.isEmpty(path)) {
+            final VirtualHost virtualHost = VirtualHost.getVirtualHostForThread();
+            final SortedSet<Node> nodes = virtualHost.getOrderedTopLevelNodes();
+            for (final Node node : nodes) {
+                if (node.isAccessible() && node instanceof VaadinNode) {
+                    return pages.get(((VaadinNode) node).getArgument());
+                }
+            }
+        }
+        return pages.get(path);
+    }
 
-	public static SystemMessages getSystemMessages() {
-		return new CustomizedSystemMessages() {
-			@Override
-			public String getSessionExpiredCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_SESSION_EXPIRED);
-			}
+    public static SystemMessages getSystemMessages() {
+        return new CustomizedSystemMessages() {
+            @Override
+            public String getSessionExpiredCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_SESSION_EXPIRED);
+            }
 
-			@Override
-			public String getSessionExpiredMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_SESSION_EXPIRED);
-			}
+            @Override
+            public String getSessionExpiredMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_SESSION_EXPIRED);
+            }
 
-			@Override
-			public String getCommunicationErrorCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_COMMUNICATION_ERROR);
-			}
+            @Override
+            public String getCommunicationErrorCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_COMMUNICATION_ERROR);
+            }
 
-			@Override
-			public String getCommunicationErrorMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_COMMUNICATION_ERROR);
-			}
+            @Override
+            public String getCommunicationErrorMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_COMMUNICATION_ERROR);
+            }
 
-			@Override
-			public String getAuthenticationErrorCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_AUTHENTICATION_ERROR);
-			}
+            @Override
+            public String getAuthenticationErrorCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_AUTHENTICATION_ERROR);
+            }
 
-			@Override
-			public String getAuthenticationErrorMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_AUTHENTICATION_ERROR);
-			}
+            @Override
+            public String getAuthenticationErrorMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_AUTHENTICATION_ERROR);
+            }
 
-			@Override
-			public String getInternalErrorCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_INTERNAL_ERROR);
-			}
+            @Override
+            public String getInternalErrorCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_INTERNAL_ERROR);
+            }
 
-			@Override
-			public String getInternalErrorMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_INTERNAL_ERROR);
-			}
+            @Override
+            public String getInternalErrorMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_INTERNAL_ERROR);
+            }
 
-			@Override
-			public String getOutOfSyncCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_OUTOFSYNC_ERROR);
-			}
+            @Override
+            public String getOutOfSyncCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_OUTOFSYNC_ERROR);
+            }
 
-			@Override
-			public String getOutOfSyncMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_OUTOFSYNC_ERROR);
-			}
+            @Override
+            public String getOutOfSyncMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_OUTOFSYNC_ERROR);
+            }
 
-			@Override
-			public String getCookiesDisabledCaption() {
-				return VaadinResources.getString(SYSTEM_TITLE_COOKIES_DISABLED_ERROR);
-			}
+            @Override
+            public String getCookiesDisabledCaption() {
+                return VaadinResources.getString(SYSTEM_TITLE_COOKIES_DISABLED_ERROR);
+            }
 
-			@Override
-			public String getCookiesDisabledMessage() {
-				return VaadinResources.getString(SYSTEM_MESSAGE_COOKIES_DISABLED_ERROR);
-			}
-		};
-	}
+            @Override
+            public String getCookiesDisabledMessage() {
+                return VaadinResources.getString(SYSTEM_MESSAGE_COOKIES_DISABLED_ERROR);
+            }
+        };
+    }
 
-	public static void registerErrorWindow(SystemErrorWindow customErrorWindow) {
-		errorWindow = customErrorWindow;
-	}
+    public static void registerErrorWindow(SystemErrorWindow customErrorWindow) {
+        errorWindow = customErrorWindow;
+    }
 
-	@Override
-	public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
-		final Throwable t = event.getThrowable();
-		if (t instanceof SocketException) {
-			// Most likely client browser closed socket
-			VaadinFrameworkLogger.getLogger().info(
-					"SocketException in CommunicationManager." + " Most likely client (browser) closed socket.");
-			return;
-		}
+    @Override
+    public void terminalError(com.vaadin.terminal.Terminal.ErrorEvent event) {
+        final Throwable t = event.getThrowable();
+        if (t instanceof SocketException) {
+            // Most likely client browser closed socket
+            VaadinFrameworkLogger.getLogger().info(
+                    "SocketException in CommunicationManager." + " Most likely client (browser) closed socket.");
+            return;
+        }
 
-		if (findInvalidValueException(t) != null) {
-			// validation errors are handled by their fields
-			return;
-		}
+        if (findInvalidValueException(t) != null) {
+            // validation errors are handled by their fields
+            return;
+        }
 
-		FFDomainException de = findDomainExceptionCause(t);
-		Buffered source = findSource(t);
-		if (de != null && source != null) {
-			setErrorsOn(source, de);
-		} else {
-			setErrorsOn(source, null);
-			VaadinFrameworkLogger.getLogger().error("Uncaught Error", t);
-			errorWindow.showError(getMainWindow(), t);
-		}
-	}
+        FFDomainException de = findDomainExceptionCause(t);
+        Buffered source = findSource(t);
+        if (de != null && source != null) {
+            setErrorsOn(source, de);
+        } else {
+            setErrorsOn(source, null);
+            VaadinFrameworkLogger.getLogger().error("Uncaught Error", t);
+            errorWindow.showError(getMainWindow(), t);
+        }
+    }
 
-	private Buffered findSource(Throwable t) {
-		if (t instanceof SourceException) {
-			return ((SourceException) t).getSource();
-		}
-		if (t.getCause() != null) {
-			return findSource(t.getCause());
-		}
-		return null;
-	}
+    private Buffered findSource(Throwable t) {
+        if (t instanceof SourceException) {
+            return ((SourceException) t).getSource();
+        }
+        if (t.getCause() != null) {
+            return findSource(t.getCause());
+        }
+        return null;
+    }
 
-	private FFDomainException findDomainExceptionCause(Throwable t) {
-		if (t instanceof FFDomainException) {
-			return (FFDomainException) t;
-		}
-		if (t.getCause() != null) {
-			return findDomainExceptionCause(t.getCause());
-		}
-		return null;
-	}
+    private FFDomainException findDomainExceptionCause(Throwable t) {
+        if (t instanceof FFDomainException) {
+            return (FFDomainException) t;
+        }
+        if (t.getCause() != null) {
+            return findDomainExceptionCause(t.getCause());
+        }
+        return null;
+    }
 
-	private InvalidValueException findInvalidValueException(Throwable t) {
-		if (t instanceof InvalidValueException) {
-			return (InvalidValueException) t;
-		}
-		if (t.getCause() != null) {
-			return findInvalidValueException(t.getCause());
-		}
-		return null;
-	}
+    private InvalidValueException findInvalidValueException(Throwable t) {
+        if (t instanceof InvalidValueException) {
+            return (InvalidValueException) t;
+        }
+        if (t.getCause() != null) {
+            return findInvalidValueException(t.getCause());
+        }
+        return null;
+    }
 
-	private static void setErrorsOn(Buffered source, FFDomainException message) {
-		DomainExceptionErrorMessage se = null;
-		if (message != null) {
-			se = new DomainExceptionErrorMessage(source, message);
-		}
-		if (source != null) {
-			if (source instanceof Form) {
-				Form form = (Form) source;
-				try {
-					Field formError = Form.class.getDeclaredField("currentBufferedSourceException");
-					formError.setAccessible(true);
-					formError.set(form, se);
-				} catch (IllegalArgumentException e) {
-				} catch (IllegalAccessException e) {
-				} catch (SecurityException e) {
-				} catch (NoSuchFieldException e) {
-				}
-				for (Object propertyId : form.getItemPropertyIds()) {
-					((AbstractField) form.getField(propertyId)).setCurrentBufferedSourceException(null);
-				}
-			} else if (source instanceof AbstractField) {
-				AbstractField field = (AbstractField) source;
-				field.setCurrentBufferedSourceException(se);
-			}
-		}
-	}
+    private static void setErrorsOn(Buffered source, FFDomainException message) {
+        DomainExceptionErrorMessage se = null;
+        if (message != null) {
+            se = new DomainExceptionErrorMessage(source, message);
+        }
+        if (source != null) {
+            if (source instanceof Form) {
+                Form form = (Form) source;
+                try {
+                    Field formError = Form.class.getDeclaredField("currentBufferedSourceException");
+                    formError.setAccessible(true);
+                    formError.set(form, se);
+                } catch (IllegalArgumentException e) {
+                } catch (IllegalAccessException e) {
+                } catch (SecurityException e) {
+                } catch (NoSuchFieldException e) {
+                }
+                for (Object propertyId : form.getItemPropertyIds()) {
+                    ((AbstractField) form.getField(propertyId)).setCurrentBufferedSourceException(null);
+                }
+            } else if (source instanceof AbstractField) {
+                AbstractField field = (AbstractField) source;
+                field.setCurrentBufferedSourceException(se);
+            }
+        }
+    }
 }

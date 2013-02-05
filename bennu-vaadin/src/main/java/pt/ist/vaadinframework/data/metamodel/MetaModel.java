@@ -43,125 +43,125 @@ import dml.Slot;
  * 
  */
 public class MetaModel implements Serializable {
-	private static final Map<Class<? extends AbstractDomainObject>, MetaModel> modelCache =
-			new HashMap<Class<? extends AbstractDomainObject>, MetaModel>();
+    private static final Map<Class<? extends AbstractDomainObject>, MetaModel> modelCache =
+            new HashMap<Class<? extends AbstractDomainObject>, MetaModel>();
 
-	private final Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
+    private final Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
 
-	/**
-	 * @param type
-	 */
+    /**
+     * @param type
+     */
 
-	private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName, Class<?> paramType) {
-		try {
-			final String setterName = "set" + StringUtils.capitalize(fieldName);
-			final Method setMethod = type.getDeclaredMethod(setterName, paramType);
-			return setMethod;
-		} catch (SecurityException e) {
-		} catch (NoSuchMethodException e) {
-		}
-		return null;
-	}
+    private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName, Class<?> paramType) {
+        try {
+            final String setterName = "set" + StringUtils.capitalize(fieldName);
+            final Method setMethod = type.getDeclaredMethod(setterName, paramType);
+            return setMethod;
+        } catch (SecurityException e) {
+        } catch (NoSuchMethodException e) {
+        }
+        return null;
+    }
 
-	private MetaModel(Class<? extends AbstractDomainObject> type) {
-		for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz =
-				(DomainClass) clazz.getSuperclass()) {
-			for (Slot slot : clazz.getSlotsList()) {
-				try {
-					descriptors.put(slot.getName(), new SlotPropertyDescriptor(slot, type));
-				} catch (IntrospectionException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for slot: " + slot.getName());
-				}
-			}
-			for (Role role : clazz.getRoleSlotsList()) {
-				try {
-					if (role.getName() != null && !role.getName().isEmpty()) {
-						descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
-					}
-				} catch (SecurityException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-				} catch (IntrospectionException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-				} catch (NoSuchMethodException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-				} catch (ClassNotFoundException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
-				}
-			}
-		}
+    private MetaModel(Class<? extends AbstractDomainObject> type) {
+        for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz =
+                (DomainClass) clazz.getSuperclass()) {
+            for (Slot slot : clazz.getSlotsList()) {
+                try {
+                    descriptors.put(slot.getName(), new SlotPropertyDescriptor(slot, type));
+                } catch (IntrospectionException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for slot: " + slot.getName());
+                }
+            }
+            for (Role role : clazz.getRoleSlotsList()) {
+                try {
+                    if (role.getName() != null && !role.getName().isEmpty()) {
+                        descriptors.put(role.getName(), new RolePropertyDescriptor(role, type));
+                    }
+                } catch (SecurityException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+                } catch (IntrospectionException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+                } catch (NoSuchMethodException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+                } catch (ClassNotFoundException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for role: " + role.getName());
+                }
+            }
+        }
 
-		for (Method method : type.getMethods()) {
-			final String methodName = method.getName();
-			String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
+        for (Method method : type.getMethods()) {
+            final String methodName = method.getName();
+            String fieldName = StringUtils.uncapitalize(methodName.substring(3, methodName.length()));
 
-			if (fieldName.equalsIgnoreCase("oid")) {
-				continue;
-			}
-			if (fieldName.equals("idInternal")) {
-				continue;
-			}
-			String replace = fieldName.replace("Count", "").replace("Set", "").replace("Iterator", "");
-			if (descriptors.containsKey(replace)) {
-				continue;
-			}
+            if (fieldName.equalsIgnoreCase("oid")) {
+                continue;
+            }
+            if (fieldName.equals("idInternal")) {
+                continue;
+            }
+            String replace = fieldName.replace("Count", "").replace("Set", "").replace("Iterator", "");
+            if (descriptors.containsKey(replace)) {
+                continue;
+            }
 
-			Method readMethod = null;
-			Method writeMethod = null;
+            Method readMethod = null;
+            Method writeMethod = null;
 
-			if (!methodName.contains("$") && methodName.startsWith("get")) {
-				readMethod = method;
-				Class<?> returnType = readMethod.getReturnType();
-				writeMethod = getSetMethod(type, fieldName, returnType);
-			}
+            if (!methodName.contains("$") && methodName.startsWith("get")) {
+                readMethod = method;
+                Class<?> returnType = readMethod.getReturnType();
+                writeMethod = getSetMethod(type, fieldName, returnType);
+            }
 
-			if (readMethod != null) {
-				java.beans.PropertyDescriptor propertyDescriptor;
-				try {
-					propertyDescriptor = new java.beans.PropertyDescriptor(fieldName, readMethod, writeMethod);
-					final BeanPropertyDescriptor beanPropertyDesc = new BeanPropertyDescriptor(propertyDescriptor, false);
-					descriptors.put(fieldName, beanPropertyDesc);
-				} catch (IntrospectionException e) {
-					VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
-				}
-			}
-		}
-	}
+            if (readMethod != null) {
+                java.beans.PropertyDescriptor propertyDescriptor;
+                try {
+                    propertyDescriptor = new java.beans.PropertyDescriptor(fieldName, readMethod, writeMethod);
+                    final BeanPropertyDescriptor beanPropertyDesc = new BeanPropertyDescriptor(propertyDescriptor, false);
+                    descriptors.put(fieldName, beanPropertyDesc);
+                } catch (IntrospectionException e) {
+                    VaadinFrameworkLogger.getLogger().error("Failed to create property descriptor for method : " + methodName);
+                }
+            }
+        }
+    }
 
-	/**
-	 * @return
-	 */
-	public Collection<PropertyDescriptor> getPropertyDescriptors() {
-		return Collections.unmodifiableCollection(descriptors.values());
-	}
+    /**
+     * @return
+     */
+    public Collection<PropertyDescriptor> getPropertyDescriptors() {
+        return Collections.unmodifiableCollection(descriptors.values());
+    }
 
-	/**
-	 * @param propertyId
-	 */
-	public PropertyDescriptor getPropertyDescriptor(String propertyId) {
-		if (!descriptors.containsKey(propertyId)) {
-			int dotLocation = propertyId.indexOf('.');
-			if (dotLocation != -1) {
-				PropertyDescriptor descriptor = descriptors.get(propertyId.substring(0, dotLocation));
-				MetaModel model = MetaModel.findMetaModelForType(descriptor.getPropertyType());
-				descriptors.put(propertyId, model.getPropertyDescriptor(propertyId.substring(dotLocation + 1)));
-			} else {
-				throw new Error("could not find property: " + propertyId);
-			}
-		}
-		return descriptors.get(propertyId);
-	}
+    /**
+     * @param propertyId
+     */
+    public PropertyDescriptor getPropertyDescriptor(String propertyId) {
+        if (!descriptors.containsKey(propertyId)) {
+            int dotLocation = propertyId.indexOf('.');
+            if (dotLocation != -1) {
+                PropertyDescriptor descriptor = descriptors.get(propertyId.substring(0, dotLocation));
+                MetaModel model = MetaModel.findMetaModelForType(descriptor.getPropertyType());
+                descriptors.put(propertyId, model.getPropertyDescriptor(propertyId.substring(dotLocation + 1)));
+            } else {
+                throw new Error("could not find property: " + propertyId);
+            }
+        }
+        return descriptors.get(propertyId);
+    }
 
-	/**
-	 * @return
-	 */
-	public Collection<String> getPropertyIds() {
-		return Collections.unmodifiableCollection(descriptors.keySet());
-	}
+    /**
+     * @return
+     */
+    public Collection<String> getPropertyIds() {
+        return Collections.unmodifiableCollection(descriptors.keySet());
+    }
 
-	public static MetaModel findMetaModelForType(Class<? extends AbstractDomainObject> type) {
-		if (!modelCache.containsKey(type)) {
-			modelCache.put(type, new MetaModel(type));
-		}
-		return modelCache.get(type);
-	}
+    public static MetaModel findMetaModelForType(Class<? extends AbstractDomainObject> type) {
+        if (!modelCache.containsKey(type)) {
+            modelCache.put(type, new MetaModel(type));
+        }
+        return modelCache.get(type);
+    }
 }

@@ -35,26 +35,26 @@ import com.vaadin.ui.TextField;
  */
 @SuppressWarnings("serial")
 public class PrimitiveField extends TextField {
-	public PrimitiveField(Validator validator, int maxLength) {
-		setNullSettingAllowed(true);
-		setNullRepresentation(StringUtils.EMPTY);
-		setMaxLength(maxLength);
-		addValidator(validator);
-	}
+    public PrimitiveField(Validator validator, int maxLength) {
+        setNullSettingAllowed(true);
+        setNullRepresentation(StringUtils.EMPTY);
+        setMaxLength(maxLength);
+        addValidator(validator);
+    }
 
-	@Override
-	public void setPropertyDataSource(final Property newDataSource) {
-		super.setPropertyDataSource(new PropertyFormatter(newDataSource) {
-			@Override
-			public Object parse(String formattedValue) throws Exception {
-				Constructor<?> constructor = newDataSource.getType().getConstructor(String.class);
-				return constructor.newInstance(formattedValue);
-			}
+    @Override
+    public void setPropertyDataSource(final Property newDataSource) {
+        super.setPropertyDataSource(new PropertyFormatter(newDataSource) {
+            @Override
+            public Object parse(String formattedValue) throws Exception {
+                Constructor<?> constructor = newDataSource.getType().getConstructor(String.class);
+                return constructor.newInstance(formattedValue);
+            }
 
-			@Override
-			public String format(Object value) {
-				return value.toString();
-			}
-		});
-	}
+            @Override
+            public String format(Object value) {
+                return value.toString();
+            }
+        });
+    }
 }

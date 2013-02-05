@@ -24,5 +24,5 @@ package pt.ist.vaadinframework.data;
 import java.io.Serializable;
 
 public interface ItemWriter<PropertyId> extends Serializable {
-	public PropertyId[] getOrderedArguments();
+    public PropertyId[] getOrderedArguments();
 }

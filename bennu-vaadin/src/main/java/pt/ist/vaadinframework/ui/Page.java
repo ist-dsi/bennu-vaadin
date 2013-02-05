@@ -29,8 +29,8 @@ import com.vaadin.ui.CustomComponent;
 @SuppressWarnings("serial")
 public class Page extends CustomComponent {
 
-	@Override
-	public ApplicationWindow getWindow() {
-		return (ApplicationWindow) super.getWindow();
-	}
+    @Override
+    public ApplicationWindow getWindow() {
+        return (ApplicationWindow) super.getWindow();
+    }
 }

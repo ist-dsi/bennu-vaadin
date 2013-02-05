@@ -31,31 +31,31 @@ import com.vaadin.ui.Select;
  */
 @SuppressWarnings("serial")
 public class EnumField extends Select {
-	/**
-	 * @param type
-	 */
-	public EnumField(Class<? extends Enum<?>> type) {
-		try {
-			Object[] values = (Object[]) type.getMethod("values").invoke(null);
-			for (Object value : values) {
-				addItem(value);
-			}
-			setNullSelectionAllowed(false);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    /**
+     * @param type
+     */
+    public EnumField(Class<? extends Enum<?>> type) {
+        try {
+            Object[] values = (Object[]) type.getMethod("values").invoke(null);
+            for (Object value : values) {
+                addItem(value);
+            }
+            setNullSelectionAllowed(false);
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

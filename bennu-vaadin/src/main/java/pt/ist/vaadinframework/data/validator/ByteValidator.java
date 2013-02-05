@@ -31,17 +31,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class ByteValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public ByteValidator() {
-		super(VaadinResources.getString(BYTE_VALIDATOR_ERROR));
-	}
+    public ByteValidator() {
+        super(VaadinResources.getString(BYTE_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			Byte.parseByte(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            Byte.parseByte(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -34,5 +34,5 @@ import java.io.Serializable;
  *            Type of the Ids of the properties
  */
 public interface ItemConstructor<PropertyId> extends Serializable {
-	public PropertyId[] getOrderedArguments();
+    public PropertyId[] getOrderedArguments();
 }

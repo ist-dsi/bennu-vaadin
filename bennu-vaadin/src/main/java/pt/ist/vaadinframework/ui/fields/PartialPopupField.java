@@ -36,84 +36,84 @@ import com.vaadin.ui.PopupDateField;
  */
 @SuppressWarnings("serial")
 public class PartialPopupField extends PopupDateField {
-	public static class PartialProperty implements Property {
-		private final PartialPopupField field;
+    public static class PartialProperty implements Property {
+        private final PartialPopupField field;
 
-		private final Property property;
+        private final Property property;
 
-		public PartialProperty(PartialPopupField field, Property dataSource) {
-			this.field = field;
-			this.property = dataSource;
-			if (!Partial.class.isAssignableFrom(dataSource.getType())) {
-				throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
-						+ " typed property as datasource");
-			}
-		}
+        public PartialProperty(PartialPopupField field, Property dataSource) {
+            this.field = field;
+            this.property = dataSource;
+            if (!Partial.class.isAssignableFrom(dataSource.getType())) {
+                throw new IllegalArgumentException("Can't use " + dataSource.getType().getName()
+                        + " typed property as datasource");
+            }
+        }
 
-		@Override
-		public Object getValue() {
-			Partial date = (Partial) property.getValue();
-			return date == null ? null : date.toDateTime(new DateTime()).toDate();
-		}
+        @Override
+        public Object getValue() {
+            Partial date = (Partial) property.getValue();
+            return date == null ? null : date.toDateTime(new DateTime()).toDate();
+        }
 
-		@Override
-		public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-			Date date = (Date) newValue;
-			Partial partial = (Partial) property.getValue();
-			if (date != null) {
-				if (partial == null) {
-					partial = new Partial();
-				}
-				DateTime dateTime = new DateTime(date);
-				if (field.getResolution() <= RESOLUTION_YEAR) {
-					partial = partial.with(DateTimeFieldType.year(), dateTime.get(DateTimeFieldType.year()));
-				}
-				if (field.getResolution() <= RESOLUTION_MONTH) {
-					partial = partial.with(DateTimeFieldType.monthOfYear(), dateTime.get(DateTimeFieldType.monthOfYear()));
-				}
-				if (field.getResolution() <= RESOLUTION_DAY) {
-					partial = partial.with(DateTimeFieldType.dayOfMonth(), dateTime.get(DateTimeFieldType.dayOfMonth()));
-				}
-				if (field.getResolution() <= RESOLUTION_HOUR) {
-					partial = partial.with(DateTimeFieldType.hourOfDay(), dateTime.get(DateTimeFieldType.hourOfDay()));
-				}
-				if (field.getResolution() <= RESOLUTION_MIN) {
-					partial = partial.with(DateTimeFieldType.minuteOfHour(), dateTime.get(DateTimeFieldType.minuteOfHour()));
-				}
-				if (field.getResolution() <= RESOLUTION_SEC) {
-					partial = partial.with(DateTimeFieldType.secondOfMinute(), dateTime.get(DateTimeFieldType.secondOfMinute()));
-				}
-				if (field.getResolution() <= RESOLUTION_MSEC) {
-					partial = partial.with(DateTimeFieldType.millisOfSecond(), dateTime.get(DateTimeFieldType.millisOfSecond()));
-				}
-			} else {
-				partial = null;
-			}
-			property.setValue(partial);
-		}
+        @Override
+        public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+            Date date = (Date) newValue;
+            Partial partial = (Partial) property.getValue();
+            if (date != null) {
+                if (partial == null) {
+                    partial = new Partial();
+                }
+                DateTime dateTime = new DateTime(date);
+                if (field.getResolution() <= RESOLUTION_YEAR) {
+                    partial = partial.with(DateTimeFieldType.year(), dateTime.get(DateTimeFieldType.year()));
+                }
+                if (field.getResolution() <= RESOLUTION_MONTH) {
+                    partial = partial.with(DateTimeFieldType.monthOfYear(), dateTime.get(DateTimeFieldType.monthOfYear()));
+                }
+                if (field.getResolution() <= RESOLUTION_DAY) {
+                    partial = partial.with(DateTimeFieldType.dayOfMonth(), dateTime.get(DateTimeFieldType.dayOfMonth()));
+                }
+                if (field.getResolution() <= RESOLUTION_HOUR) {
+                    partial = partial.with(DateTimeFieldType.hourOfDay(), dateTime.get(DateTimeFieldType.hourOfDay()));
+                }
+                if (field.getResolution() <= RESOLUTION_MIN) {
+                    partial = partial.with(DateTimeFieldType.minuteOfHour(), dateTime.get(DateTimeFieldType.minuteOfHour()));
+                }
+                if (field.getResolution() <= RESOLUTION_SEC) {
+                    partial = partial.with(DateTimeFieldType.secondOfMinute(), dateTime.get(DateTimeFieldType.secondOfMinute()));
+                }
+                if (field.getResolution() <= RESOLUTION_MSEC) {
+                    partial = partial.with(DateTimeFieldType.millisOfSecond(), dateTime.get(DateTimeFieldType.millisOfSecond()));
+                }
+            } else {
+                partial = null;
+            }
+            property.setValue(partial);
+        }
 
-		@Override
-		public Class<?> getType() {
-			return Date.class;
-		}
+        @Override
+        public Class<?> getType() {
+            return Date.class;
+        }
 
-		@Override
-		public boolean isReadOnly() {
-			return property.isReadOnly();
-		}
+        @Override
+        public boolean isReadOnly() {
+            return property.isReadOnly();
+        }
 
-		@Override
-		public void setReadOnly(boolean newStatus) {
-			property.setReadOnly(newStatus);
-		}
-	}
+        @Override
+        public void setReadOnly(boolean newStatus) {
+            property.setReadOnly(newStatus);
+        }
+    }
 
-	public PartialPopupField() {
-		super();
-	}
+    public PartialPopupField() {
+        super();
+    }
 
-	@Override
-	public void setPropertyDataSource(Property dataSource) {
-		super.setPropertyDataSource(new PartialProperty(this, dataSource));
-	}
+    @Override
+    public void setPropertyDataSource(Property dataSource) {
+        super.setPropertyDataSource(new PartialProperty(this, dataSource));
+    }
 }

@@ -29,39 +29,39 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 public class TextSize implements Hint {
-	private final int rows;
+    private final int rows;
 
-	public TextSize(int rows) {
-		this.rows = rows;
-	}
+    public TextSize(int rows) {
+        this.rows = rows;
+    }
 
-	@Override
-	public Field applyHint(Field field) {
-		if (field instanceof TextArea) {
-			TextArea area = (TextArea) field;
-			if (rows > 1) {
-				area.setRows(rows);
-			} else {
-				TextField newField = new TextField();
-				newField.setCaption(area.getCaption());
-				newField.setDescription(area.getDescription());
-				newField.setImmediate(area.isImmediate());
-				newField.setInvalidAllowed(area.isInvalidAllowed());
-				newField.setInvalidCommitted(area.isInvalidCommitted());
-				newField.setNullRepresentation(area.getNullRepresentation());
-				newField.setReadThrough(area.isReadThrough());
-				newField.setReadOnly(area.isReadOnly());
-				newField.setRequired(area.isRequired());
-				newField.setWidth(area.getWidth(), area.getWidthUnits());
-				return newField;
-			}
-		}
-		return field;
-	}
+    @Override
+    public Field applyHint(Field field) {
+        if (field instanceof TextArea) {
+            TextArea area = (TextArea) field;
+            if (rows > 1) {
+                area.setRows(rows);
+            } else {
+                TextField newField = new TextField();
+                newField.setCaption(area.getCaption());
+                newField.setDescription(area.getDescription());
+                newField.setImmediate(area.isImmediate());
+                newField.setInvalidAllowed(area.isInvalidAllowed());
+                newField.setInvalidCommitted(area.isInvalidCommitted());
+                newField.setNullRepresentation(area.getNullRepresentation());
+                newField.setReadThrough(area.isReadThrough());
+                newField.setReadOnly(area.isReadOnly());
+                newField.setRequired(area.isRequired());
+                newField.setWidth(area.getWidth(), area.getWidthUnits());
+                return newField;
+            }
+        }
+        return field;
+    }
 
-	@Override
-	public boolean appliesTo(Field field) {
-		return field instanceof AbstractTextField;
-	}
+    @Override
+    public boolean appliesTo(Field field) {
+        return field instanceof AbstractTextField;
+    }
 
 }

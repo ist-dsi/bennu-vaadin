@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * @version 1.0
  */
 public class VaadinFrameworkLogger {
-	protected static final Logger LOGGER = Logger.getLogger("pt.ist.vaadinframework");
+    protected static final Logger LOGGER = Logger.getLogger("pt.ist.vaadinframework");
 
-	private VaadinFrameworkLogger() {
-	}
+    private VaadinFrameworkLogger() {
+    }
 
-	public static final Logger getLogger() {
-		return LOGGER;
-	}
+    public static final Logger getLogger() {
+        return LOGGER;
+    }
 }

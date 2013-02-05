@@ -31,17 +31,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class FloatValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public FloatValidator() {
-		super(VaadinResources.getString(FLOAT_VALIDATOR_ERROR));
-	}
+    public FloatValidator() {
+        super(VaadinResources.getString(FLOAT_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			Float.parseFloat(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            Float.parseFloat(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

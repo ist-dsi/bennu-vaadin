@@ -33,17 +33,17 @@ import com.vaadin.data.validator.AbstractStringValidator;
  */
 @SuppressWarnings("serial")
 public class BigDecimalValidator extends AbstractStringValidator implements VaadinResourceConstants {
-	public BigDecimalValidator() {
-		super(VaadinResources.getString(BIG_DECIMAL_VALIDATOR_ERROR));
-	}
+    public BigDecimalValidator() {
+        super(VaadinResources.getString(BIG_DECIMAL_VALIDATOR_ERROR));
+    }
 
-	@Override
-	protected boolean isValidString(String value) {
-		try {
-			new BigDecimal(value);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    @Override
+    protected boolean isValidString(String value) {
+        try {
+            new BigDecimal(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

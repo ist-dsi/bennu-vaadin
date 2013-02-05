@@ -36,15 +36,15 @@ import pt.ist.bennu.core.domain.contents.NodeType;
  */
 public class VaadinNodeType extends NodeType {
 
-	@Override
-	public String getName() {
-		return "VaadinNode";
-	}
+    @Override
+    public String getName() {
+        return "VaadinNode";
+    }
 
-	@Override
-	public Node instantiateNode(VirtualHost virtualHost, Node parentNode, NodeBean nodeBean) {
-		return VaadinNode.createVaadinNode(virtualHost, parentNode, nodeBean.getLinkBundle(), nodeBean.getLinkKey(),
-				nodeBean.getArgument(), nodeBean.getPersistentGroup(), nodeBean.isUseBennuLayout());
-	}
+    @Override
+    public Node instantiateNode(VirtualHost virtualHost, Node parentNode, NodeBean nodeBean) {
+        return VaadinNode.createVaadinNode(virtualHost, parentNode, nodeBean.getLinkBundle(), nodeBean.getLinkKey(),
+                nodeBean.getArgument(), nodeBean.getPersistentGroup(), nodeBean.isUseBennuLayout());
+    }
 
 }

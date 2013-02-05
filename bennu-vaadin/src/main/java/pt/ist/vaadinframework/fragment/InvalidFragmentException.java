@@ -28,11 +28,11 @@ package pt.ist.vaadinframework.fragment;
  */
 
 class InvalidFragmentException extends Error {
-	public InvalidFragmentException(String message) {
-		super(message);
-	}
+    public InvalidFragmentException(String message) {
+        super(message);
+    }
 
-	public InvalidFragmentException() {
-		super();
-	}
+    public InvalidFragmentException() {
+        super();
+    }
 }

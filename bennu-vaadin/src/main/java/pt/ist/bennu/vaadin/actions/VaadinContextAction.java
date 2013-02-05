@@ -44,31 +44,31 @@ import pt.ist.fenixWebFramework.struts.annotations.Mapping;
  */
 public class VaadinContextAction extends ContextBaseAction {
 
-	public static class FullVaadinLayoutContext extends Context {
+    public static class FullVaadinLayoutContext extends Context {
 
-		@Override
-		public ActionForward forward(final String body) {
-			return new ActionForward("/embedded/vaadin-embedded-full.jsp");
-		}
+        @Override
+        public ActionForward forward(final String body) {
+            return new ActionForward("/embedded/vaadin-embedded-full.jsp");
+        }
 
-		public FullVaadinLayoutContext() {
-			super(null);
-		}
-	}
+        public FullVaadinLayoutContext() {
+            super(null);
+        }
+    }
 
-	public final ActionForward forwardToVaadin(final ActionMapping mapping, final ActionForm form,
-			final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-		return forwardToVaadin(request, true);
-	}
+    public final ActionForward forwardToVaadin(final ActionMapping mapping, final ActionForm form,
+            final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+        return forwardToVaadin(request, true);
+    }
 
-	public final ActionForward forwardToFullVaadin(final ActionMapping mapping, final ActionForm form,
-			final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-		return forwardToVaadin(request, false);
-	}
+    public final ActionForward forwardToFullVaadin(final ActionMapping mapping, final ActionForm form,
+            final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+        return forwardToVaadin(request, false);
+    }
 
-	public static ActionForward forwardToVaadin(final HttpServletRequest request, final boolean useBennuLayout) {
-		final Context context = useBennuLayout ? getContext(request) : new FullVaadinLayoutContext();
-		setContext(request, context);
-		return forward(request, "/embedded/vaadin-embedded.jsp");
-	}
+    public static ActionForward forwardToVaadin(final HttpServletRequest request, final boolean useBennuLayout) {
+        final Context context = useBennuLayout ? getContext(request) : new FullVaadinLayoutContext();
+        setContext(request, context);
+        return forward(request, "/embedded/vaadin-embedded.jsp");
+    }
 }

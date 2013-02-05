@@ -30,55 +30,55 @@ import com.vaadin.ui.Label;
  * 
  */
 public class FlowLayout extends CssLayout {
-	private String separator;
+    private String separator;
 
-	public FlowLayout() {
-		addStyleName("flow");
-	}
+    public FlowLayout() {
+        addStyleName("flow");
+    }
 
-	public FlowLayout(String separator) {
-		this();
-		this.separator = separator;
-	}
+    public FlowLayout(String separator) {
+        this();
+        this.separator = separator;
+    }
 
-	public void setSeparator(String separator) {
-		this.separator = separator;
-	}
+    public void setSeparator(String separator) {
+        this.separator = separator;
+    }
 
-	public String getSeparator() {
-		return separator;
-	}
+    public String getSeparator() {
+        return separator;
+    }
 
-	@Override
-	public void addComponent(Component c) {
-		if (separator != null && !components.isEmpty()) {
-			addSeparator();
-		}
-		super.addComponent(c);
-		setStyle(c);
-	}
+    @Override
+    public void addComponent(Component c) {
+        if (separator != null && !components.isEmpty()) {
+            addSeparator();
+        }
+        super.addComponent(c);
+        setStyle(c);
+    }
 
-	@Override
-	public void addComponent(Component c, int index) {
-		super.addComponent(c, index);
-		setStyle(c);
-	}
+    @Override
+    public void addComponent(Component c, int index) {
+        super.addComponent(c, index);
+        setStyle(c);
+    }
 
-	@Override
-	public void addComponentAsFirst(Component c) {
-		super.addComponentAsFirst(c);
-		setStyle(c);
-	}
+    @Override
+    public void addComponentAsFirst(Component c) {
+        super.addComponentAsFirst(c);
+        setStyle(c);
+    }
 
-	private void addSeparator() {
-		Label separatorLabel = new Label(separator);
-		separatorLabel.addStyleName("flow-separator");
-		separatorLabel.setSizeUndefined();
-		super.addComponent(separatorLabel);
-	}
+    private void addSeparator() {
+        Label separatorLabel = new Label(separator);
+        separatorLabel.addStyleName("flow-separator");
+        separatorLabel.setSizeUndefined();
+        super.addComponent(separatorLabel);
+    }
 
-	private void setStyle(Component c) {
-		c.addStyleName("flow-part");
-		c.setSizeUndefined();
-	}
+    private void setStyle(Component c) {
+        c.addStyleName("flow-part");
+        c.setSizeUndefined();
+    }
 }

@@ -32,28 +32,28 @@ import java.io.InputStreamReader;
 
 public class FragmentQueryTestApplication {
 
-	public static String readln() {
-		InputStreamReader converter = new InputStreamReader(System.in);
-		BufferedReader reader = new BufferedReader(converter);
-		try {
-			return reader.readLine();
-		} catch (Throwable t) {
-			throw new Error(t);
-		}
-	}
+    public static String readln() {
+        InputStreamReader converter = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(converter);
+        try {
+            return reader.readLine();
+        } catch (Throwable t) {
+            throw new Error(t);
+        }
+    }
 
-	public static void main(String... args) {
-		String line = null;
-		System.out.printf(":$> ");
-		while (!(line = readln()).equals("quit")) {
-			try {
-				final FragmentQuery fragmentQuery = new FragmentQuery(line);
-				System.out.println(fragmentQuery.toString());
-			} catch (InvalidFragmentException e) {
-				System.out.println("Error : " + e.getMessage());
-			}
-			System.out.printf("\n:$> ");
-		}
+    public static void main(String... args) {
+        String line = null;
+        System.out.printf(":$> ");
+        while (!(line = readln()).equals("quit")) {
+            try {
+                final FragmentQuery fragmentQuery = new FragmentQuery(line);
+                System.out.println(fragmentQuery.toString());
+            } catch (InvalidFragmentException e) {
+                System.out.println("Error : " + e.getMessage());
+            }
+            System.out.printf("\n:$> ");
+        }
 
-	}
+    }
 }

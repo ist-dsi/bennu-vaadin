@@ -41,96 +41,96 @@ import pt.ist.vaadinframework.ui.EmbeddedComponentContainer;
  * 
  */
 public class FragmentQuery implements Serializable {
-	String path;
+    String path;
 
-	Map<String, String> params;
+    Map<String, String> params;
 
-	private void setParams(String query) {
-		final String[] args = query.split("&");
-		for (String param : args) {
-			final String[] split = param.split("=");
-			if (split.length == 2) {
-				String name = split[0];
-				String value = split[1];
-				put(name, value);
-			} else {
-				throw new InvalidFragmentException(query);
-			}
-		}
-	}
+    private void setParams(String query) {
+        final String[] args = query.split("&");
+        for (String param : args) {
+            final String[] split = param.split("=");
+            if (split.length == 2) {
+                String name = split[0];
+                String value = split[1];
+                put(name, value);
+            } else {
+                throw new InvalidFragmentException(query);
+            }
+        }
+    }
 
-	private void setPath(final String path) {
-		this.path = path;
-	}
+    private void setPath(final String path) {
+        this.path = path;
+    }
 
-	public FragmentQuery() {
-		// params = new HashMap<String, String>();
-	}
+    public FragmentQuery() {
+        // params = new HashMap<String, String>();
+    }
 
-	public void put(String key, String value) {
-		if (params == null) {
-			params = new HashMap<>();
-		}
-		params.put(key, value);
-	}
+    public void put(String key, String value) {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        params.put(key, value);
+    }
 
-	public FragmentQuery(Class<? extends EmbeddedComponentContainer> clazz, String... values) {
-		this();
-		final EmbeddedComponent annotation = EmbeddedComponentUtils.getAnnotation(clazz);
-		final String[] path = annotation.path();
-		final String[] args = annotation.args();
+    public FragmentQuery(Class<? extends EmbeddedComponentContainer> clazz, String... values) {
+        this();
+        final EmbeddedComponent annotation = EmbeddedComponentUtils.getAnnotation(clazz);
+        final String[] path = annotation.path();
+        final String[] args = annotation.args();
 
-		if (args.length < values.length || path.length != 1) {
-			throw new InvalidFragmentException("args don't match");
-		}
+        if (args.length < values.length || path.length != 1) {
+            throw new InvalidFragmentException("args don't match");
+        }
 
-		this.path = path[0];
+        this.path = path[0];
 
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] != null) {
-				put(args[i], values[i]);
-			}
-		}
-	}
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+                put(args[i], values[i]);
+            }
+        }
+    }
 
-	public FragmentQuery(String fragment) {
-		this();
-		if (fragment == null || fragment.isEmpty() || !fragment.startsWith("#")) {
-			path = null;
-			params = null;
-			throw new InvalidFragmentException();
-		}
+    public FragmentQuery(String fragment) {
+        this();
+        if (fragment == null || fragment.isEmpty() || !fragment.startsWith("#")) {
+            path = null;
+            params = null;
+            throw new InvalidFragmentException();
+        }
 
-		if (!fragment.contains("?")) {
-			path = fragment.substring(1);
-			params = null;
-			return;
-		}
+        if (!fragment.contains("?")) {
+            path = fragment.substring(1);
+            params = null;
+            return;
+        }
 
-		final Pattern compile = Pattern.compile("^\\#(.*)\\?(.*)?$");
-		final Matcher matcher = compile.matcher(fragment);
-		if (matcher.matches() && matcher.groupCount() == 2) {
-			setPath(matcher.group(1));
-			setParams(matcher.group(2));
-		}
-	}
+        final Pattern compile = Pattern.compile("^\\#(.*)\\?(.*)?$");
+        final Matcher matcher = compile.matcher(fragment);
+        if (matcher.matches() && matcher.groupCount() == 2) {
+            setPath(matcher.group(1));
+            setParams(matcher.group(2));
+        }
+    }
 
-	public String getPath() {
-		return path;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public Map<String, String> getParams() {
-		return params != null ? params : Collections.EMPTY_MAP;
-	}
+    public Map<String, String> getParams() {
+        return params != null ? params : Collections.EMPTY_MAP;
+    }
 
-	public String getQueryString() {
-		String queryString = String.format("%s", path);
-		final ArrayList<String> args = new ArrayList<String>();
-		if (params != null) {
-			for (Entry<String, String> entry : params.entrySet()) {
-				args.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
-			}
-		}
-		return args.isEmpty() ? queryString : queryString + "?" + StringUtils.join(args, "&");
-	}
+    public String getQueryString() {
+        String queryString = String.format("%s", path);
+        final ArrayList<String> args = new ArrayList<String>();
+        if (params != null) {
+            for (Entry<String, String> entry : params.entrySet()) {
+                args.add(String.format("%s=%s", entry.getKey(), entry.getValue()));
+            }
+        }
+        return args.isEmpty() ? queryString : queryString + "?" + StringUtils.join(args, "&");
+    }
 }

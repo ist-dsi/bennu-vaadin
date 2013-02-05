@@ -5,13 +5,13 @@ package pt.ist.vaadinframework.ui.wizard;
  */
 public class PreviousStepWizardStepAction extends WizardStepAction {
 
-	public PreviousStepWizardStepAction(WizardStep currentStep, String actionLabel) {
-		super(currentStep, actionLabel);
-	}
+    public PreviousStepWizardStepAction(WizardStep currentStep, String actionLabel) {
+        super(currentStep, actionLabel);
+    }
 
-	@Override
-	public void execute(WizardStep currentStep) {
-		currentStep.getWizard().goToPreviousStep();
-	}
+    @Override
+    public void execute(WizardStep currentStep) {
+        currentStep.getWizard().goToPreviousStep();
+    }
 
 }
