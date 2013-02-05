@@ -24,158 +24,158 @@ import com.vaadin.ui.Select;
 @ClientWidget(VTimeoutSelect.class)
 public class TimeoutSelect extends Select implements TextChangeNotifier {
 
-	private String curText = null;
+    private String curText = null;
 
-	private int timeout = 1000;
+    private int timeout = 1000;
 
-	// private Object selected;
+    // private Object selected;
 
-	public TimeoutSelect() {
-		super();
-		setImmediate(true);
-		super.setFilteringMode(Select.FILTERINGMODE_OFF);
-	}
+    public TimeoutSelect() {
+        super();
+        setImmediate(true);
+        super.setFilteringMode(Select.FILTERINGMODE_OFF);
+    }
 
-	public TimeoutSelect(String caption, Container dataSource) {
-		super(caption, dataSource);
-		setImmediate(true);
-		super.setFilteringMode(Select.FILTERINGMODE_OFF);
-	}
+    public TimeoutSelect(String caption, Container dataSource) {
+        super(caption, dataSource);
+        setImmediate(true);
+        super.setFilteringMode(Select.FILTERINGMODE_OFF);
+    }
 
-	public TimeoutSelect(String caption) {
-		super(caption);
-		setImmediate(true);
-		super.setFilteringMode(Select.FILTERINGMODE_OFF);
-	}
+    public TimeoutSelect(String caption) {
+        super(caption);
+        setImmediate(true);
+        super.setFilteringMode(Select.FILTERINGMODE_OFF);
+    }
 
-	@Override
-	public void changeVariables(Object source, Map<String, Object> variables) {
+    @Override
+    public void changeVariables(Object source, Map<String, Object> variables) {
 
-		// if (variables.containsKey("selected")) {
-		// final String[] keys = (String[]) variables.get("selected");
-		// if (!isMultiSelect()) {
-		// if (keys.length > 0) {
-		// selected = itemIdMapper.get(keys[0]);
-		// }
-		// }
-		// }
+        // if (variables.containsKey("selected")) {
+        // final String[] keys = (String[]) variables.get("selected");
+        // if (!isMultiSelect()) {
+        // if (keys.length > 0) {
+        // selected = itemIdMapper.get(keys[0]);
+        // }
+        // }
+        // }
 
-		if (variables.containsKey("filter")) {
-			final String newText = (String) variables.get("filter");
-			if (!newText.equals(curText)) {
-				setText(newText);
-			} else {
-				// variables.remove("filter");
-			}
-		}
+        if (variables.containsKey("filter")) {
+            final String newText = (String) variables.get("filter");
+            if (!newText.equals(curText)) {
+                setText(newText);
+            } else {
+                // variables.remove("filter");
+            }
+        }
 
-		super.changeVariables(source, variables);
-	}
+        super.changeVariables(source, variables);
+    }
 
-	private class TextChangeEventImpl extends TextChangeEvent {
+    private class TextChangeEventImpl extends TextChangeEvent {
 
-		public TextChangeEventImpl(Component arg0) {
-			super(arg0);
-		}
+        public TextChangeEventImpl(Component arg0) {
+            super(arg0);
+        }
 
-		@Override
-		public String getText() {
-			return ((TimeoutSelect) getComponent()).curText;
-		}
+        @Override
+        public String getText() {
+            return ((TimeoutSelect) getComponent()).curText;
+        }
 
-		@Override
-		public int getCursorPosition() {
-			return 0;
-		}
+        @Override
+        public int getCursorPosition() {
+            return 0;
+        }
 
-	}
+    }
 
-	@Override
-	public void setContainerDataSource(Container newDataSource) {
-		if (newDataSource == null) {
-			newDataSource = new IndexedContainer();
-		}
+    @Override
+    public void setContainerDataSource(Container newDataSource) {
+        if (newDataSource == null) {
+            newDataSource = new IndexedContainer();
+        }
 
-		getCaptionChangeListener().clear();
+        getCaptionChangeListener().clear();
 
-		if (items != newDataSource) {
+        if (items != newDataSource) {
 
-			// Removes listeners from the old datasource
-			if (items != null) {
-				if (items instanceof Container.ItemSetChangeNotifier) {
-					((Container.ItemSetChangeNotifier) items).removeListener(this);
-				}
-				if (items instanceof Container.PropertySetChangeNotifier) {
-					((Container.PropertySetChangeNotifier) items).removeListener(this);
-				}
-			}
+            // Removes listeners from the old datasource
+            if (items != null) {
+                if (items instanceof Container.ItemSetChangeNotifier) {
+                    ((Container.ItemSetChangeNotifier) items).removeListener(this);
+                }
+                if (items instanceof Container.PropertySetChangeNotifier) {
+                    ((Container.PropertySetChangeNotifier) items).removeListener(this);
+                }
+            }
 
-			// Assigns new data source
-			items = newDataSource;
+            // Assigns new data source
+            items = newDataSource;
 
-			// Clears itemIdMapper also
-			itemIdMapper.removeAll();
+            // Clears itemIdMapper also
+            itemIdMapper.removeAll();
 
-			// Adds listeners
-			if (items != null) {
-				if (items instanceof Container.ItemSetChangeNotifier) {
-					((Container.ItemSetChangeNotifier) items).addListener(this);
-				}
-				if (items instanceof Container.PropertySetChangeNotifier) {
-					((Container.PropertySetChangeNotifier) items).addListener(this);
-				}
-			}
+            // Adds listeners
+            if (items != null) {
+                if (items instanceof Container.ItemSetChangeNotifier) {
+                    ((Container.ItemSetChangeNotifier) items).addListener(this);
+                }
+                if (items instanceof Container.PropertySetChangeNotifier) {
+                    ((Container.PropertySetChangeNotifier) items).addListener(this);
+                }
+            }
 
-			/*
-			 * We expect changing the data source should also clean value. See
-			 * #810, #4607, #5281
-			 */
-			// if (selected != null && !items.containsId(selected)) {
-			// setValue(null);
-			// }
+            /*
+             * We expect changing the data source should also clean value. See
+             * #810, #4607, #5281
+             */
+            // if (selected != null && !items.containsId(selected)) {
+            // setValue(null);
+            // }
 
-			requestRepaint();
+            requestRepaint();
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public void paintContent(PaintTarget target) throws PaintException {
-		super.paintContent(target);
+    @Override
+    public void paintContent(PaintTarget target) throws PaintException {
+        super.paintContent(target);
 
-		if (hasListeners(TextChangeEvent.class)) {
-			target.addAttribute(VTextField.ATTR_TEXTCHANGE_EVENTMODE, AbstractTextField.TextChangeEventMode.TIMEOUT.toString());
-			target.addAttribute(VTextField.ATTR_TEXTCHANGE_TIMEOUT, getTimeout());
-		}
+        if (hasListeners(TextChangeEvent.class)) {
+            target.addAttribute(VTextField.ATTR_TEXTCHANGE_EVENTMODE, AbstractTextField.TextChangeEventMode.TIMEOUT.toString());
+            target.addAttribute(VTextField.ATTR_TEXTCHANGE_TIMEOUT, getTimeout());
+        }
 
-	}
+    }
 
-	private int getTimeout() {
-		return timeout;
-	}
+    private int getTimeout() {
+        return timeout;
+    }
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-		requestRepaint();
-	}
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+        requestRepaint();
+    }
 
-	@Override
-	public void addListener(TextChangeListener listener) {
-		addListener(TextChangeListener.EVENT_ID, TextChangeEvent.class, listener, TextChangeListener.EVENT_METHOD);
-	}
+    @Override
+    public void addListener(TextChangeListener listener) {
+        addListener(TextChangeListener.EVENT_ID, TextChangeEvent.class, listener, TextChangeListener.EVENT_METHOD);
+    }
 
-	@Override
-	public void removeListener(TextChangeListener listener) {
-		removeListener(listener);
-	}
+    @Override
+    public void removeListener(TextChangeListener listener) {
+        removeListener(listener);
+    }
 
-	@Override
-	public void setFilteringMode(int filteringMode) {
-	}
+    @Override
+    public void setFilteringMode(int filteringMode) {
+    }
 
-	public void setText(String newText) {
-		curText = newText;
-		fireEvent(new TextChangeEventImpl(this));
-	}
+    public void setText(String newText) {
+        curText = newText;
+        fireEvent(new TextChangeEventImpl(this));
+    }
 
 }
