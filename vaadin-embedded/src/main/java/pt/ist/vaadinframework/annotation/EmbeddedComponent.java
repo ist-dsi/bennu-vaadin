@@ -29,9 +29,9 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmbeddedComponent {
-	String[] path();
+    String[] path();
 
-	String[] args() default {};
+    String[] args() default {};
 
-	boolean persistent() default false;
+    boolean persistent() default false;
 }
