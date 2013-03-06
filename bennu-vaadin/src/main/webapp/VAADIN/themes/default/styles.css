@@ -1,0 +1,114 @@
+@import url(../reindeer/styles.css);
+@import url(../commons/styles.css);
+
+/*---------------------------------------------------------------
+    Main Layout
+---------------------------------------------------------------*/
+#container {
+	width: 960px;
+	margin: 25px auto 0 auto;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background: #333;
+}
+
+#container #header {
+	padding: 5px;
+}
+
+#container #header #logo {
+	float: left;
+}
+
+#container #header #actionMenu {
+	float: right;
+}
+
+#container #header #title {
+	color: white;
+	font-size: xx-large;
+	font-weight: bold;
+	padding: 20px;
+}
+
+#container #header #subtitle {
+	color: #b6d7e8;
+	font-size: normal;
+	padding: 0px 20px 0 20px;
+}
+
+#container #contentMenu {
+	
+}
+
+#container #content {
+	background: white;
+	margin: 23px 0 0 0;
+	padding: 30px;
+}
+
+#container #footer {
+	text-align: center;
+	color: white;
+	padding: 5px;
+}
+
+/*---------------------------------------------------------------
+    Reindeer Layout Overrides
+---------------------------------------------------------------*/
+
+.v-generated-body,.v-app {
+	background: url(images/back01.gif);
+}
+
+.v-select-optiongroup-horizontal .v-select-option {
+	display: block;
+	float: left;
+}
+
+.v-csslayout-left {
+	padding-left: 20px;
+}
+
+.inline,
+.inline div,
+.inline span {
+	display: inline;
+}
+
+.v-gridlayout-properties .v-gridlayout-spacing-on {
+	padding: 0px;
+}
+
+.v-gridlayout-properties .v-gridlayout-margin-top {
+	padding-top: 20px;
+}
+
+.v-gridlayout-properties>div>div {
+	border-bottom: 1px solid #ddd;
+}
+
+.v-gridlayout-properties .v-label-label {
+	border-top: 1px solid #ddd;
+	text-align: right;
+	padding: 4px;
+}
+
+.v-gridlayout-properties .value {
+	background: #fff;
+	border-top: 1px solid #ddd;
+	padding: 4px;
+}
+
+.v-label-page-title {
+	text-align: center;
+	margin-top: 15px
+}
+
+.bold {
+	font-weight: bold;  
+}
+
+.float-right {
+	float: right;
+}

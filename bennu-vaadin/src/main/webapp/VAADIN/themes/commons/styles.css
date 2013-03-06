@@ -1,0 +1,143 @@
+/* vaadin commons styles */
+
+.v-panel-caption {
+    white-space: normal;
+}
+
+.v-generated-body, .v-app {
+	background: none repeat scroll 0 0 #FFFFFF;
+}
+
+
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell,
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
+.embedded-no-spacing .v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
+	padding-top: 0px;
+}
+
+.flow .v-csslayout-margin,.v-csslayout-margin-top,.v-csslayout-margin-right,.v-csslayout-margin-bottom,.v-csslayout-margin-left {
+	padding: 4px;
+}
+
+.flow-part, .flow-separator {
+	display: inline !important;
+	white-space: normal;
+	vertical-align: top;
+	padding-right: 2px;
+}
+
+.flow-part *, .flow-separator * {
+	display: inline !important;
+	white-space: normal;
+}
+
+.v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell, 
+.v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
+.v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-captioncell, 
+.v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-contentcell,
+.v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-errorcell {
+    padding-top: 0;
+}
+
+.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-captioncell, 
+.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-contentcell,
+.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-errorcell {
+    padding-top: 5px;
+}
+
+.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-captioncell,
+.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-contentcell,
+.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-errorcell {
+    padding-bottom: 5px;
+}
+
+.v-formlayout-margin-left .v-formlayout-captioncell {
+    padding-left: 12px;
+} 
+
+.v-formlayout-margin-right .v-formlayout-contentcell {
+    padding-right: 12px;
+}
+
+/* BennuTheme.WRAP */
+.text-wrap {
+	white-space: normal;
+}
+
+/*
+.text-wrap .v-button-wrap,
+.text-wrap .v-button-caption {
+	white-space: normal;
+}
+*/
+
+/* BennuTheme.WIDE_FORM */
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr,
+.v-formlayout-wide > table > tbody > tr {
+	border-bottom: 1px solid #DDDDDD;
+    border-top: 1px solid #DDDDDD;
+    vertical-align: top;
+}
+
+.v-form-wide > fieldset > div > div.v-formlayout > table > tbody > tr > td > .v-caption,
+.v-formlayout.wide > table > tbody > tr > td > .v-caption {
+	text-align: left;
+}
+
+/* BennuTheme.TABLE_CLEAR */
+.v-table-clear .v-table-row-odd {
+	background: none;
+}
+
+.v-table-clear .v-table-cell-wrapper {
+    white-space: normal;
+}
+
+.v-table-clear .v-table-body-noselection {
+	height: auto !important;
+}
+
+/* Reindeer.TABLE_BORDERLESS */
+.v-table-borderless .v-table-cell-content {
+	border-right: none;
+}
+
+.v-upload-link .v-button {
+	height: auto;
+	padding: 0;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-image: none;
+	background-image: none;
+	border: none;
+	cursor: pointer;
+}
+.v-upload-link .v-button .v-button-wrap {
+	display: block;
+	height: auto;
+	padding: 0;
+	background-color: transparent;
+	background-image: none;
+	background-image: none;
+	cursor: pointer;
+}
+.v-upload-link .v-button .v-button-wrap .v-button-caption {
+	color: #1b699f;
+	text-shadow: none;
+	font-weight: normal;
+	font-size: 12px;
+	line-height: normal;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.v-label-small {
+	font-style: italic;
+	color: #222;
+	font-size: 11px;
+}
