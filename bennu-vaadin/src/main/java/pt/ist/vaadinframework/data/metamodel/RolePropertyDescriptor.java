@@ -30,11 +30,10 @@ import java.util.Set;
 
 import org.apache.commons.lang.WordUtils;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
+import pt.ist.fenixframework.dml.Role;
 
 import com.vaadin.data.Property.ConversionException;
-
-import dml.Role;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
@@ -51,22 +50,22 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
 
     // if the relation has * on other type this implies a collection of elements
     // of this type.
-    private Class<? extends AbstractDomainObject> elementType;
+    private Class<? extends DomainObject> elementType;
 
     private final Role role;
 
-    private final Class<? extends AbstractDomainObject> type;
+    private final Class<? extends DomainObject> type;
 
-    private final Class<? extends AbstractDomainObject> returnType;
+    private final Class<? extends DomainObject> returnType;
 
-    public RolePropertyDescriptor(Role role, Class<? extends AbstractDomainObject> type) throws IntrospectionException,
+    public RolePropertyDescriptor(Role role, Class<? extends DomainObject> type) throws IntrospectionException,
             SecurityException, NoSuchMethodException, ClassNotFoundException {
         this.propertyId = role.getName();
         required = role.getMultiplicityLower() > 0;
         this.role = role;
         this.type = type;
         calc();
-        returnType = (Class<? extends AbstractDomainObject>) reader.getReturnType();
+        returnType = (Class<? extends DomainObject>) reader.getReturnType();
     }
 
     private void calc() throws IntrospectionException, SecurityException, NoSuchMethodException, ClassNotFoundException {
@@ -76,7 +75,7 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
             writer = property.getWriteMethod();
         } else {
             reader = type.getMethod("get" + WordUtils.capitalize(role.getName()) + "Set");
-            elementType = (Class<? extends AbstractDomainObject>) Class.forName(role.getType().getFullName());
+            elementType = (Class<? extends DomainObject>) Class.forName(role.getType().getFullName());
         }
     }
 
@@ -92,12 +91,12 @@ public class RolePropertyDescriptor implements PropertyDescriptor {
      * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getPropertyType()
      */
     @Override
-    public Class<? extends AbstractDomainObject> getPropertyType() {
+    public Class<? extends DomainObject> getPropertyType() {
         return returnType;
     }
 
     @Override
-    public Class<? extends AbstractDomainObject> getCollectionElementType() {
+    public Class<? extends DomainObject> getCollectionElementType() {
         return elementType;
     }
 

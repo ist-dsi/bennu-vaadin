@@ -24,7 +24,7 @@ package pt.ist.vaadinframework.data.reflect;
 import java.util.HashMap;
 import java.util.Map;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.vaadinframework.data.AbstractBufferedItem;
 import pt.ist.vaadinframework.data.BufferedProperty;
 import pt.ist.vaadinframework.data.HintedProperty;
@@ -87,8 +87,8 @@ public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
     }
 
     public void discoverAllItems() {
-        if (AbstractDomainObject.class.isAssignableFrom(getType())) {
-            MetaModel model = MetaModel.findMetaModelForType((Class<? extends AbstractDomainObject>) getType());
+        if (DomainObject.class.isAssignableFrom(getType())) {
+            MetaModel model = MetaModel.findMetaModelForType((Class<? extends DomainObject>) getType());
             for (String propertyId : model.getPropertyIds()) {
                 getItemProperty(propertyId);
             }
@@ -122,7 +122,7 @@ public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
         PropertyDescriptor descriptor = getDescriptor(propertyId);
         if (descriptor != null) {
             Property property;
-            if (AbstractDomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
+            if (DomainObject.class.isAssignableFrom(descriptor.getPropertyType())) {
                 property = new DomainItem(new DescriptorProperty(descriptor));
             } else if (descriptor.isCollection()) {
                 property = new DomainContainer(new DescriptorProperty(descriptor), descriptor.getCollectionElementType());
@@ -141,8 +141,8 @@ public class DomainItem<Type> extends AbstractBufferedItem<Object, Type> {
 
     private PropertyDescriptor getDescriptor(String propertyId) {
         if (!descriptorCache.containsKey(propertyId)) {
-            Class<? extends AbstractDomainObject> type = (Class<? extends AbstractDomainObject>) getType();
-            if (AbstractDomainObject.class.isAssignableFrom(type)) {
+            Class<? extends DomainObject> type = (Class<? extends DomainObject>) getType();
+            if (DomainObject.class.isAssignableFrom(type)) {
                 MetaModel model = MetaModel.findMetaModelForType(type);
                 descriptorCache.put(propertyId, model.getPropertyDescriptor(propertyId));
             }

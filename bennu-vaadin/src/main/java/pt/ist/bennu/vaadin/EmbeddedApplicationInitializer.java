@@ -42,8 +42,8 @@ import pt.ist.bennu.core._development.PropertiesManager;
 import pt.ist.bennu.vaadin.errorHandling.ReporterErrorWindow;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.RequestChecksumFilter;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.RequestChecksumFilter.ChecksumPredicate;
-import pt.ist.fenixframework.artifact.FenixFrameworkArtifact;
-import pt.ist.fenixframework.project.exception.FenixFrameworkProjectException;
+import pt.ist.fenixframework.core.Project;
+import pt.ist.fenixframework.core.exception.ProjectException;
 import pt.ist.vaadinframework.EmbeddedApplication;
 import pt.ist.vaadinframework.annotation.EmbeddedAnnotationProcessor;
 import pt.ist.vaadinframework.annotation.EmbeddedComponent;
@@ -99,8 +99,7 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
     private void loadEmbeddedComponentsFromFile(final Set<Class<? extends EmbeddedComponentContainer>> embeddedComponentClasses) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
-            for (FenixFrameworkArtifact artifact : FenixFrameworkArtifact.fromName(PropertiesManager.getProperty("app.name"))
-                    .getArtifacts()) {
+            for (Project artifact : Project.fromName(PropertiesManager.getProperty("app.name")).getProjects()) {
                 try (InputStream stream =
                         loader.getResourceAsStream(artifact.getName() + "/" + EmbeddedAnnotationProcessor.LOG_FILENAME)) {
                     if (stream != null) {
@@ -113,7 +112,7 @@ public class EmbeddedApplicationInitializer extends HttpServlet {
                     }
                 }
             }
-        } catch (IOException | ClassNotFoundException | FenixFrameworkProjectException e) {
+        } catch (IOException | ClassNotFoundException | ProjectException e) {
             e.printStackTrace();
         }
     }

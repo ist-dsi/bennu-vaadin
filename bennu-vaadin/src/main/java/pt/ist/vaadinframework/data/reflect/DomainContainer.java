@@ -28,10 +28,10 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.plugins.luceneIndexing.DomainIndexer;
 import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.BuildingState;
 import pt.ist.fenixframework.plugins.luceneIndexing.queryBuilder.dsl.DSLState;
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.data.LuceneContainer;
@@ -41,7 +41,7 @@ import pt.ist.vaadinframework.data.metamodel.PropertyDescriptor;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ItemSorter;
 
-public class DomainContainer<Type extends AbstractDomainObject> extends AbstractBufferedContainer<Type, Object, DomainItem<Type>>
+public class DomainContainer<Type extends DomainObject> extends AbstractBufferedContainer<Type, Object, DomainItem<Type>>
         implements LuceneContainer {
     private final int maxHits = 1000000;
 

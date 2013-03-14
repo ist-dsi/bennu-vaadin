@@ -32,7 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.pstm.OneBoxDomainObject;
+import pt.ist.fenixframework.dml.DomainClass;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 
@@ -41,8 +41,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
-
-import dml.DomainClass;
 
 /**
  * @author Sérgio Silva (sergio.silva@ist.utl.pt)
@@ -145,7 +143,7 @@ public class CaptionUtils {
     }
 
     private static boolean hasMoreClassesInHierarchy(Class<?> clazz) {
-        if (clazz == null || clazz.equals(OneBoxDomainObject.class)) {
+        if (clazz == null) {
             return false;
         }
         final DomainClass findClass = FenixFramework.getDomainModel().findClass(clazz.getName());

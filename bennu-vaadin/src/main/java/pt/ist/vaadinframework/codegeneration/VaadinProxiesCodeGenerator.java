@@ -34,6 +34,15 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
+import pt.ist.fenixframework.dml.DomainClass;
+import pt.ist.fenixframework.dml.DomainEntity;
+import pt.ist.fenixframework.dml.DomainModel;
+import pt.ist.fenixframework.dml.EnumValueType;
+import pt.ist.fenixframework.dml.ParamValueType;
+import pt.ist.fenixframework.dml.Role;
+import pt.ist.fenixframework.dml.Slot;
+import pt.ist.fenixframework.dml.Slot.Option;
+import pt.ist.fenixframework.dml.ValueType;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.data.AbstractBufferedItem;
 import pt.ist.vaadinframework.data.BufferedProperty;
@@ -60,16 +69,6 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.util.AbstractProperty;
-
-import dml.DomainClass;
-import dml.DomainEntity;
-import dml.DomainModel;
-import dml.EnumValueType;
-import dml.ParamValueType;
-import dml.Role;
-import dml.Slot;
-import dml.Slot.Option;
-import dml.ValueType;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)

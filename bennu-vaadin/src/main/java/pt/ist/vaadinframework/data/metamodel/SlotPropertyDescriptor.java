@@ -26,12 +26,11 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.lang.StringUtils;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
+import pt.ist.fenixframework.dml.Slot;
+import pt.ist.fenixframework.dml.Slot.Option;
 
 import com.vaadin.data.Property.ConversionException;
-
-import dml.Slot;
-import dml.Slot.Option;
 
 /**
  * Meta information over a DML slot. Read and write operations are supported
@@ -42,7 +41,7 @@ import dml.Slot.Option;
 public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implements PropertyDescriptor {
     private final boolean required;
 
-    SlotPropertyDescriptor(Slot slot, Class<? extends AbstractDomainObject> type) throws IntrospectionException {
+    SlotPropertyDescriptor(Slot slot, Class<? extends DomainObject> type) throws IntrospectionException {
         super(slot.getName(), type, "get" + StringUtils.capitalize(slot.getName()), "set"
                 + StringUtils.capitalize(slot.getName()));
         this.required = slot.getOptions().contains(Option.REQUIRED);
@@ -72,15 +71,15 @@ public class SlotPropertyDescriptor extends java.beans.PropertyDescriptor implem
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Class<? extends AbstractDomainObject> getPropertyType() {
-        return (Class<? extends AbstractDomainObject>) super.getPropertyType();
+    public Class<? extends DomainObject> getPropertyType() {
+        return (Class<? extends DomainObject>) super.getPropertyType();
     }
 
     /**
      * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getCollectionElementType()
      */
     @Override
-    public Class<? extends AbstractDomainObject> getCollectionElementType() {
+    public Class<? extends DomainObject> getCollectionElementType() {
         return null;
     }
 

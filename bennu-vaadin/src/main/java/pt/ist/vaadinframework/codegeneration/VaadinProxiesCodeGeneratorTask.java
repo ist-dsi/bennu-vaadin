@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
@@ -39,11 +38,9 @@ import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import pt.ist.fenixframework.FenixFrameworkPlugin;
-import pt.ist.fenixframework.pstm.DML;
-import pt.ist.fenixframework.pstm.dml.FenixDomainModel;
+import pt.ist.fenixframework.DomainModelParser;
+import pt.ist.fenixframework.dml.DomainModel;
 import pt.utl.ist.fenix.tools.util.MultiProperty;
-import antlr.ANTLRException;
 
 import com.sun.codemodel.JClassAlreadyExistsException;
 
@@ -133,14 +130,6 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
             // be injected, so they are sequential injected and before the
             // application DMLs
 
-            FenixFrameworkPlugin[] plugins = getPluginArray(properties);
-            if (plugins != null) {
-                for (FenixFrameworkPlugin plugin : plugins) {
-                    List<URL> pluginDomainModel = plugin.getDomainModel();
-                    domainModelURLs.addAll(pluginDomainModel);
-                }
-            }
-
             for (FileSet fileset : filesets) {
                 if (fileset.getDir().exists()) {
                     DirectoryScanner scanner = fileset.getDirectoryScanner(getProject());
@@ -158,7 +147,7 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
             }
 
             // first, get the domain model
-            FenixDomainModel model = DML.getDomainModelForURLs(FenixDomainModel.class, domainModelURLs, false);
+            DomainModel model = DomainModelParser.getDomainModel(domainModelURLs, false);
             VaadinProxiesCodeGenerator generator =
                     new VaadinProxiesCodeGenerator(model, srcBaseDir, vaadinSrcDir, packageSourceLocations);
             generator.generate();
@@ -169,8 +158,6 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
             // }
         } catch (IOException e) {
             throw new BuildException(e);
-        } catch (ANTLRException e) {
-            throw new BuildException(e);
         } catch (JClassAlreadyExistsException e) {
             throw new BuildException(e);
         }
@@ -178,28 +165,6 @@ public class VaadinProxiesCodeGeneratorTask extends Task {
         PeriodFormatter formatter =
                 new PeriodFormatterBuilder().appendMinutes().appendSuffix("m").appendSeconds().appendSuffix("s").toFormatter();
         System.out.println("Vaadin Generation Took: " + formatter.print(processingTime.toPeriod()));
-    }
-
-    private FenixFrameworkPlugin[] getPluginArray(Properties properties) {
-        String property = properties.getProperty("plugins");
-        if (StringUtils.isEmpty(property)) {
-            return new FenixFrameworkPlugin[0];
-        }
-        String[] classNames = property.split("\\s*,\\s*");
-
-        FenixFrameworkPlugin[] pluginArray = new FenixFrameworkPlugin[classNames.length];
-        for (int i = 0; i < classNames.length; i++) {
-            try {
-                pluginArray[i] = (FenixFrameworkPlugin) Class.forName(classNames[i].trim()).newInstance();
-            } catch (InstantiationException e) {
-                throw new Error(e);
-            } catch (IllegalAccessException e) {
-                throw new Error(e);
-            } catch (ClassNotFoundException e) {
-                throw new Error(e);
-            }
-        }
-        return pluginArray;
     }
 
 }

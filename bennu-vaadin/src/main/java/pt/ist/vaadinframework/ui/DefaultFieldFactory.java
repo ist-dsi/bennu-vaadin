@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.vaadinframework.data.AbstractBufferedContainer;
 import pt.ist.vaadinframework.data.validator.BigDecimalValidator;
 import pt.ist.vaadinframework.data.validator.ByteValidator;
@@ -88,7 +88,7 @@ public class DefaultFieldFactory extends AbstractFieldFactory {
             return new ContainerEditor<Object>(this, bundlename,
                     ((AbstractBufferedContainer<?, ?, ?>) item.getItemProperty(propertyId)).getElementType());
         }
-        if (AbstractDomainObject.class.isAssignableFrom(type)) {
+        if (DomainObject.class.isAssignableFrom(type)) {
             Select select = new Select();
             select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
             select.setImmediate(true);
