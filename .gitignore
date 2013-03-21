@@ -7,6 +7,8 @@
 
 .settings/
 .serviceAnnotationLog
+.actionAnnotationLog
+.embeddedAnnotationLog
 
 # Maven #
 target/
