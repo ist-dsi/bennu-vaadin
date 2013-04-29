@@ -5,6 +5,8 @@
 *.war
 *.ear
 
+.project
+.classpath
 .settings/
 .serviceAnnotationLog
 .actionAnnotationLog
