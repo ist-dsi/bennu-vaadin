@@ -1,10 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>bennu-project</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1.0-rc1</version>
     </parent>
 
     <artifactId>bennu-vaadin</artifactId>
@@ -13,11 +14,9 @@
     <name>Bennu Vaadin</name>
 
     <properties>
-        <version.pt.ist.bennu.core>1.1-SNAPSHOT</version.pt.ist.bennu.core>
-        <version.pt.ist.lucene.indexing.plugin>1.1-SNAPSHOT</version.pt.ist.lucene.indexing.plugin>
+        <version.pt.ist.bennu.core>1.1.0-rc1</version.pt.ist.bennu.core>
+        <version.pt.ist.lucene.indexing.plugin>1.1.0-rc1</version.pt.ist.lucene.indexing.plugin>
         <version.pt.ist.fenix.tools>1.0</version.pt.ist.fenix.tools>
-        <version.pt.ist.vaadin.embedded>1.1-SNAPSHOT</version.pt.ist.vaadin.embedded>
-        <version.pt.ist.vaadin.framework>1.1-SNAPSHOT</version.pt.ist.vaadin.framework>
         <version.org.apache.ant>1.8.2</version.org.apache.ant>
     </properties>
 
@@ -30,12 +29,12 @@
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>vaadin-framework</artifactId>
-            <version>${version.pt.ist.vaadin.framework}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>vaadin-embedded</artifactId>
-            <version>${version.pt.ist.vaadin.embedded}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.gwt</groupId>
