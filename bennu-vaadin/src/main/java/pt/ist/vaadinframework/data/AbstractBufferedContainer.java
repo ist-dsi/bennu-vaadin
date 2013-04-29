@@ -30,9 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import pt.ist.fenixWebFramework.services.Service;
-import pt.ist.fenixWebFramework.services.ServiceManager;
-import pt.ist.fenixWebFramework.services.ServicePredicate;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.vaadinframework.data.util.ServiceUtils;
 
 import com.vaadin.data.BufferedValidatable;
@@ -89,25 +87,21 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
             fireItemSetChange();
         }
 
+        @Atomic
         @Override
         public void commit() throws SourceException, InvalidValueException {
-            ServiceManager.execute(new ServicePredicate() {
-                @Override
-                public void execute() {
-                    try {
-                        for (Object itemId : getAllItemIds()) {
-                            if (indexPropertyId != null) {
-                                getContainerProperty(itemId, indexPropertyId).setValue(indexOfId(itemId));
-                            }
-                            getItem(itemId).commit();
-                        }
-                        ContainerPropertyWrapper.super.commit();
-                    } catch (Throwable e) {
-                        ServiceUtils.handleException(e);
-                        throw new SourceException(AbstractBufferedContainer.this, e);
+            try {
+                for (Object itemId : getAllItemIds()) {
+                    if (indexPropertyId != null) {
+                        getContainerProperty(itemId, indexPropertyId).setValue(indexOfId(itemId));
                     }
+                    getItem(itemId).commit();
                 }
-            });
+                ContainerPropertyWrapper.super.commit();
+            } catch (Throwable e) {
+                ServiceUtils.handleException(e);
+                throw new SourceException(AbstractBufferedContainer.this, e);
+            }
         }
 
         @Override
@@ -372,7 +366,7 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
 
     protected abstract ItemType makeItem(Class<? extends ItemId> type);
 
-    @Service
+    @Atomic
     public void addItemBatch(Collection<ItemId> itemIds) {
         for (ItemId itemId : itemIds) {
             addItem(itemId);
@@ -561,25 +555,21 @@ public abstract class AbstractBufferedContainer<ItemId, Id, ItemType extends Abs
         value.removeListener(listener);
     }
 
+    @Atomic
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        ServiceManager.execute(new ServicePredicate() {
-            @Override
-            public void execute() {
-                try {
-                    for (Object itemId : getAllItemIds()) {
-                        if (indexPropertyId != null) {
-                            getContainerProperty(itemId, indexPropertyId).setValue(indexOfId(itemId));
-                        }
-                        getItem(itemId).commit();
-                    }
-                    value.commit();
-                } catch (Throwable e) {
-                    ServiceUtils.handleException(e);
-                    throw new SourceException(AbstractBufferedContainer.this, e);
+        try {
+            for (Object itemId : getAllItemIds()) {
+                if (indexPropertyId != null) {
+                    getContainerProperty(itemId, indexPropertyId).setValue(indexOfId(itemId));
                 }
+                getItem(itemId).commit();
             }
-        });
+            value.commit();
+        } catch (Throwable e) {
+            ServiceUtils.handleException(e);
+            throw new SourceException(AbstractBufferedContainer.this, e);
+        }
     }
 
     @Override

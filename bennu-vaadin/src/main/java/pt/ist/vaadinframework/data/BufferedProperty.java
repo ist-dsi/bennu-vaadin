@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import pt.ist.fenixWebFramework.services.ServiceManager;
-import pt.ist.fenixWebFramework.services.ServicePredicate;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.vaadinframework.data.util.ServiceUtils;
 
 import com.vaadin.data.BufferedValidatable;
@@ -132,25 +131,21 @@ public class BufferedProperty<Type> extends AbstractHintedProperty<Type> impleme
     /**
      * @see com.vaadin.data.Buffered#commit()
      */
+    @Atomic
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        ServiceManager.execute(new ServicePredicate() {
-            @Override
-            public void execute() {
-                try {
-                    if (!isInvalidCommitted() && !isValid()) {
-                        validate();
-                    }
-                    if (isModified()) {
-                        wrapped.setValue(cache);
-                    }
-                    modified = false;
-                } catch (Throwable e) {
-                    ServiceUtils.handleException(e);
-                    throw new SourceException(BufferedProperty.this, e);
-                }
+        try {
+            if (!isInvalidCommitted() && !isValid()) {
+                validate();
             }
-        });
+            if (isModified()) {
+                wrapped.setValue(cache);
+            }
+            modified = false;
+        } catch (Throwable e) {
+            ServiceUtils.handleException(e);
+            throw new SourceException(BufferedProperty.this, e);
+        }
     }
 
     /**

@@ -22,15 +22,7 @@
 package pt.ist.vaadinframework.ui;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-
-import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
-import pt.ist.fenixframework.pstm.PersistentRoot;
-import dml.DomainClass;
-import dml.DomainModel;
-import dml.Role;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
@@ -38,24 +30,24 @@ import dml.Role;
  */
 public class SelectOptionProvider {
     public static Set<?> provideFor(Class<?> type) {
-        DomainModel model = FenixFramework.getDomainModel();
-        DomainClass domainClass = model.findClass(type.getName());
-        Set<String> roots = getRoots();
-        for (Role role : domainClass.getRoleSlotsList()) {
-            if (roots.contains(role.getOtherRole().getType().getFullName())) {
-
-            }
-        }
+//        DomainModel model = FenixFramework.getDomainModel();
+//        DomainClass domainClass = model.findClass(type.getName());
+//        Set<String> roots = getRoots();
+//        for (Role role : domainClass.getRoleSlotsList()) {
+//            if (roots.contains(role.getOtherRole().getType().getFullName())) {
+//
+//            }
+//        }
         return Collections.emptySet();
     }
 
-    private static Set<String> getRoots() {
-        Set<String> roots = new HashSet<String>();
-        PersistentRoot root = AbstractDomainObject.fromOID(1L);
-        while (root != null) {
-            roots.add(root.getRootObject().getClass().getName());
-            root = root.hasNext() ? root.getNext() : null;
-        }
-        return roots;
-    }
+//    private static Set<String> getRoots() {
+//        Set<String> roots = new HashSet<String>();
+//        PersistentRoot root = AbstractDomainObject.fromOID(1L);
+//        while (root != null) {
+//            roots.add(root.getRootObject().getClass().getName());
+//            root = root.hasNext() ? root.getNext() : null;
+//        }
+//        return roots;
+//    }
 }

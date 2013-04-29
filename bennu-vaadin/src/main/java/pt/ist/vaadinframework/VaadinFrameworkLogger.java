@@ -21,7 +21,8 @@
  */
 package pt.ist.vaadinframework;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Log4j logger for vaadin-framework
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
  * @version 1.0
  */
 public class VaadinFrameworkLogger {
-    protected static final Logger LOGGER = Logger.getLogger("pt.ist.vaadinframework");
+    protected static final Logger LOGGER = LoggerFactory.getLogger("pt.ist.vaadinframework");
 
     private VaadinFrameworkLogger() {
     }

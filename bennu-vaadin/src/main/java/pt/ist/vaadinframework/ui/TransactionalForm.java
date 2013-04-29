@@ -23,7 +23,7 @@ package pt.ist.vaadinframework.ui;
 
 import java.util.Collection;
 
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.vaadinframework.VaadinResourceConstants;
 import pt.ist.vaadinframework.VaadinResources;
 import pt.ist.vaadinframework.data.util.ServiceUtils;
@@ -177,7 +177,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     }
 
     @Override
-    @Service
+    @Atomic
     public void commit() throws SourceException, InvalidValueException {
         try {
             super.commit();
@@ -194,7 +194,7 @@ public class TransactionalForm extends Form implements VaadinResourceConstants {
     }
 
     @Override
-    @Service
+    @Atomic
     public void discard() throws SourceException {
         try {
             // if (getItemDataSource() instanceof Buffered) {

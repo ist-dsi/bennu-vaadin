@@ -23,7 +23,7 @@ package pt.ist.vaadinframework.data.metamodel;
 
 import java.io.Serializable;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
 
 import com.vaadin.data.Property.ConversionException;
 
@@ -34,9 +34,9 @@ import com.vaadin.data.Property.ConversionException;
 public interface PropertyDescriptor extends Serializable {
     public String getPropertyId();
 
-    public Class<? extends AbstractDomainObject> getPropertyType();
+    public Class<? extends DomainObject> getPropertyType();
 
-    public Class<? extends AbstractDomainObject> getCollectionElementType();
+    public Class<? extends DomainObject> getCollectionElementType();
 
     public boolean isCollection();
 

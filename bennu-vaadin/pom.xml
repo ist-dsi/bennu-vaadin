@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>pt.ist</groupId>
 		<artifactId>bennu-project</artifactId>
-		<version>1.0.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bennu-vaadin</artifactId>
@@ -13,11 +13,12 @@
 	<name>Bennu Vaadin</name>
 
 	<properties>
-		<version.pt.ist.bennu.core>1.0.0</version.pt.ist.bennu.core>
-		<version.pt.ist.lucene.indexing.plugin>1.0.0</version.pt.ist.lucene.indexing.plugin>
+		<version.pt.ist.bennu.core>1.1-SNAPSHOT</version.pt.ist.bennu.core>
+		<version.pt.ist.lucene.indexing.plugin>1.1-SNAPSHOT</version.pt.ist.lucene.indexing.plugin>
 		<version.pt.ist.fenix.tools>1.0</version.pt.ist.fenix.tools>
 		<version.pt.ist.vaadin.embedded>1.1-SNAPSHOT</version.pt.ist.vaadin.embedded>
 		<version.pt.ist.vaadin.framework>1.1-SNAPSHOT</version.pt.ist.vaadin.framework>
+		<version.org.apache.ant>1.8.2</version.org.apache.ant>
 	</properties>
 
 	<dependencies>
@@ -53,6 +54,11 @@
 			<groupId>pt.ist</groupId>
 			<artifactId>fenix-tools</artifactId>
 			<version>${version.pt.ist.fenix.tools}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>${version.org.apache.ant}</version>
 		</dependency>
 	</dependencies>
 	<repositories>

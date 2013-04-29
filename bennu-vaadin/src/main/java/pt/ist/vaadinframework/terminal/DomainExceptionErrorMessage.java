@@ -1,6 +1,6 @@
 package pt.ist.vaadinframework.terminal;
 
-import pt.ist.fenixframework.FFDomainException;
+import pt.ist.bennu.core.domain.exceptions.DomainException;
 
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Buffered.SourceException;
@@ -9,7 +9,7 @@ import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 
 public class DomainExceptionErrorMessage extends SourceException {
-    public DomainExceptionErrorMessage(Buffered source, FFDomainException cause) {
+    public DomainExceptionErrorMessage(Buffered source, DomainException cause) {
         super(source, cause);
     }
 
