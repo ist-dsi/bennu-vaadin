@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import jvstm.VBox;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
 
 import com.vaadin.data.util.AbstractProperty;
@@ -51,7 +51,7 @@ public class VBoxProperty extends AbstractProperty implements HintedProperty {
         this.hints = new ArrayList<Hint>(Arrays.asList(hints));
     }
 
-    @Service
+    @Atomic
     private void writeVBox(Object instance) {
         this.instance = new VBox<Object>(instance);
     }

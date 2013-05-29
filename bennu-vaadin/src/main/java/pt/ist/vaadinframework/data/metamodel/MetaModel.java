@@ -31,20 +31,20 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.dml.DomainClass;
+import pt.ist.fenixframework.dml.Role;
+import pt.ist.fenixframework.dml.Slot;
 import pt.ist.vaadinframework.VaadinFrameworkLogger;
-import dml.DomainClass;
-import dml.Role;
-import dml.Slot;
 
 /**
  * @author Pedro Santos (pedro.miguel.santos@ist.utl.pt)
  * 
  */
 public class MetaModel implements Serializable {
-    private static final Map<Class<? extends AbstractDomainObject>, MetaModel> modelCache =
-            new HashMap<Class<? extends AbstractDomainObject>, MetaModel>();
+    private static final Map<Class<? extends DomainObject>, MetaModel> modelCache =
+            new HashMap<Class<? extends DomainObject>, MetaModel>();
 
     private final Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
 
@@ -52,7 +52,7 @@ public class MetaModel implements Serializable {
      * @param type
      */
 
-    private Method getSetMethod(Class<? extends AbstractDomainObject> type, String fieldName, Class<?> paramType) {
+    private Method getSetMethod(Class<? extends DomainObject> type, String fieldName, Class<?> paramType) {
         try {
             final String setterName = "set" + StringUtils.capitalize(fieldName);
             final Method setMethod = type.getDeclaredMethod(setterName, paramType);
@@ -63,7 +63,7 @@ public class MetaModel implements Serializable {
         return null;
     }
 
-    private MetaModel(Class<? extends AbstractDomainObject> type) {
+    private MetaModel(Class<? extends DomainObject> type) {
         for (DomainClass clazz = FenixFramework.getDomainModel().findClass(type.getName()); clazz != null; clazz =
                 (DomainClass) clazz.getSuperclass()) {
             for (Slot slot : clazz.getSlotsList()) {
@@ -158,7 +158,7 @@ public class MetaModel implements Serializable {
         return Collections.unmodifiableCollection(descriptors.keySet());
     }
 
-    public static MetaModel findMetaModelForType(Class<? extends AbstractDomainObject> type) {
+    public static MetaModel findMetaModelForType(Class<? extends DomainObject> type) {
         if (!modelCache.containsKey(type)) {
             modelCache.put(type, new MetaModel(type));
         }

@@ -21,10 +21,9 @@
  */
 package pt.ist.vaadinframework.data.util;
 
-import jvstm.CommitException;
 import jvstm.cps.ConsistencyException;
-import pt.ist.fenixframework.pstm.AbstractDomainObject.UnableToDetermineIdException;
-import pt.ist.fenixframework.pstm.IllegalWriteException;
+import pt.ist.fenixframework.core.TransactionError;
+import pt.ist.fenixframework.core.WriteOnReadError;
 
 import com.vaadin.data.Buffered;
 
@@ -36,14 +35,12 @@ public class ServiceUtils {
     public static void handleException(Throwable throwable) {
         // This is a little hackish but is somewhat forced by the
         // combination of architectures of both vaadin and the jvstm
-        if (throwable instanceof IllegalWriteException) {
-            throw (IllegalWriteException) throwable;
+        if (throwable instanceof WriteOnReadError) {
+            throw (WriteOnReadError) throwable;
         } else if (throwable instanceof ConsistencyException) {
             throw (ConsistencyException) throwable;
-        } else if (throwable instanceof UnableToDetermineIdException) {
-            throw (UnableToDetermineIdException) throwable;
-        } else if (throwable instanceof CommitException) {
-            throw (CommitException) throwable;
+        } else if (throwable instanceof TransactionError) {
+            throw (TransactionError) throwable;
         } else if (throwable instanceof Buffered.SourceException) {
             for (Throwable cause : ((Buffered.SourceException) throwable).getCauses()) {
                 handleException(cause);

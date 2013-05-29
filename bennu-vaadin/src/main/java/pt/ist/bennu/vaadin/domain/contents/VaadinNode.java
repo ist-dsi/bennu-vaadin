@@ -27,7 +27,7 @@ package pt.ist.bennu.vaadin.domain.contents;
 import pt.ist.bennu.core.domain.VirtualHost;
 import pt.ist.bennu.core.domain.contents.Node;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 
 /**
  * 
@@ -57,13 +57,13 @@ public class VaadinNode extends VaadinNode_Base {
         setArgument(argument);
     }
 
-    @Service
+    @Atomic
     public static VaadinNode createVaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
             final String linkKey, final String argument, final PersistentGroup accessibilityGroup) {
         return new VaadinNode(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup);
     }
 
-    @Service
+    @Atomic
     public static VaadinNode createVaadinNode(final VirtualHost virtualHost, final Node parentNode, final String linkBundle,
             final String linkKey, final String argument, final PersistentGroup accessibilityGroup, boolean useBennuLayout) {
         return new VaadinNode(virtualHost, parentNode, linkBundle, linkKey, argument, accessibilityGroup, useBennuLayout);

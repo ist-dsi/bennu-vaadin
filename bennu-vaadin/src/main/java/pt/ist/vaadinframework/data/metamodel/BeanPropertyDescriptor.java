@@ -25,7 +25,7 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import pt.ist.fenixframework.pstm.AbstractDomainObject;
+import pt.ist.fenixframework.DomainObject;
 
 import com.vaadin.data.Property.ConversionException;
 
@@ -64,15 +64,15 @@ public class BeanPropertyDescriptor extends java.beans.PropertyDescriptor implem
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Class<? extends AbstractDomainObject> getPropertyType() {
-        return (Class<? extends AbstractDomainObject>) super.getPropertyType();
+    public Class<? extends DomainObject> getPropertyType() {
+        return (Class<? extends DomainObject>) super.getPropertyType();
     }
 
     /**
      * @see pt.ist.vaadinframework.data.metamodel.PropertyDescriptor#getCollectionElementType()
      */
     @Override
-    public Class<? extends AbstractDomainObject> getCollectionElementType() {
+    public Class<? extends DomainObject> getCollectionElementType() {
         return null;
     }
 

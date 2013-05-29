@@ -32,8 +32,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.lang.StringUtils;
 
-import pt.ist.fenixWebFramework.services.ServiceManager;
-import pt.ist.fenixWebFramework.services.ServicePredicate;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.vaadinframework.data.util.ServiceUtils;
 
 import com.vaadin.data.Buffered;
@@ -156,37 +155,33 @@ public abstract class AbstractBufferedItem<Id, Type> extends BufferedProperty<Ty
      */
     protected abstract Property makeProperty(Id propertyId);
 
+    @Atomic
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        ServiceManager.execute(new ServicePredicate() {
-            @Override
-            public void execute() {
-                try {
-                    if (!isInvalidCommitted() && !isValid()) {
-                        validate();
-                    }
-                    if (cache == null) {
-                        construct(true);
-                        fireValueChange();
-                    } else {
-                        applyWriter();
-                    }
-                    for (Id propertyId : getItemPropertyIds()) {
-                        if (getItemProperty(propertyId) instanceof Buffered) {
-                            ((Buffered) getItemProperty(propertyId)).commit();
-                        }
-                    }
-                    if (isModified()) {
-                        wrapped.setValue(cache);
-                    }
-                    discard();
-                    modified = false;
-                } catch (Throwable e) {
-                    ServiceUtils.handleException(e);
-                    throw new SourceException(AbstractBufferedItem.this, e);
+        try {
+            if (!isInvalidCommitted() && !isValid()) {
+                validate();
+            }
+            if (cache == null) {
+                construct(true);
+                fireValueChange();
+            } else {
+                applyWriter();
+            }
+            for (Id propertyId : getItemPropertyIds()) {
+                if (getItemProperty(propertyId) instanceof Buffered) {
+                    ((Buffered) getItemProperty(propertyId)).commit();
                 }
             }
-        });
+            if (isModified()) {
+                wrapped.setValue(cache);
+            }
+            discard();
+            modified = false;
+        } catch (Throwable e) {
+            ServiceUtils.handleException(e);
+            throw new SourceException(AbstractBufferedItem.this, e);
+        }
     }
 
     private void construct(boolean taint) {

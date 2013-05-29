@@ -5,8 +5,12 @@
 *.war
 *.ear
 
+.project
+.classpath
 .settings/
 .serviceAnnotationLog
+.actionAnnotationLog
+.embeddedAnnotationLog
 
 # Maven #
 target/

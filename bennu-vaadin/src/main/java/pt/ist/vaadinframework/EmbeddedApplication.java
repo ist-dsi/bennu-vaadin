@@ -36,9 +36,9 @@ import org.joda.time.DateTime;
 import pt.ist.bennu.core.applicationTier.Authenticate.UserView;
 import pt.ist.bennu.core.domain.VirtualHost;
 import pt.ist.bennu.core.domain.contents.Node;
+import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.vaadin.domain.contents.VaadinNode;
 import pt.ist.fenixWebFramework.servlets.filters.SetUserViewFilter;
-import pt.ist.fenixframework.FFDomainException;
 import pt.ist.vaadinframework.annotation.EmbeddedComponentUtils;
 import pt.ist.vaadinframework.fragment.FragmentQuery;
 import pt.ist.vaadinframework.terminal.DefaultSystemErrorWindow;
@@ -335,7 +335,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
             return;
         }
 
-        FFDomainException de = findDomainExceptionCause(t);
+        DomainException de = findDomainExceptionCause(t);
         Buffered source = findSource(t);
         if (de != null && source != null) {
             setErrorsOn(source, de);
@@ -356,9 +356,9 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
         return null;
     }
 
-    private FFDomainException findDomainExceptionCause(Throwable t) {
-        if (t instanceof FFDomainException) {
-            return (FFDomainException) t;
+    private DomainException findDomainExceptionCause(Throwable t) {
+        if (t instanceof DomainException) {
+            return (DomainException) t;
         }
         if (t.getCause() != null) {
             return findDomainExceptionCause(t.getCause());
@@ -376,7 +376,7 @@ public class EmbeddedApplication extends Application implements VaadinResourceCo
         return null;
     }
 
-    private static void setErrorsOn(Buffered source, FFDomainException message) {
+    private static void setErrorsOn(Buffered source, DomainException message) {
         DomainExceptionErrorMessage se = null;
         if (message != null) {
             se = new DomainExceptionErrorMessage(source, message);
